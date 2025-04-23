@@ -1,42 +1,71 @@
 <script setup>
-import { reactive } from "vue";
+import { reactive, onMounted, watch } from 'vue'
+import { useRoute } from 'vue-router'
+import { useFlightStore } from '@/stores/useFlight'
+import { url } from '@/plugins/baseUrl'
 
-const seats = reactive([
-  { id: 1, class: "seat-1", selected: false, booked: false },
-  { id: 2, class: "seat-2", selected: false, booked: false },
-  { id: 3, class: "seat-3", selected: false, booked: true },
-  { id: 4, class: "seat-4", selected: false, booked: false },
-  { id: 5, class: "seat-5", selected: false, booked: true },
-  { id: 6, class: "seat-6", selected: false, booked: false },
-  { id: 7, class: "seat-7", selected: false, booked: false },
-]);
+const route = useRoute()
+const flightStore = useFlightStore()
 
+const flightId = route.params.id
+const seats = reactive([])
+
+const fetchSeats = async () => {
+  await flightStore.flightSeat(`${url}/flights/${flightId}/seats`)
+  seats.splice(0, seats.length)
+  const apiSeats = flightStore.seats?.seats || []
+
+  apiSeats.slice(0, 7).forEach((seat, index) => {
+    seats.push({
+      ...seat,
+      class: `seat-${index + 1}`,
+      selected: false,
+      booked: seat.is_booked === 1
+    })
+  })
+}
+
+fetchSeats()
+
+// Watch route param changes
+watch(() => route.params.id, () => {
+  fetchSeats()
+})
+
+// Toggle Seat Logic
 const toggleSeat = (id) => {
-  const seat = seats.find((s) => s.id === id);
+  const seat = seats.find((s) => s.id === id)
   if (seat && !seat.booked) {
-    seat.selected = !seat.selected;
+    seat.selected = !seat.selected
   }
-};
+}
 </script>
 
 <template>
   <div class="seat-container">
     <v-btn
-      v-for="seat in seats"
-      :key="seat.id"
-      :class="[seat.class, { selected: seat.selected, booked: seat.booked }]"
-      class="seat-item"
-      :disabled="seat.booked"
-      @click="toggleSeat(seat.id)"
-      density="compact"
-      variant="tonal"
-    >
-      <span
-        v-if="seat.booked"
-        class="booked-text text-caption text-white font-weight-medium"
-        >BOKAD</span
-      >
-    </v-btn>
+  v-for="seat in seats"
+  :key="seat.id"
+  :class="[seat.class, { selected: seat.selected, booked: seat.booked }]"
+  class="seat-item"
+  :disabled="seat.booked"
+  @click="toggleSeat(seat.id)"
+  density="compact"
+  variant="tonal"
+>
+  <span
+    v-if="seat.booked"
+    class="booked-text text-caption text-white font-weight-medium"
+  >
+    BOKAD
+  </span>
+  <span
+    v-else
+    class="text-caption font-weight-medium"
+  >
+    {{ seat.seat_number }}
+  </span>
+</v-btn>
   </div>
 
   <div class="seat-overview mt-16">

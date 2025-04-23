@@ -1,47 +1,66 @@
 <script setup>
-import { ref, computed } from 'vue'
-import { useFlightStore } from '@/stores/useFlight'
-import SubHeader from '@/components/subPages/SubHeader.vue'
+import { ref, computed } from "vue";
+import { useFlightStore } from "@/stores/useFlight";
+import SubHeader from "@/components/subPages/SubHeader.vue";
+import { useRouter } from "vue-router";
 
-const flightStore = useFlightStore()
+const flightStore = useFlightStore();
+const router = useRouter();
 
 // Get today's date
-const today = new Date()
+const today = new Date();
 
-const currentMonth = today.getMonth() + 1
-const selectedMonth = ref(currentMonth)
+const currentMonth = today.getMonth() + 1;
+const selectedMonth = ref(currentMonth);
 
 const filteredFlights = computed(() => {
-  return flightStore.flightList.outbound.filter(flight => {
-    const flightDate = new Date(flight.departure_date)
-    const flightMonth = flightDate.getMonth() + 1
+  const flightList = flightStore.flightList;
+  if (!flightList || !flightList.outbound) return [];
 
-    return (
-      flightMonth === selectedMonth.value &&
-      flightDate >= today
-    )
-  })
-})
+  return flightList.outbound.filter((flight) => {
+    const flightDate = new Date(flight.departure_date);
+    const flightMonth = flightDate.getMonth() + 1;
+
+    return flightMonth === selectedMonth.value && flightDate >= today;
+  });
+});
 
 const monthNames = [
-  'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
-  'Jul', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'
-]
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sept",
+  "Oct",
+  "Nov",
+  "Dec",
+];
 
 const months = computed(() => {
-  const current = today.getMonth()
+  const current = today.getMonth();
   return monthNames.slice(current).map((name, index) => ({
     label: name,
-    value: current + index + 1
-  }))
-})
+    value: current + index + 1,
+  }));
+});
+
+// const seatBook = ()=>{
+//   router.push({ path: `seat/${}` });
+// }
 </script>
 
 <template>
   <div class="subpage-container">
     <v-row no-gutters>
       <v-col cols="12" lg="4" md="12">
-        <div class="subpage-left" style="background-image: url('/images/subPage/departure.svg')">
+        <div
+          class="subpage-left"
+          style="background-image: url('/images/subPage/departure.svg')"
+        >
           <router-link to="/">
             <div class="logo">
               <v-img src="/images/logo/logo.png" max-width="130"></v-img>
@@ -56,25 +75,41 @@ const months = computed(() => {
       </v-col>
       <v-col cols="12" lg="8" md="12">
         <div class="subpage-content">
-          <SubHeader  />
+          <SubHeader />
           <v-container>
             <h2 class="text-black font-weight-regular text-h3 mt-10">
               Departure
             </h2>
             <div class="d-flex gap-4 mt-6">
-              <span v-for="month in months" :key="month.value"
-                class="cursor-pointer text-subtitle font-weight-regular px-3 py-1 border-b-2" :class="{
-                  'border-primary text-primary font-weight-bold': selectedMonth === month.value,
-                  'border-transparent text-gray-600': selectedMonth !== month.value
-                }" @click="selectedMonth = month.value">
+              <span
+                v-for="month in months"
+                :key="month.value"
+                class="cursor-pointer text-subtitle font-weight-regular px-3 py-1 border-b-2"
+                :class="{
+                  'border-primary text-primary font-weight-bold':
+                    selectedMonth === month.value,
+                  'border-transparent text-gray-600':
+                    selectedMonth !== month.value,
+                }"
+                @click="selectedMonth = month.value"
+              >
                 {{ month.label }}
               </span>
             </div>
 
             <div class="departure-content mt-8">
-              <DepartureItem v-for="(item, index) in filteredFlights" :key="item.id" :item="item" />
+              <router-link
+                :to="`/seat/${item.id}`"
+                v-for="item in filteredFlights"
+                :key="item.id"
+              >
+                <DepartureItem :item="item" />
+              </router-link>
             </div>
-            <div v-if="filteredFlights.length === 0" class="mt-20 text-center font-weight-bold text-grey mt-6 text-h6">
+            <div
+              v-if="filteredFlights.length === 0"
+              class="mt-20 text-center font-weight-bold text-grey mt-6 text-h6"
+            >
               No Flights available for this month
             </div>
           </v-container>

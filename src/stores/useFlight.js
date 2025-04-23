@@ -14,7 +14,14 @@ export const useFlightStore = defineStore("useFlight", () => {
     execute: searchFlightExecute,
     data: flightList,
     isLoading: searchLoading,
-  } = useAxios("", "GET");
+  } = useAxios("", "GET" , { immediate: false });
+
+
+  const {
+    execute: flightSeat,
+    data: seats,
+    isLoading: seatLoading,
+  } = useAxios("", "GET", { immediate: false });
 
   return {
     executeOrigin,
@@ -23,5 +30,8 @@ export const useFlightStore = defineStore("useFlight", () => {
     searchFlightExecute,
     flightList,
     searchLoading,
+    flightSeat,
+    seats,
+    seatLoading,
   };
 });

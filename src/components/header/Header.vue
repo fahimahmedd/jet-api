@@ -11,7 +11,6 @@ const { originData } = storeToRefs(flightStore);
 const originList = computed(() => originData.value);
 const destinationList = computed(() => destinationData.value);
 
-const route = useRoute();
 const router = useRouter();
 
 const originPlaceholder = ref({
@@ -30,14 +29,13 @@ const {
 watch(originPlaceholder, (newVal) => {
   if (newVal) {
     executeDestination(`${url}/airport-routes/${newVal.id}`);
-
   }
 });
 
 watch(destinationData, (newVal) => {
   if (Array.isArray(newVal)) {
     if (newVal.length === 1) {
-      destinationPlaceholder.value = newVal[0]; // Auto-select if only one
+      destinationPlaceholder.value = newVal[0]; 
     } else {
       destinationPlaceholder.value = {
         city: "Destination",
