@@ -112,9 +112,10 @@ async function searchFlight() {
       isRoundTrip ? "twoway" : "oneway"
     }`
   );
-  // console.log(flightStore.flightList);
-  // router.push({ path: "departure" });
+  console.log(flightStore.flightList);
+  router.push({ path: "departure" });
 }
+
 </script>
 
 <template>
