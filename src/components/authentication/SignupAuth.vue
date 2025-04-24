@@ -1,11 +1,48 @@
 <script setup>
+import { useAuthStore } from "@/stores/useAuth";
+import { useRoute, useRouter } from "vue-router";
+
+
+const router = useRouter();
+const useAuth = useAuthStore();
+const name = ref();
+const email = ref();
+const password = ref();
+const confirm_password = ref();
+const showError = ref("");
+
+
+const register = async () => {
+  showError.value = "hello"; 
+
+  const res = await useAuth.executeRegister({
+    data: {
+      name: name.value,
+      email: email.value,
+      password: password.value,
+      password_confirmation: confirm_password.value,
+    },
+  });
+
+  try {
+    if (res.response.value.status === 201) {
+       router.push("signin");
+    }else{
+      showError.value = res.response.value.data?.message || "Registration failed";
+    }
+  } catch (error) {
+    showError.value = error.response?.data?.message || "An unexpected error occurred";
+  }
+};
+
+
 
 const rules = {
   email: (v) => {
     const pattern = /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     return pattern.test(v) || "Invalid e-mail";
   },
-  min: (v) => (v || "").length >= 6 || "Min 6 characters",
+  min: (v) => (v || "").length >= 6 || "Min 8 characters",
 };
 </script>
 
@@ -18,18 +55,21 @@ const rules = {
       Create a <strong>new</strong> account
     </h3>
 
-    <div class="auth-content mt-16">
+    <div class="auth-content mt-10">
       <v-text-field
+        v-model="name"
         prepend-inner-icon="mdi-account"
         placeholder="Your Name"
       ></v-text-field>
       <v-text-field
+        v-model="email"
         prepend-inner-icon="mdi-email"
         class="mt-1"
         placeholder="E-mail"
         :rules="[rules.email]"
       ></v-text-field>
       <v-text-field
+        v-model="password"
         type="password"
         :rules="[rules.min]"
         prepend-inner-icon="mdi-lock"
@@ -37,6 +77,7 @@ const rules = {
         placeholder="Password"
       ></v-text-field>
       <v-text-field
+        v-model="confirm_password"
         type="password"
         :rules="[rules.min]"
         prepend-inner-icon="mdi-lock"
@@ -48,12 +89,14 @@ const rules = {
         class="text-medium-emphasis text-center text-caption"
       >
         {{ showError }}
+        hmm
       </v-card-text> -->
       <v-btn
         color="black"
         class="mt-5"
         size="large"
         block
+        @click="register"
       >
         SIGN UP
       </v-btn>

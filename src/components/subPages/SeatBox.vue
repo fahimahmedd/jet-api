@@ -15,7 +15,7 @@ const fetchSeats = async () => {
   seats.splice(0, seats.length)
   const apiSeats = flightStore.seats?.seats || []
 
-  apiSeats.slice(0, 7).forEach((seat, index) => {
+  apiSeats.forEach((seat, index) => {
     seats.push({
       ...seat,
       class: `seat-${index + 1}`,
@@ -43,29 +43,15 @@ const toggleSeat = (id) => {
 
 <template>
   <div class="seat-container">
-    <v-btn
-  v-for="seat in seats"
-  :key="seat.id"
-  :class="[seat.class, { selected: seat.selected, booked: seat.booked }]"
-  class="seat-item"
-  :disabled="seat.booked"
-  @click="toggleSeat(seat.id)"
-  density="compact"
-  variant="tonal"
->
-  <span
-    v-if="seat.booked"
-    class="booked-text text-caption text-white font-weight-medium"
-  >
-    BOKAD
-  </span>
-  <span
-    v-else
-    class="text-caption font-weight-medium"
-  >
-    {{ seat.seat_number }}
-  </span>
-</v-btn>
+    <v-btn v-for="seat in seats" :key="seat.id" :class="[seat.class, { selected: seat.selected, booked: seat.booked }]"
+      class="seat-item" :disabled="seat.booked" @click="toggleSeat(seat.id)" density="compact" variant="tonal">
+      <span v-if="seat.booked" class="booked-text text-caption text-white font-weight-medium">
+        BOKAD
+      </span>
+      <span v-else class="text-caption font-weight-medium">
+        <!-- {{ seat.seat_number }} -->
+      </span>
+    </v-btn>
   </div>
 
   <div class="seat-overview mt-16">
@@ -81,23 +67,12 @@ const toggleSeat = (id) => {
   <div class="seat-footer d-flex justify-space-between mt-16">
     <div class="d-flex ga-4 align-center">
       <div>
-        <v-img
-          src="/public/images/seat/seat.png"
-          height="22"
-          width="22"
-        ></v-img>
+        <v-img src="/public/images/seat/seat.png" height="22" width="22"></v-img>
       </div>
       <span>Seating <strong>3L</strong> </span>
     </div>
     <router-link to="/trip">
-      <v-btn
-        size="x-large"
-        density="comfortable"
-        variant="tonal"
-        max-width="260"
-        rounded
-        >1/2</v-btn
-      >
+      <v-btn size="x-large" density="comfortable" variant="tonal" max-width="260" rounded>1/2</v-btn>
     </router-link>
   </div>
 </template>
@@ -125,6 +100,7 @@ const toggleSeat = (id) => {
   position: relative;
   z-index: 1;
 }
+
 .seat-item {
   height: 40px !important;
   width: 50px;
@@ -141,31 +117,37 @@ const toggleSeat = (id) => {
   top: 25px;
   left: 185px;
 }
+
 .seat-2 {
   background-image: url(/public/images/seat/seat-2.png);
   top: 25px;
   left: 280px;
 }
+
 .seat-3 {
   background-image: url(/public/images/seat/seat-3.png);
   top: 25px;
   left: 390px;
 }
+
 .seat-4 {
   background-image: url(/public/images/seat/seat-4.png);
   top: 25px;
   right: 260px;
 }
+
 .seat-5 {
   background-image: url(/public/images/seat/seat-5.png);
   bottom: 27px;
   left: 280px;
 }
+
 .seat-6 {
   background-image: url(/public/images/seat/seat-6.png);
   bottom: 27px;
   left: 390px;
 }
+
 .seat-7 {
   background-image: url(/public/images/seat/seat-7.png);
   bottom: 27px;
@@ -183,15 +165,18 @@ const toggleSeat = (id) => {
   pointer-events: none;
   opacity: 0.8;
 }
+
 .booked .booked-text {
   position: relative;
   z-index: 111;
 }
+
 .seat-overview {
   display: flex;
   align-items: center;
   gap: 60px;
 }
+
 .seat-shape {
   height: 20px;
   width: 25px;
@@ -200,9 +185,11 @@ const toggleSeat = (id) => {
   border-bottom-left-radius: 6px;
   border-bottom-right-radius: 2px;
 }
+
 .booked-seat {
   background-color: #b9b9b9;
 }
+
 .choosen-seat {
   background-color: #358b38fd;
 }
@@ -217,30 +204,37 @@ const toggleSeat = (id) => {
     top: 20px;
     left: 162px;
   }
+
   .seat-2 {
     top: 20px;
     left: 245px;
   }
+
   .seat-3 {
     top: 20px;
     left: 350px;
   }
+
   .seat-4 {
     top: 20px;
     right: 230px;
   }
+
   .seat-5 {
     bottom: 22px;
     left: 250px;
   }
+
   .seat-6 {
     bottom: 22px;
     left: 345px;
   }
+
   .seat-7 {
     bottom: 22px;
     right: 230px;
   }
+
   .seat-item {
     height: 35px !important;
     width: 40px;
@@ -252,30 +246,37 @@ const toggleSeat = (id) => {
     max-width: 600px;
     background-image: url("/images/seat/md-seat-plan.svg");
   }
+
   .seat-1 {
     top: 20px;
     left: 120px;
   }
+
   .seat-2 {
     top: 20px;
     left: 205px;
   }
+
   .seat-3 {
     top: 20px;
     left: 305px;
   }
+
   .seat-4 {
     top: 20px;
     right: 165px;
   }
+
   .seat-5 {
     bottom: 22px;
     left: 207px;
   }
+
   .seat-6 {
     bottom: 22px;
     left: 306px;
   }
+
   .seat-7 {
     bottom: 22px;
     right: 168px;
@@ -289,37 +290,45 @@ const toggleSeat = (id) => {
     background-image: url("/images/seat/m-seat-plan.svg");
     margin: 0 auto;
   }
+
   .seat-item {
     transform: rotate(90deg);
   }
+
   .seat-1 {
     top: 95px;
     right: 30px;
     left: auto;
   }
+
   .seat-2 {
     top: 190px;
     right: 30px;
     left: auto;
   }
+
   .seat-3 {
     top: 310px;
     right: 30px;
     left: auto;
   }
+
   .seat-4 {
     bottom: 155px;
     top: auto;
     right: 30px;
   }
+
   .seat-5 {
     top: 200px;
     left: 30px;
   }
+
   .seat-6 {
     top: 310px;
     left: 30px;
   }
+
   .seat-7 {
     bottom: 160px;
     top: auto;

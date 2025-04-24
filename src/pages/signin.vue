@@ -79,7 +79,7 @@ const router = useRouter();
   left: 0;
   height: 100%;
   width: 100%;
-  background-color: rgba(0, 0, 0, 0.9);
+  background-color: rgba(0, 0, 0, 0.8);
   z-index: -1;
 }
 h3 {

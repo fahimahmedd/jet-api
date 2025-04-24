@@ -5,8 +5,16 @@ import { ref } from "vue";
 import { url } from "@/plugins/baseUrl";
 import { useAxios } from "@vueuse/integrations/useAxios";
 import { useRoute, useRouter } from "vue-router";
+import { useUserStore } from "@/stores/useUser";
+import { useAuthStore } from "@/stores/useAuth";
+
+
+const dashboardMenu = ref(false)
+
 
 const flightStore = useFlightStore();
+const userStore = useUserStore();
+const useAuth = useAuthStore();
 const { originData } = storeToRefs(flightStore);
 const originList = computed(() => originData.value);
 const destinationList = computed(() => destinationData.value);
@@ -35,7 +43,7 @@ watch(originPlaceholder, (newVal) => {
 watch(destinationData, (newVal) => {
   if (Array.isArray(newVal)) {
     if (newVal.length === 1) {
-      destinationPlaceholder.value = newVal[0]; 
+      destinationPlaceholder.value = newVal[0];
     } else {
       destinationPlaceholder.value = {
         city: "Destination",
@@ -104,43 +112,36 @@ const isSearchDisabled = computed(() => {
 
 async function searchFlight() {
   await flightStore.searchFlightExecute(
-    `https://appsdevelopmentfirm.agency/admin/site/api/flights?origin_id=${
-      originPlaceholder.value.id
-    }&destination_id=${destinationPlaceholder.value.id}&departure_date=&trip=${
-      isRoundTrip ? "twoway" : "oneway"
+    `https://appsdevelopmentfirm.agency/admin/site/api/flights?origin_id=${originPlaceholder.value.id
+    }&destination_id=${destinationPlaceholder.value.id}&departure_date=&trip=${isRoundTrip ? "twoway" : "oneway"
     }`
   );
-  console.log(flightStore.flightList);
   router.push({ path: "departure" });
 }
+
+const userData = computed(() => {
+  return userStore.user;
+});
+
+const onLogout = () => {
+  userStore.logoutUser();
+};
+
 
 </script>
 
 <template>
+  {{userData}}
   <div class="header">
     <router-link to="/" class="logo">
-      <v-img
-        src="/public/images/logo/logo.png"
-        max-height="20"
-        contain
-        class="logo-img"
-      ></v-img>
+      <v-img src="/public/images/logo/logo.png" max-height="20" contain class="logo-img"></v-img>
     </router-link>
 
     <!-- Origin -->
     <div class="transport-wrapper d-none d-md-flex">
       <div class="transport-wrap">
-        <v-select
-          v-model="originPlaceholder"
-          item-value="value"
-          item-title="city"
-          :items="originList"
-          variant="plain"
-          return-object
-          density="compact"
-          hide-details
-          theme="dark"
-        >
+        <v-select v-model="originPlaceholder" item-value="value" item-title="city" :items="originList" variant="plain"
+          return-object density="compact" hide-details theme="dark">
           <template #item="data">
             <v-list-item v-bind="data.props" class="custom-select-item">
               <template #title>
@@ -149,10 +150,7 @@ async function searchFlight() {
                   <div class="d-flex align-center justify-space-between">
                     <div class="select-item-content d-flex align-center mt-1">
                       <span class="mdi mdi-airplane air-icon"></span>
-                      <span
-                        class="select-text ml-2 text-truncate"
-                        style="max-width: 190px"
-                      >
+                      <span class="select-text ml-2 text-truncate" style="max-width: 190px">
                         {{ data.item.raw.name }}
                       </span>
                     </div>
@@ -186,27 +184,13 @@ async function searchFlight() {
 
       <!-- Reverse Trip -->
       <div class="reverse-trip">
-        <v-btn
-          class="reverse-btn"
-          icon="mdi-autorenew"
-          size="x-small"
-          rounded="xl"
-          @click="reverseTrip"
-        ></v-btn>
+        <v-btn class="reverse-btn" icon="mdi-autorenew" size="x-small" rounded="xl" @click="reverseTrip"></v-btn>
       </div>
 
       <!-- Destination -->
       <div class="transport-wrap">
-        <v-select
-          v-model="destinationPlaceholder"
-          item-value="value"
-          item-title="city"
-          :items="destinationList"
-          variant="plain"
-          return-object
-          density="compact"
-          theme="dark"
-        >
+        <v-select v-model="destinationPlaceholder" item-value="value" item-title="city" :items="destinationList"
+          variant="plain" return-object density="compact" theme="dark">
           <template #item="data">
             <v-list-item v-bind="data.props" class="custom-select-item">
               <template #title>
@@ -215,10 +199,7 @@ async function searchFlight() {
                   <div class="d-flex align-center justify-space-between">
                     <div class="select-item-content d-flex align-center mt-1">
                       <span class="mdi mdi-airplane air-icon"></span>
-                      <span
-                        class="select-text ml-2 text-truncate"
-                        style="max-width: 190px"
-                      >
+                      <span class="select-text ml-2 text-truncate" style="max-width: 190px">
                         {{ data.item.raw.name }}
                       </span>
                     </div>
@@ -252,18 +233,12 @@ async function searchFlight() {
     </div>
 
     <!-- Guest -->
-    <v-menu
-      v-model="menu"
-      :close-on-content-click="false"
-      transition="scale-transition"
-    >
+    <v-menu v-model="menu" :close-on-content-click="false" transition="scale-transition">
       <template v-slot:activator="{ props }">
         <div class="add-guest d-none d-md-flex" v-bind="props">
           <div class="guest-container">
             <div class="guest-title text-grey-darken-1">Guests</div>
-            <div
-              class="guest-content d-flex justify-space-between align-center"
-            >
+            <div class="guest-content d-flex justify-space-between align-center">
               <h2 class="text-h4 text-grey-lighten-2 font-weight-regular">
                 {{ totalGuests }}
               </h2>
@@ -272,13 +247,7 @@ async function searchFlight() {
           </div>
         </div>
       </template>
-      <v-card
-        color="black"
-        class="guest-plate"
-        width="380"
-        max-height="440"
-        rounded="0"
-      >
+      <v-card color="black" class="guest-plate" width="380" max-height="440" rounded="0">
         <div v-for="(item, index) in addGuest" :key="index" class="plate-item">
           <div class="d-flex justify-space-between align-center">
             <h3 class="text-h5 font-weight-regular text-white">
@@ -300,11 +269,7 @@ async function searchFlight() {
     <!-- Round trip -->
     <div class="d-none d-md-flex align-center">
       <!-- Vertical Switch -->
-      <v-switch
-        v-model="isRoundTrip"
-        class="custom-switch vertical-switch mr-3"
-        hide-details
-      >
+      <v-switch v-model="isRoundTrip" class="custom-switch vertical-switch mr-3" hide-details>
         <template #thumb>
           <span class="switch-check mdi mdi-check"></span>
         </template>
@@ -312,34 +277,46 @@ async function searchFlight() {
 
       <!-- Labels -->
       <div>
-        <div
-          class="text-body-2 font-weight-medium cursor-pointer"
-          :class="!isRoundTrip ? 'text-white' : 'text-grey-darken-1'"
-          @click="isRoundTrip = false"
-        >
+        <div class="text-body-2 font-weight-medium cursor-pointer"
+          :class="!isRoundTrip ? 'text-white' : 'text-grey-darken-1'" @click="isRoundTrip = false">
           One Way
         </div>
-        <div
-          class="text-body-2 font-weight-medium cursor-pointer"
-          :class="isRoundTrip ? 'text-white' : 'text-grey-darken-1'"
-          @click="isRoundTrip = true"
-        >
+        <div class="text-body-2 font-weight-medium cursor-pointer"
+          :class="isRoundTrip ? 'text-white' : 'text-grey-darken-1'" @click="isRoundTrip = true">
           Round Trip
         </div>
       </div>
     </div>
 
     <!-- <router-link to="/departure"> -->
-    <v-btn
-      class="next-btn d-none d-md-flex"
-      icon="mdi-arrow-right"
-      size="large"
-      rounded="lg"
-      @click="searchFlight"
-      :disabled="isSearchDisabled"
-    ></v-btn>
+    <v-btn class="next-btn d-none d-md-flex" icon="mdi-arrow-right" size="large" rounded="lg" @click="searchFlight"
+      :disabled="isSearchDisabled"></v-btn>
 
-    <v-btn density="comfortable" icon="mdi-menu" rounded="lg"></v-btn>
+    <v-menu v-model="dashboardMenu" :close-on-content-click="false" location="bottom">
+      <template v-slot:activator="{ props }">
+        <div class="dashboard-menu-btn" v-bind="props">
+
+          <v-btn density="comfortable" icon="mdi-menu" size="large" rounded="lg"></v-btn>
+        </div>
+      </template>
+
+      <v-card min-width="240" rounded="0" color="black" class="dashboard-menu-card" max-height="440">
+        
+        <div class="dashboard-menu">
+          <v-list-item prepend-avatar="https://cdn.vuetifyjs.com/images/john.jpg" subtitle="Founder of Vuetify"
+            title="John Leider">
+            <template v-slot:append>
+            </template>
+          </v-list-item>
+          <ul class="text-end">
+            <li class="text-subtitle font-weight-medium text-grey-lighten-2"><router-link to="/signin">Login</router-link></li>
+            <li class="text-subtitle font-weight-medium text-grey-lighten-2"><router-link to="/flight">Book Trip</router-link></li>
+            <li class="text-subtitle font-weight-medium text-grey-lighten-2"><router-link to="/">My Trips</router-link></li>
+            <li class="text-subtitle font-weight-medium text-grey-lighten-2"><a @click="onLogout">Log Out</a></li>
+          </ul>
+        </div>
+      </v-card>
+    </v-menu>
   </div>
 </template>
 
@@ -361,6 +338,7 @@ async function searchFlight() {
   justify-content: space-between;
   padding: 0 20px;
 }
+
 .logo {
   border-right: 1px solid #a6acb541;
   height: 100%;
@@ -368,66 +346,85 @@ async function searchFlight() {
   align-items: center;
   padding-right: 20px;
 }
+
 .logo-img {
   width: 100px;
 }
+
 .transport-wrapper {
   display: flex;
   align-items: center;
   height: 100%;
 }
+
 .transport-place-container {
   height: 100%;
   width: 220px;
 }
+
 .transport-place {
   width: 100%;
   height: 100%;
 }
+
 .transport-title {
   font-size: 12px;
   color: #c0bfbf;
   line-height: 18px;
 }
+
 .transport-content {
   color: #fff;
 }
+
 .transport-content h2 {
   font-weight: 400;
   font-size: 24px;
 }
+
 .transport-content p {
   font-size: 12px;
   color: #a4a3a3;
   line-height: 16px;
 }
+
 .transport-content .key-word {
   font-size: 22px;
   color: #a4a3a3;
 }
+
 .select-key-word {
   font-size: 16px;
   color: #a4a3a3;
 }
+
 .transport-content .key-word span {
   color: #fff;
   font-size: 26px;
 }
+
 ::v-deep(.v-field) {
   align-items: center !important;
 }
+
 ::v-deep(.mdi-menu-down) {
   color: #ffffff;
 }
+
 ::v-deep(.v-field__input) {
   padding-bottom: 10px !important;
 }
+
 ::v-deep(.v-input) {
   height: 100%;
 }
+
 .custom-select-item {
   border-top: 1px solid #c3c3c333;
   /* transition: background-color 0.3s ease; */
+}
+.dashboard-menu-card{
+  margin-top: 1px;
 }
 
 .custom-select-item:hover {
@@ -448,6 +445,7 @@ async function searchFlight() {
   color: #7184a2;
   font-size: 22px;
 }
+
 .guest-text {
   font-size: 12px;
   max-width: 220px;
@@ -456,8 +454,31 @@ async function searchFlight() {
 .select-item {
   padding: 10px 0;
 }
+
 .guest-title {
   font-size: 14px;
+}
+.dashboard-menu-btn{
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+.dashboard-menu ul li{
+  border-top: 1px solid #c3c3c334;
+  width: 100%;
+  cursor: pointer;
+}
+.dashboard-menu ul li a{
+  display: block;
+  width: 100%;
+  height: 100%;
+  padding: 18px 20px;
+}
+.dashboard-menu ul li:hover{
+  background-color: #adcede2c;
+}
+.dashboard-menu ul li:first-child{
+  border-top: 1px solid transparent;
 }
 .select-item h6 {
   font-size: 12px;
@@ -465,18 +486,22 @@ async function searchFlight() {
   line-height: 16px;
   font-weight: 400;
 }
+
 .transport-wrap {
   height: 100%;
 }
+
 .select-text {
   font-weight: 400;
   font-size: 20px;
 }
+
 .next-btn {
   background-color: #657ca2;
   color: #fff;
   font-size: 24px;
 }
+
 .reverse-trip {
   height: 100%;
   position: relative;
@@ -484,6 +509,7 @@ async function searchFlight() {
   justify-content: center;
   align-items: center;
 }
+
 .reverse-btn {
   margin: 0 20px;
 }
@@ -494,6 +520,7 @@ async function searchFlight() {
   border-left: 1px solid #a6acb541;
   border-right: 1px solid #a6acb541;
 }
+
 .guest-container {
   height: 100%;
   width: 100px;
@@ -502,6 +529,7 @@ async function searchFlight() {
   justify-content: space-between;
   flex-direction: column;
 }
+
 .transport-title {
   font-size: 16px;
   font-weight: 500;
@@ -539,23 +567,29 @@ async function searchFlight() {
   transform: rotate(90deg);
   transform-origin: center center;
 }
+
 .switch-check {
   transform: rotate(-90deg);
   transform-origin: center center;
   color: white;
 }
+
 ::v-deep(.v-switch__track) {
   padding: 0 5px;
   height: 25px;
   opacity: 0.8;
   min-width: 50px;
 }
+
 ::v-deep(.v-switch__thumb) {
   background-color: #6d92cf;
 }
+
 ::v-deep(.v-overlay-container) {
   display: none !important;
 }
+
+
 @media (max-width: 991px) {
   .header {
     height: 60px;
