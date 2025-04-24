@@ -73,8 +73,8 @@ const featureItems = [
                 <v-btn
                   density="comfortable"
                   size="large"
-                  variant="tonal"
-                  color="#6d92cf"
+                  variant="plain"
+                  color="black"
                   icon="mdi-arrow-left"
                   rounded="sm"
                   v-bind="props"

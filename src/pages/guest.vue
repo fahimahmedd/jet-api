@@ -58,6 +58,8 @@ import SubHeader from "@/components/subPages/SubHeader.vue";
       <v-col cols="12" lg="7" md="8">
         <div class="subpage-content">
           <SubHeader />
+          <div class="sub-container">
+
           <v-container>
             <div class="guest-form">
               <h2 class="text-black font-weight-medium text-h4 mt-5">
@@ -71,6 +73,7 @@ import SubHeader from "@/components/subPages/SubHeader.vue";
               <GuestForm />
             </div>
           </v-container>
+          </div>
         </div>
       </v-col>
     </v-row>

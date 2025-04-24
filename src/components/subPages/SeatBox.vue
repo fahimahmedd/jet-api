@@ -155,7 +155,7 @@ const toggleSeat = (id) => {
 }
 
 .selected {
-  background-color: #3db641f6 !important;
+  background-color: #1E4721 !important;
   color: white;
 }
 
@@ -191,7 +191,7 @@ const toggleSeat = (id) => {
 }
 
 .choosen-seat {
-  background-color: #358b38fd;
+  background-color: #1E4721;
 }
 
 @media (max-width: 1260px) {

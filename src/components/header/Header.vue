@@ -127,12 +127,25 @@ const onLogout = () => {
   userStore.logoutUser();
 };
 
+const isScrolled = ref(false)
+
+const handleScroll = () => {
+  isScrolled.value = window.scrollY > 10
+}
+
+onMounted(() => {
+  window.addEventListener('scroll', handleScroll)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('scroll', handleScroll)
+})
 
 </script>
 
 <template>
   {{userData}}
-  <div class="header">
+  <div :class="['header', { scrolled: isScrolled }]">
     <router-link to="/" class="logo">
       <v-img src="/public/images/logo/logo.png" max-height="20" contain class="logo-img"></v-img>
     </router-link>
@@ -166,7 +179,7 @@ const onLogout = () => {
           <template #selection="data">
             <div class="transport-place-container">
               <div class="transport-place">
-                <div class="transport-title text-caption">From</div>
+                <div class="transport-title text-caption font-weight-light">From</div>
                 <div class="transport-content">
                   <div class="d-flex align-center justify-space-between">
                     <h2>{{ data.item?.raw?.city }}</h2>
@@ -174,7 +187,7 @@ const onLogout = () => {
                       {{ data.item.raw.code }}
                     </div>
                   </div>
-                  <p>{{ data.item.raw.name || "Select Your Origin" }}</p>
+                  <p class="font-weight-light">{{ data.item.raw.name || "Select Your Origin" }}</p>
                 </div>
               </div>
             </div>
@@ -215,7 +228,7 @@ const onLogout = () => {
           <template #selection="data">
             <div class="transport-place-container">
               <div class="transport-place">
-                <div class="transport-title text-caption">To</div>
+                <div class="transport-title text-caption font-weight-light">To</div>
                 <div class="transport-content">
                   <div class="d-flex align-center justify-space-between">
                     <h2>{{ data.item?.raw?.city }}</h2>
@@ -223,7 +236,7 @@ const onLogout = () => {
                       {{ data.item.raw.code }}
                     </div>
                   </div>
-                  <p>{{ data.item.raw.name || "Select Your Destination" }}</p>
+                  <p class="font-weight-light">{{ data.item.raw.name || "Select Your Destination" }}</p>
                 </div>
               </div>
             </div>
@@ -231,7 +244,8 @@ const onLogout = () => {
         </v-select>
       </div>
     </div>
-
+    <div class="h-100">
+    <div class="header-right-content d-flex align-center">
     <!-- Guest -->
     <v-menu v-model="menu" :close-on-content-click="false" transition="scale-transition">
       <template v-slot:activator="{ props }">
@@ -271,7 +285,7 @@ const onLogout = () => {
       <!-- Vertical Switch -->
       <v-switch v-model="isRoundTrip" class="custom-switch vertical-switch mr-3" hide-details>
         <template #thumb>
-          <span class="switch-check mdi mdi-check"></span>
+          <!-- <span class="switch-check mdi mdi-check"></span> -->
         </template>
       </v-switch>
 
@@ -281,7 +295,7 @@ const onLogout = () => {
           :class="!isRoundTrip ? 'text-white' : 'text-grey-darken-1'" @click="isRoundTrip = false">
           One Way
         </div>
-        <div class="text-body-2 font-weight-medium cursor-pointer"
+        <div class="text-body-2 font-weight-medium cursor-pointer mt-1"
           :class="isRoundTrip ? 'text-white' : 'text-grey-darken-1'" @click="isRoundTrip = true">
           Round Trip
         </div>
@@ -296,11 +310,11 @@ const onLogout = () => {
       <template v-slot:activator="{ props }">
         <div class="dashboard-menu-btn" v-bind="props">
 
-          <v-btn density="comfortable" icon="mdi-menu" size="large" rounded="lg"></v-btn>
+          <v-btn density="comfortable" variant="text" color="white" icon="mdi-menu" size="large" rounded="lg"></v-btn>
         </div>
       </template>
 
-      <v-card min-width="240" rounded="0" color="black" class="dashboard-menu-card" max-height="440">
+      <v-card min-width="240"  color="black" class="dashboard-menu-card" max-height="440">
         
         <div class="dashboard-menu">
           <v-list-item prepend-avatar="https://cdn.vuetifyjs.com/images/john.jpg" subtitle="Founder of Vuetify"
@@ -317,31 +331,56 @@ const onLogout = () => {
         </div>
       </v-card>
     </v-menu>
+    </div>
+    </div>
   </div>
 </template>
 
 <style scoped>
 .header {
   height: 90px;
-  width: 95%;
-  max-width: 1440px;
   border: 1px solid #a6acb53f;
   background-color: #000000;
   position: fixed;
-  top: 20px;
-  left: 50%;
+  top: 24px;
+  left: 32px;
+  right: 32px;
   border-radius: 16px;
-  transform: translateX(-50%);
   z-index: 10;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 20px;
+  transition:
+    top 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+    left 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+    right 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+    border-radius 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+    width 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.logo {
-  border-right: 1px solid #a6acb541;
+.header.scrolled {
+  width: 100%;
+  top: 0px;
+  left: 0px;
+  right: 0px;
+  border-radius: 0px;
+  border: 1px solid transparent;
+  border-bottom: 1px solid #a6acb53f;
+}
+.header-right-content{
   height: 100%;
+  width: 500px;
+  justify-content: space-between;
+}
+.h-100{
+  height: 100%;
+}
+.logo {
+  border-right: 1px solid #6c7a908e;
+  height: 100%;
+  width: 150px;
   display: flex;
   align-items: center;
   padding-right: 20px;
@@ -355,11 +394,12 @@ const onLogout = () => {
   display: flex;
   align-items: center;
   height: 100%;
+  width: 100%;
 }
 
 .transport-place-container {
   height: 100%;
-  width: 220px;
+  width: 100%;
 }
 
 .transport-place {
@@ -369,7 +409,7 @@ const onLogout = () => {
 
 .transport-title {
   font-size: 12px;
-  color: #c0bfbf;
+  color: #fafafa;
   line-height: 18px;
 }
 
@@ -413,12 +453,16 @@ const onLogout = () => {
 
 ::v-deep(.v-field__input) {
   padding-bottom: 10px !important;
+  padding-left: 20px;
+  padding-right: 20px;
 }
 
 ::v-deep(.v-input) {
   height: 100%;
 }
-
+::v-deep(.v-select__selection){
+  width: 100%;
+}
 .custom-select-item {
   border-top: 1px solid #c3c3c333;
   /* transition: background-color 0.3s ease; */
@@ -489,6 +533,7 @@ const onLogout = () => {
 
 .transport-wrap {
   height: 100%;
+  width: 100%;
 }
 
 .select-text {
@@ -498,8 +543,10 @@ const onLogout = () => {
 
 .next-btn {
   background-color: #657ca2;
-  color: #fff;
-  font-size: 24px;
+  color: #ffffff;
+  font-size: 44px;
+  height: 80%;
+  min-width: 100px;
 }
 
 .reverse-trip {
@@ -517,14 +564,14 @@ const onLogout = () => {
 .add-guest {
   cursor: pointer;
   height: 100%;
-  border-left: 1px solid #a6acb541;
-  border-right: 1px solid #a6acb541;
+  border-left: 1px solid #6c7a908e;
+  border-right: 1px solid #6c7a908e;
 }
 
 .guest-container {
   height: 100%;
-  width: 100px;
-  padding: 10px 10px;
+  width: 120px;
+  padding: 10px 20px;
   display: flex;
   justify-content: space-between;
   flex-direction: column;
@@ -582,7 +629,7 @@ const onLogout = () => {
 }
 
 ::v-deep(.v-switch__thumb) {
-  background-color: #6d92cf;
+  background-color: #8599b9;
 }
 
 ::v-deep(.v-overlay-container) {

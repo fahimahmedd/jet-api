@@ -22,13 +22,15 @@ import SubHeader from "@/components/subPages/SubHeader.vue";
       <v-col cols="12" lg="6" md="6">
         <div class="subpage-content">
           <SubHeader />
+          <div class="sub-container">
           <v-container>
-            <h2 class="text-black font-weight-regular text-h4 mt-5">
+            <h2 class="title-text text-black font-weight-regular mt-5">
               Trip Summary
             </h2>
             <Coupon />
             <OrderDetail />
           </v-container>
+          </div>
         </div>
       </v-col>
     </v-row>
@@ -65,6 +67,9 @@ import SubHeader from "@/components/subPages/SubHeader.vue";
 h3 {
   font-size: 28px;
   margin-top: 120px;
+}
+.title-text{
+  font-size: 40px;
 }
 .gap {
   gap: 18px;

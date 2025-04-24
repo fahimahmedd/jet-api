@@ -85,7 +85,6 @@ const seatStatus = computed(() => {
 .departure-item {
   height: 150px;
   width: 100%;
-  max-width: 800px;
   background-color: #6c7a90;
   margin-top: 20px;
   border-radius: 10px;

@@ -10,9 +10,11 @@
 // );
 
 html{
-    font-family: "Inter", sans-serif;
+    font-family: "Inter", sans-serif !important;
 }
-
+body {
+    font-family: "Inter", sans-serif !important;
+  }
 p{
     font-size: 14px;
 }
@@ -25,7 +27,22 @@ a{
     text-decoration: none;
     color: inherit;
 }
-
+body,
+.text-body-1,
+.text-body-2,
+.text-caption,
+.text-h1,
+.text-h2,
+.text-h3,
+.text-h4,
+.text-h5,
+.text-h6,
+.text-subtitle-1,
+.text-subtitle-2,
+.text-overline,
+.text-button {
+  font-family: 'Inter', sans-serif !important;
+}
 .v-list{
     // background-color: #000 !important;
     // color: #fff !important; 
@@ -40,6 +57,12 @@ a{
     overflow-y: scroll;
     padding-bottom: 40px;
     position: relative;
+}
+.btn-max{
+    max-width:450px;
+}
+.sub-container{
+    max-width: 850px;
 }
 
 @media (min-width: 1920px) {

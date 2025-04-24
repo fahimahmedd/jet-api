@@ -14,7 +14,6 @@
     "@vueuse/integrations": "^11.1.0",
     "axios": "^1.7.7",
     "core-js": "^3.37.1",
-    "roboto-fontface": "*",
     "swiper": "^11.2.6",
     "vue": "^3.4.31",
     "vuetify": "^3.6.14"

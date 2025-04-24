@@ -67,9 +67,8 @@ const months = computed(() => {
             </div>
           </router-link>
 
-          <h3 class="text-grey-lighten-2 font-weight-regular">
-            When would you like to depart from
-            <strong class="text-white">Gothenburg?</strong>
+          <h3 class="sub-text-content text-white font-weight-medium">
+            When would you like to depart from Gothenburg?
           </h3>
         </div>
       </v-col>
@@ -77,6 +76,7 @@ const months = computed(() => {
         <div class="subpage-content">
           <SubHeader />
           <v-container>
+            <div class="sub-container">
             <h2 class="text-black font-weight-regular text-h3 mt-10">
               Departure
             </h2>
@@ -84,9 +84,9 @@ const months = computed(() => {
               <span
                 v-for="month in months"
                 :key="month.value"
-                class="cursor-pointer text-subtitle font-weight-regular px-3 py-1 border-b-2"
+                class="cursor-pointer text-subtitle font-weight-regular px-1 mx-3 py-1 border-b-2"
                 :class="{
-                  'border-primary text-primary font-weight-bold':
+                  'border-b-active font-weight-bold':
                     selectedMonth === month.value,
                   'border-transparent text-gray-600':
                     selectedMonth !== month.value,
@@ -112,6 +112,7 @@ const months = computed(() => {
             >
               No Flights available for this month
             </div>
+            </div>
           </v-container>
         </div>
       </v-col>
@@ -124,7 +125,9 @@ const months = computed(() => {
   height: 100vh;
   width: 100%;
 }
-
+.border-b-active{
+  border-bottom: 2px solid #6C7A90;
+}
 .subpage-left {
   height: 100vh;
   width: 100%;
@@ -149,9 +152,11 @@ const months = computed(() => {
 
 h3 {
   font-size: 28px;
-  margin-top: 120px;
 }
-
+.sub-text-content{
+  max-width: 340px;
+  margin: 120px auto 0;
+}
 .gap {
   gap: 18px;
 }
@@ -169,11 +174,6 @@ h3 {
     height: auto;
     padding: 20px;
   }
-
-  h3 {
-    margin-top: 50px;
-  }
-
   .subpage-content[data-v-49e4dc52] {
     padding-left: 0px;
   }

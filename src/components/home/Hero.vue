@@ -46,13 +46,14 @@ const modules = [Autoplay, EffectFade];
    <div class="hero-text">
       <div class="container">
         <v-container>
-            <h1>Nu är det Officiellt: Flyg direkt till Stockholm, Bromma</h1>
-            <h1>Från och med Juni 2025</h1>
+            <h1>Nu är det Officiellt: Flyg direkt till Stockholm, Bromma Från och med Juni 2025</h1>
+            <div class="btn-max">
             <router-link to="/flight">
-            <v-btn class="booking-btn mt-5" append-icon="mdi-arrow-right" variant="outlined"
-            rounded="xl" size="large" width="300"
+            <v-btn class="booking-btn mt-5" variant="outlined"
+            rounded="xl" size="large" block
             >Book Your Seat</v-btn>
             </router-link>
+            </div>
         </v-container>
       </div>
    </div>
@@ -90,11 +91,17 @@ const modules = [Autoplay, EffectFade];
 .hero-text h1{
     color: #fff;
     font-weight: 400;
+    font-size: 25px;
+    max-width: 700px;
 }
 .booking-btn{
-    background-color: #d7e1f239;
+    background-color: #6c7a9056;
     color: #fff;
-    font-weight: 700;
+    border: 2px solid #6C7A90;
+    font-size: 22px;
+    text-transform: capitalize;
+    min-height: 46px;
+    font-weight: 400;
 }
 
 @media (max-width: 991px) {

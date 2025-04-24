@@ -28,8 +28,12 @@ const featureItems = [
       <v-row>
         <v-col>
           <div class="feature-content">
-            <h2>What to Except:</h2>
-            <h2 class="text-grey-lighten-1">The Perks of Flying Private</h2>
+            <h2>
+              What to Except: <br />
+              <span class="text-grey-lighten-1"
+                >The Perks of Flying Private</span
+              >
+            </h2>
 
             <v-row class="mt-5">
               <v-col
@@ -50,14 +54,19 @@ const featureItems = [
               </v-col>
             </v-row>
 
-            <v-btn
-              class="booking-btn mt-16"
-              variant="outlined"
-              rounded="xl"
-              size="large"
-              width="400"
-              >Book Your Seat</v-btn
-            >
+            <div class="btn-max">
+              <router-link to="/flight">
+                <v-btn
+                  class="flight-serach-btn booking-btn mt-16"
+                  variant="outlined"
+                  rounded="xl"
+                  size="large"
+                  width="400"
+                  block
+                  >Book Your Seat</v-btn
+                >
+              </router-link>
+            </div>
           </div>
         </v-col>
         <v-col cols="12" xs="12" sm="12" md="6" lg="6">
@@ -65,7 +74,7 @@ const featureItems = [
             <v-img
               cover
               rounded="xl"
-              src="/public/images/feature/feature.svg"
+              src="/public/images/feature/feature.jpg"
             ></v-img>
           </div>
         </v-col>
@@ -106,11 +115,15 @@ const featureItems = [
 .feature-item p {
   font-size: 14px;
   font-weight: 700;
+  max-width: 230px;
 }
 .booking-btn {
-  background-color: #fff;
-  font-weight: 700;
-  color: #000;
+    background-color: #fff;
+    color: #000;
+    font-size: 22px;
+    text-transform: capitalize;
+    min-height: 48px;
+    font-weight: 500;
 }
 
 @media (max-width: 991px) {
