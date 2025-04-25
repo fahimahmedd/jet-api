@@ -8,13 +8,10 @@ import { useRoute, useRouter } from "vue-router";
 import { useUserStore } from "@/stores/useUser";
 import { useAuthStore } from "@/stores/useAuth";
 
-
-const dashboardMenu = ref(false)
-
+const dashboardMenu = ref(false);
 
 const flightStore = useFlightStore();
 const userStore = useUserStore();
-const useAuth = useAuthStore();
 const { originData } = storeToRefs(flightStore);
 const originList = computed(() => originData.value);
 const destinationList = computed(() => destinationData.value);
@@ -106,18 +103,75 @@ const totalGuests = computed(() => {
 });
 
 const isRoundTrip = ref(false);
+
 const isSearchDisabled = computed(() => {
   return !originPlaceholder.value?.id || !destinationPlaceholder.value?.id;
 });
 
 async function searchFlight() {
-  await flightStore.searchFlightExecute(
-    `https://appsdevelopmentfirm.agency/admin/site/api/flights?origin_id=${originPlaceholder.value.id
-    }&destination_id=${destinationPlaceholder.value.id}&departure_date=&trip=${isRoundTrip ? "twoway" : "oneway"
-    }`
-  );
-  router.push({ path: "departure" });
+  try {
+    await flightStore.searchFlightExecute(
+      `${url}/flights?origin_id=${originPlaceholder.value.id}&destination_id=${destinationPlaceholder.value.id}&departure_date=&trip=${isRoundTrip.value ? 'twoway' : 'oneway'}`,
+      originPlaceholder.value.code,
+      destinationPlaceholder.value.code,
+      totalGuests.value  // Pass total guests count
+    );
+    router.push({ path: "departure" });
+  } catch (error) {
+    console.error("Search failed:", error);
+  }
 }
+
+
+onMounted(() => {
+
+  isRoundTrip.value = false;
+  // Set initial placeholder structure
+  originPlaceholder.value = {
+    city: "Origin",
+    airport: "",
+    code: "",
+    value: "",
+  };
+
+  if (flightStore.searchParams) {
+    // Find the matching origin in originList
+    const matchingOrigin = originList.value?.find(
+      (origin) => origin.id === flightStore.searchParams.origin_id
+    );
+    
+    // If found, update the originPlaceholder
+    if (matchingOrigin) {
+      originPlaceholder.value = {
+        ...matchingOrigin,
+        city: matchingOrigin.city || "Origin",
+        airport: matchingOrigin.name || "",
+        code: matchingOrigin.code || "",
+        value: matchingOrigin.id || "",
+      };
+    }
+
+    // Find the matching destination in destinationList
+    const matchingDestination = destinationList.value?.find(
+      (dest) => dest.id === flightStore.searchParams.destination_id
+    );
+    
+    // If found, update the destinationPlaceholder
+    if (matchingDestination) {
+      destinationPlaceholder.value = {
+        ...matchingDestination,
+        city: matchingDestination.city || "Destination",
+        airport: matchingDestination.name || "",
+        code: matchingDestination.code || "",
+        value: matchingDestination.id || "",
+      };
+    }
+    
+    // Restore trip type
+    isRoundTrip.value = flightStore.searchParams.trip === 'twoway';
+  }
+});
+
 
 const userData = computed(() => {
   return userStore.user;
@@ -127,34 +181,46 @@ const onLogout = () => {
   userStore.logoutUser();
 };
 
-const isScrolled = ref(false)
+const isScrolled = ref(false);
 
 const handleScroll = () => {
-  isScrolled.value = window.scrollY > 10
-}
+  isScrolled.value = window.scrollY > 10;
+};
 
 onMounted(() => {
-  window.addEventListener('scroll', handleScroll)
-})
+  window.addEventListener("scroll", handleScroll);
+});
 
 onUnmounted(() => {
-  window.removeEventListener('scroll', handleScroll)
-})
-
+  window.removeEventListener("scroll", handleScroll);
+});
 </script>
 
 <template>
-  {{userData}}
   <div :class="['header', { scrolled: isScrolled }]">
     <router-link to="/" class="logo">
-      <v-img src="/public/images/logo/logo.png" max-height="20" contain class="logo-img"></v-img>
+      <v-img
+        src="/public/images/logo/logo.png"
+        max-height="20"
+        contain
+        class="logo-img"
+      ></v-img>
     </router-link>
 
     <!-- Origin -->
     <div class="transport-wrapper d-none d-md-flex">
       <div class="transport-wrap">
-        <v-select v-model="originPlaceholder" item-value="value" item-title="city" :items="originList" variant="plain"
-          return-object density="compact" hide-details theme="dark">
+        <v-select
+          v-model="originPlaceholder"
+          item-value="value"
+          item-title="city"
+          :items="originList"
+          variant="plain"
+          return-object
+          density="compact"
+          hide-details
+          theme="dark"
+        >
           <template #item="data">
             <v-list-item v-bind="data.props" class="custom-select-item">
               <template #title>
@@ -163,7 +229,10 @@ onUnmounted(() => {
                   <div class="d-flex align-center justify-space-between">
                     <div class="select-item-content d-flex align-center mt-1">
                       <span class="mdi mdi-airplane air-icon"></span>
-                      <span class="select-text ml-2 text-truncate" style="max-width: 190px">
+                      <span
+                        class="select-text ml-2 text-truncate"
+                        style="max-width: 190px"
+                      >
                         {{ data.item.raw.name }}
                       </span>
                     </div>
@@ -179,7 +248,9 @@ onUnmounted(() => {
           <template #selection="data">
             <div class="transport-place-container">
               <div class="transport-place">
-                <div class="transport-title text-caption font-weight-light">From</div>
+                <div class="transport-title text-caption font-weight-light">
+                  From
+                </div>
                 <div class="transport-content">
                   <div class="d-flex align-center justify-space-between">
                     <h2>{{ data.item?.raw?.city }}</h2>
@@ -187,7 +258,9 @@ onUnmounted(() => {
                       {{ data.item.raw.code }}
                     </div>
                   </div>
-                  <p class="font-weight-light">{{ data.item.raw.name || "Select Your Origin" }}</p>
+                  <p class="font-weight-light">
+                    {{ data.item.raw.name || "Select Your Origin" }}
+                  </p>
                 </div>
               </div>
             </div>
@@ -197,13 +270,27 @@ onUnmounted(() => {
 
       <!-- Reverse Trip -->
       <div class="reverse-trip">
-        <v-btn class="reverse-btn" icon="mdi-autorenew" size="x-small" rounded="xl" @click="reverseTrip"></v-btn>
+        <v-btn
+          class="reverse-btn"
+          icon="mdi-autorenew"
+          size="x-small"
+          rounded="xl"
+          @click="reverseTrip"
+        ></v-btn>
       </div>
 
       <!-- Destination -->
       <div class="transport-wrap">
-        <v-select v-model="destinationPlaceholder" item-value="value" item-title="city" :items="destinationList"
-          variant="plain" return-object density="compact" theme="dark">
+        <v-select
+          v-model="destinationPlaceholder"
+          item-value="value"
+          item-title="city"
+          :items="destinationList"
+          variant="plain"
+          return-object
+          density="compact"
+          theme="dark"
+        >
           <template #item="data">
             <v-list-item v-bind="data.props" class="custom-select-item">
               <template #title>
@@ -212,7 +299,10 @@ onUnmounted(() => {
                   <div class="d-flex align-center justify-space-between">
                     <div class="select-item-content d-flex align-center mt-1">
                       <span class="mdi mdi-airplane air-icon"></span>
-                      <span class="select-text ml-2 text-truncate" style="max-width: 190px">
+                      <span
+                        class="select-text ml-2 text-truncate"
+                        style="max-width: 190px"
+                      >
                         {{ data.item.raw.name }}
                       </span>
                     </div>
@@ -228,7 +318,9 @@ onUnmounted(() => {
           <template #selection="data">
             <div class="transport-place-container">
               <div class="transport-place">
-                <div class="transport-title text-caption font-weight-light">To</div>
+                <div class="transport-title text-caption font-weight-light">
+                  To
+                </div>
                 <div class="transport-content">
                   <div class="d-flex align-center justify-space-between">
                     <h2>{{ data.item?.raw?.city }}</h2>
@@ -236,7 +328,9 @@ onUnmounted(() => {
                       {{ data.item.raw.code }}
                     </div>
                   </div>
-                  <p class="font-weight-light">{{ data.item.raw.name || "Select Your Destination" }}</p>
+                  <p class="font-weight-light">
+                    {{ data.item.raw.name || "Select Your Destination" }}
+                  </p>
                 </div>
               </div>
             </div>
@@ -245,93 +339,171 @@ onUnmounted(() => {
       </div>
     </div>
     <div class="h-100">
-    <div class="header-right-content d-flex align-center">
-    <!-- Guest -->
-    <v-menu v-model="menu" :close-on-content-click="false" transition="scale-transition">
-      <template v-slot:activator="{ props }">
-        <div class="add-guest d-none d-md-flex" v-bind="props">
-          <div class="guest-container">
-            <div class="guest-title text-grey-darken-1">Guests</div>
-            <div class="guest-content d-flex justify-space-between align-center">
-              <h2 class="text-h4 text-grey-lighten-2 font-weight-regular">
-                {{ totalGuests }}
-              </h2>
-              <span class="mdi mdi-chevron-down"></span>
+      <div class="header-right-content d-flex align-center">
+        <!-- Guest -->
+        <v-menu
+          v-model="menu"
+          :close-on-content-click="false"
+          transition="scale-transition"
+        >
+          <template v-slot:activator="{ props }">
+            <div class="add-guest d-none d-md-flex" v-bind="props">
+              <div class="guest-container">
+                <div class="guest-title text-grey-darken-1">Guests</div>
+                <div
+                  class="guest-content d-flex justify-space-between align-center"
+                >
+                  <h2 class="text-h4 text-grey-lighten-2 font-weight-regular">
+                    {{ totalGuests }}
+                  </h2>
+                  <span class="mdi mdi-chevron-down"></span>
+                </div>
+              </div>
             </div>
-          </div>
-        </div>
-      </template>
-      <v-card color="black" class="guest-plate" width="380" max-height="440" rounded="0">
-        <div v-for="(item, index) in addGuest" :key="index" class="plate-item">
-          <div class="d-flex justify-space-between align-center">
-            <h3 class="text-h5 font-weight-regular text-white">
-              {{ item.title }}
-            </h3>
-            <CounterPlate v-model:count="item.value" />
-          </div>
-          <p class="guest-text text-grey-darken-1">{{ item.description }}</p>
-        </div>
+          </template>
+          <v-card
+            color="black"
+            class="guest-plate"
+            width="380"
+            max-height="440"
+            rounded="0"
+          >
+            <div
+              v-for="(item, index) in addGuest"
+              :key="index"
+              class="plate-item"
+            >
+              <div class="d-flex justify-space-between align-center">
+                <h3 class="text-h5 font-weight-regular text-white">
+                  {{ item.title }}
+                </h3>
+                <CounterPlate v-model:count="item.value" />
+              </div>
+              <p class="guest-text text-grey-darken-1">
+                {{ item.description }}
+              </p>
+            </div>
 
-        <v-card-actions class="guest-action d-flex justify-end">
-          <v-btn variant="text" size="small" @click="menu = false">
-            Done
-          </v-btn>
-        </v-card-actions>
-      </v-card>
-    </v-menu>
+            <v-card-actions class="guest-action d-flex justify-end">
+              <v-btn variant="text" size="small" @click="menu = false">
+                Done
+              </v-btn>
+            </v-card-actions>
+          </v-card>
+        </v-menu>
 
-    <!-- Round trip -->
-    <div class="d-none d-md-flex align-center">
-      <!-- Vertical Switch -->
-      <v-switch v-model="isRoundTrip" class="custom-switch vertical-switch mr-3" hide-details>
-        <template #thumb>
-          <!-- <span class="switch-check mdi mdi-check"></span> -->
-        </template>
-      </v-switch>
-
-      <!-- Labels -->
-      <div>
-        <div class="text-body-2 font-weight-medium cursor-pointer"
-          :class="!isRoundTrip ? 'text-white' : 'text-grey-darken-1'" @click="isRoundTrip = false">
-          One Way
-        </div>
-        <div class="text-body-2 font-weight-medium cursor-pointer mt-1"
-          :class="isRoundTrip ? 'text-white' : 'text-grey-darken-1'" @click="isRoundTrip = true">
-          Round Trip
-        </div>
-      </div>
-    </div>
-
-    <!-- <router-link to="/departure"> -->
-    <v-btn class="next-btn d-none d-md-flex" icon="mdi-arrow-right" size="large" rounded="lg" @click="searchFlight"
-      :disabled="isSearchDisabled"></v-btn>
-
-    <v-menu v-model="dashboardMenu" :close-on-content-click="false" location="bottom">
-      <template v-slot:activator="{ props }">
-        <div class="dashboard-menu-btn" v-bind="props">
-
-          <v-btn density="comfortable" variant="text" color="white" icon="mdi-menu" size="large" rounded="lg"></v-btn>
-        </div>
-      </template>
-
-      <v-card min-width="240"  color="black" class="dashboard-menu-card" max-height="440">
-        
-        <div class="dashboard-menu">
-          <v-list-item prepend-avatar="https://cdn.vuetifyjs.com/images/john.jpg" subtitle="Founder of Vuetify"
-            title="John Leider">
-            <template v-slot:append>
+        <!-- Round trip -->
+        <div class="d-none d-md-flex align-center">
+          <!-- Vertical Switch -->
+          <v-switch
+            v-model="isRoundTrip"
+            class="custom-switch vertical-switch mr-3"
+            hide-details
+          >
+            <template #thumb>
+              <!-- <span class="switch-check mdi mdi-check"></span> -->
             </template>
-          </v-list-item>
-          <ul class="text-end">
-            <li class="text-subtitle font-weight-medium text-grey-lighten-2"><router-link to="/signin">Login</router-link></li>
-            <li class="text-subtitle font-weight-medium text-grey-lighten-2"><router-link to="/flight">Book Trip</router-link></li>
-            <li class="text-subtitle font-weight-medium text-grey-lighten-2"><router-link to="/">My Trips</router-link></li>
-            <li class="text-subtitle font-weight-medium text-grey-lighten-2"><a @click="onLogout">Log Out</a></li>
-          </ul>
+          </v-switch>
+
+          <!-- Labels -->
+          <div>
+           
+            <div
+              class="text-body-2 font-weight-medium cursor-pointer"
+              :class="!isRoundTrip ? 'text-white' : 'text-grey-darken-1'"
+              @click="isRoundTrip = false"
+            >
+              One Way
+            </div>
+            <div
+              class="text-body-2 font-weight-medium cursor-pointer mt-1"
+              :class="isRoundTrip ? 'text-white' : 'text-grey-darken-1'"
+              @click="isRoundTrip = true"
+            >
+              Round Trip
+            </div>
+           
+          </div>
         </div>
-      </v-card>
-    </v-menu>
-    </div>
+
+        <!-- <router-link to="/departure"> -->
+        <v-btn
+          class="next-btn d-none d-md-flex"
+          icon="mdi-arrow-right"
+          size="large"
+          rounded="lg"
+          @click="searchFlight"
+          :disabled="isSearchDisabled"
+        ></v-btn>
+
+        <v-menu
+          v-model="dashboardMenu"
+          :close-on-content-click="false"
+          :close-on-click="false"
+          location="bottom"
+        >
+          <template v-slot:activator="{ props }">
+            <div class="dashboard-menu-btn" v-bind="props">
+              <v-btn
+                density="comfortable"
+                variant="text"
+                color="white"
+                icon="mdi-menu"
+                size="large"
+                rounded="lg"
+              ></v-btn>
+            </div>
+          </template>
+
+          <v-card
+            min-width="240"
+            color="black"
+            class="dashboard-menu-card"
+            max-height="440"
+          >
+            <div class="dashboard-menu">
+              <v-list-item
+                v-if="userData?.user"
+                class="py-3 profile-menu"
+                :prepend-avatar="
+                  userData.user.avatar ||
+                  'https://cdn.vuetifyjs.com/images/john.jpg'
+                "
+                :subtitle="`${userData.user.email} `"
+                :title="userData.user.name"
+              >
+                <template v-slot:append> </template>
+              </v-list-item>
+
+              <ul class="text-end">
+                <!-- Show login only when NOT logged in -->
+                <li
+                  v-if="!userData?.user"
+                  class="text-subtitle font-weight-medium text-grey-lighten-2"
+                >
+                  <router-link to="/signin">Login</router-link>
+                </li>
+                <li
+                  class="text-subtitle font-weight-medium text-grey-lighten-2"
+                >
+                  <router-link to="/flight">Book Trip</router-link>
+                </li>
+                <li
+                  class="text-subtitle font-weight-medium text-grey-lighten-2"
+                >
+                  <router-link to="/">My Trips</router-link>
+                </li>
+                <li
+                  v-if="userData?.user"
+                  class="text-subtitle font-weight-medium text-grey-lighten-2"
+                >
+                  <a @click="onLogout">Log Out</a>
+                </li>
+              </ul>
+            </div>
+          </v-card>
+        </v-menu>
+      </div>
     </div>
   </div>
 </template>
@@ -351,8 +523,7 @@ onUnmounted(() => {
   align-items: center;
   justify-content: space-between;
   padding: 0 20px;
-  transition:
-    top 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+  transition: top 0.5s cubic-bezier(0.4, 0, 0.2, 1),
     left 0.5s cubic-bezier(0.4, 0, 0.2, 1),
     right 0.5s cubic-bezier(0.4, 0, 0.2, 1),
     border-radius 0.5s cubic-bezier(0.4, 0, 0.2, 1),
@@ -369,12 +540,15 @@ onUnmounted(() => {
   border: 1px solid transparent;
   border-bottom: 1px solid #a6acb53f;
 }
-.header-right-content{
+.header-right-content {
   height: 100%;
   width: 500px;
   justify-content: space-between;
 }
-.h-100{
+.profile-menu {
+  border-bottom: 1px solid #6c7a908e;
+}
+.h-100 {
   height: 100%;
 }
 .logo {
@@ -460,14 +634,14 @@ onUnmounted(() => {
 ::v-deep(.v-input) {
   height: 100%;
 }
-::v-deep(.v-select__selection){
+::v-deep(.v-select__selection) {
   width: 100%;
 }
 .custom-select-item {
   border-top: 1px solid #c3c3c333;
   /* transition: background-color 0.3s ease; */
 }
-.dashboard-menu-card{
+.dashboard-menu-card {
   margin-top: 1px;
 }
 
@@ -494,7 +668,6 @@ onUnmounted(() => {
   font-size: 12px;
   max-width: 220px;
 }
-
 .select-item {
   padding: 10px 0;
 }
@@ -502,26 +675,26 @@ onUnmounted(() => {
 .guest-title {
   font-size: 14px;
 }
-.dashboard-menu-btn{
+.dashboard-menu-btn {
   height: 100%;
   display: flex;
   align-items: center;
 }
-.dashboard-menu ul li{
+.dashboard-menu ul li {
   border-top: 1px solid #c3c3c334;
   width: 100%;
   cursor: pointer;
 }
-.dashboard-menu ul li a{
+.dashboard-menu ul li a {
   display: block;
   width: 100%;
   height: 100%;
   padding: 18px 20px;
 }
-.dashboard-menu ul li:hover{
+.dashboard-menu ul li:hover {
   background-color: #adcede2c;
 }
-.dashboard-menu ul li:first-child{
+.dashboard-menu ul li:first-child {
   border-top: 1px solid transparent;
 }
 .select-item h6 {
@@ -635,7 +808,6 @@ onUnmounted(() => {
 ::v-deep(.v-overlay-container) {
   display: none !important;
 }
-
 
 @media (max-width: 991px) {
   .header {

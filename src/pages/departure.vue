@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted } from "vue";
 import { useFlightStore } from "@/stores/useFlight";
 import SubHeader from "@/components/subPages/SubHeader.vue";
 import { useRouter } from "vue-router";
@@ -9,18 +9,33 @@ const router = useRouter();
 
 // Get today's date
 const today = new Date();
-
 const currentMonth = today.getMonth() + 1;
 const selectedMonth = ref(currentMonth);
 
-const filteredFlights = computed(() => {
-  const flightList = flightStore.flightList;
-  if (!flightList || !flightList.outbound) return [];
+// Load flight data when component mounts
+onMounted(async () => {
+  if (flightStore.searchParams && !flightStore.flightList) {
+    try {
+      await flightStore.searchFlightExecute(
+        `${url}/flights?origin_id=${flightStore.searchParams.origin_id}&destination_id=${flightStore.searchParams.destination_id}&departure_date=&trip=${flightStore.searchParams.trip}`
+      );
+    } catch (error) {
+      console.error("Error reloading flight data:", error);
+      flightStore.clearFlightData();
+      router.push('/');
+    }
+  } else if (!flightStore.searchParams) {
+    // If no search params exist, redirect to home
+    router.push('/');
+  }
+});
 
-  return flightList.outbound.filter((flight) => {
+const filteredFlights = computed(() => {
+  if (!flightStore.flightList || !flightStore.flightList.outbound) return [];
+  
+  return flightStore.flightList.outbound.filter((flight) => {
     const flightDate = new Date(flight.departure_date);
     const flightMonth = flightDate.getMonth() + 1;
-
     return flightMonth === selectedMonth.value && flightDate >= today;
   });
 });

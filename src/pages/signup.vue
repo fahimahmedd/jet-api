@@ -83,7 +83,7 @@ const router = useRouter();
   z-index: -1;
 }
 h3 {
-  font-size: 28px;
+  font-size: 32px;
   margin-top: 120px;
 }
 .gap {

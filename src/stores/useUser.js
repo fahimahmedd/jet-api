@@ -13,7 +13,7 @@ export const useUserStore = defineStore("useUser", () => {
 
   // Set up headers
   const headers = {
-    Authorization: `Bearer ${token}`,
+    Authorization: `Bearer ${token.value}`,
   };
 
   // useAxios for user profile
@@ -32,14 +32,14 @@ export const useUserStore = defineStore("useUser", () => {
 
   // Watch for user API response
   watchEffect(() => {
-    if (response.value && token) {
+    if (response.value && token.value) {
       user.value = response.value.data;
       localStorage.setItem("user", JSON.stringify(response.value.data));
     }
   });
 
   // Initial fetch if token exists
-  if (token) {
+  if (token.value) {
     executeUser();
   }
 

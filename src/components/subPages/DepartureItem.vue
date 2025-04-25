@@ -110,7 +110,9 @@ const seatStatus = computed(() => {
 .flight-content {
   width: 100%;
 }
-
+.text-caption{
+  font-weight: 200;
+}
 .flight-content h5 {
   line-height: 1.1;
   margin-top: 2px;

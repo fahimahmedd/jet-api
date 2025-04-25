@@ -43,8 +43,7 @@ const featureItems = [
           </router-link>
 
           <h3 class="text-grey-lighten-2 font-weight-regular">
-            Let's fly to
-            <strong class="text-white">Gothenburg?</strong>
+            Let's fly to Gothenburg?
           </h3>
           <v-row class="mt-5 d-none d-lg-flex">
             <v-col
