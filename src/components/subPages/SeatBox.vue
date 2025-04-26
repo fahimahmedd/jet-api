@@ -1,83 +1,252 @@
 <script setup>
-import { reactive, onMounted, watch } from 'vue'
-import { useRoute } from 'vue-router'
+import { reactive, onMounted, watch, computed, ref } from 'vue'
+import { useRoute, useRouter } from 'vue-router'
 import { useFlightStore } from '@/stores/useFlight'
 import { url } from '@/plugins/baseUrl'
+import { useUserStore } from '@/stores/useUser'
+import { storeToRefs } from 'pinia'
+
+const userStore = useUserStore()
+const { user, loadingUser } = storeToRefs(userStore)
 
 const route = useRoute()
+const router = useRouter()
 const flightStore = useFlightStore()
+const isLoading = ref(false)
+
+// Get guest count from session storage with error handling
+const getSearchParams = () => {
+  try {
+    return JSON.parse(sessionStorage.getItem('searchParams')) || {}
+  } catch {
+    return {}
+  }
+}
+const searchParams = getSearchParams()
+const totalGuests = searchParams?.totalGuests || 1
 
 const flightId = route.params.id
 const seats = reactive([])
+const selectedSeats = reactive([])
 
 const fetchSeats = async () => {
-  await flightStore.flightSeat(`${url}/flights/${flightId}/seats`)
-  seats.splice(0, seats.length)
-  const apiSeats = flightStore.seats?.seats || []
+  try {
+    isLoading.value = true
+    await flightStore.flightSeat(`${url}/flights/${flightId}/seats`)
+    seats.splice(0, seats.length)
+    const apiSeats = flightStore.seats?.seats || []
 
-  apiSeats.forEach((seat, index) => {
-    seats.push({
-      ...seat,
-      class: `seat-${index + 1}`,
-      selected: false,
-      booked: seat.is_booked === 1
+    apiSeats.forEach((seat, index) => {
+      seats.push({
+        ...seat,
+        class: `seat-${index + 1}`,
+        selected: false,
+        booked: seat.is_booked === 1,
+        seat_number: seat.seat_number || `Seat ${index + 1}`
+      })
     })
-  })
+  } catch (error) {
+    console.error('Error fetching seats:', error)
+  } finally {
+    isLoading.value = false
+  }
 }
 
-fetchSeats()
+onMounted(() => {
+  fetchSeats();
+  
+  // Restore previous selection if exists
+  const savedBooking = sessionStorage.getItem('bookingData');
+  if (savedBooking) {
+    const bookingData = JSON.parse(savedBooking);
+    if (bookingData.flight_id === flightId) {
+      // Match the seats with stored selection
+      bookingData.selected_seats?.forEach(savedSeat => {
+        const seat = seats.find(s => s.id === savedSeat.id);
+        if (seat && !seat.booked) {
+          seat.selected = true;
+          selectedSeats.push(savedSeat);
+        }
+      });
+    }
+  }
+});
 
 // Watch route param changes
-watch(() => route.params.id, () => {
-  fetchSeats()
-})
+watch(() => route.params.id, fetchSeats)
 
-// Toggle Seat Logic
+// Toggle Seat Logic with better feedback
 const toggleSeat = (id) => {
   const seat = seats.find((s) => s.id === id)
-  if (seat && !seat.booked) {
-    seat.selected = !seat.selected
+  if (!seat || seat.booked) return
+
+  if (seat.selected) {
+    // Deselect seat
+    seat.selected = false
+    const index = selectedSeats.findIndex(s => s.id === id)
+    if (index !== -1) selectedSeats.splice(index, 1)
+  } else if (selectedSeats.length < totalGuests) {
+    // Select seat if under limit
+    seat.selected = true
+    selectedSeats.push({
+      id: seat.id,
+      seat_number: seat.seat_number
+    })
+  } else {
+    // Show visual feedback when trying to select beyond limit
+    const seatElement = document.querySelector(`.${seat.class}`)
+    seatElement.classList.add('limit-reached')
+    setTimeout(() => seatElement.classList.remove('limit-reached'), 500)
+  }
+}
+
+const buttonState = computed(() => ({
+  text: `${selectedSeats.length}/${totalGuests}`,
+  disabled: selectedSeats.length !== totalGuests,
+  color: selectedSeats.length === totalGuests ? 'primary' : 'grey'
+}))
+
+const selectedSeatsDisplay = computed(() => {
+  if (selectedSeats.length === 0) return 'Not selected'
+  return selectedSeats.map(s => s.seat_number).join(', ')
+})
+
+
+const proceedToTrip = async () => {
+  if (buttonState.value.disabled) return
+  
+  try {
+    // Prepare booking data
+    const bookingData = {
+      flight_id: flightId,
+      seat_ids: selectedSeats.map(seat => seat.id),
+      trip_type: searchParams.trip,
+    };
+
+    const guestData = {
+      flight_id: flightId,
+      total_guests: totalGuests,
+      selected_seats: selectedSeats
+    }
+    // Store in sessionStorage
+    sessionStorage.setItem('bookingData', JSON.stringify(bookingData));
+    sessionStorage.setItem('guestData', JSON.stringify(guestData));
+    
+    // Wait if user data is still loading
+    if (loadingUser.value) {
+      await new Promise(resolve => {
+        const unwatch = watch(() => loadingUser.value, (isLoading) => {
+          if (!isLoading) {
+            unwatch()
+            resolve()
+          }
+        })
+      })
+    }
+    
+    // Check authentication and redirect
+    if (user.value) {
+      router.push('/trip');
+    } else {
+      // Optional: Store intended path for post-login redirect
+      sessionStorage.setItem('authRedirect', '/trip');
+      router.push('/signin');
+    }
+  } catch (error) {
+    console.error('Navigation error:', error)
+    // Handle error (show toast, etc.)
   }
 }
 </script>
 
 <template>
-  <div class="seat-container">
-    <v-btn v-for="seat in seats" :key="seat.id" :class="[seat.class, { selected: seat.selected, booked: seat.booked }]"
-      class="seat-item" :disabled="seat.booked" @click="toggleSeat(seat.id)" density="compact" variant="tonal">
-      <span v-if="seat.booked" class="booked-text text-caption text-white font-weight-medium">
-        BOKAD
-      </span>
-      <span v-else class="text-caption font-weight-medium">
-        <!-- {{ seat.seat_number }} -->
-      </span>
-    </v-btn>
-  </div>
+  <div class="seat-wrapper">
+    <div v-if="isLoading" class="loading-overlay">
+      <v-progress-circular indeterminate color="primary"></v-progress-circular>
+    </div>
+    
+    <div class="seat-container">
+      <v-btn 
+        v-for="seat in seats" 
+        :key="seat.id" 
+        :class="[seat.class, { 
+          'selected': seat.selected, 
+          'booked': seat.booked,
+          'limit-reached': selectedSeats.length >= totalGuests && !seat.selected && !seat.booked
+        }]"
+        class="seat-item" 
+        :disabled="seat.booked" 
+        @click="toggleSeat(seat.id)" 
+        density="compact" 
+        variant="tonal"
+      >
+        <span v-if="seat.booked" class="booked-text text-caption text-white font-weight-bold">
+          BOKAD
+        </span>
+        <!-- <span v-else class="text-caption font-weight-medium">
+          {{ seat.seat_number }}
+        </span> -->
+      </v-btn>
+    </div>
 
-  <div class="seat-overview mt-16">
-    <div class="d-flex align-center ga-2">
-      <span class="seat-shape booked-seat"></span>
-      <span>Booked Seat</span>
-    </div>
-    <div class="d-flex align-center ga-2">
-      <span class="seat-shape choosen-seat"></span>
-      <span>Choosen Seat</span>
-    </div>
-  </div>
-  <div class="seat-footer d-flex justify-space-between mt-16">
-    <div class="d-flex ga-4 align-center">
-      <div>
-        <v-img src="/public/images/seat/seat.png" height="22" width="22"></v-img>
+    <div class="seat-overview mt-8">
+      <div class="d-flex align-center ga-2">
+        <span class="seat-shape booked-seat"></span>
+        <span class="text-caption">Booked Seat</span>
       </div>
-      <span>Seating <strong>3L</strong> </span>
+      <div class="d-flex align-center ga-2">
+        <span class="seat-shape choosen-seat"></span>
+        <span class="text-caption">Selected Seat</span>
+      </div>
+      <div class="d-flex align-center ga-2">
+        <span class="seat-shape available-seat"></span>
+        <span class="text-caption">Available Seat</span>
+      </div>
     </div>
-    <router-link to="/trip">
-      <v-btn size="x-large" density="comfortable" variant="tonal" max-width="260" rounded>1/2</v-btn>
-    </router-link>
+
+    <div class="seat-footer d-flex justify-space-between mt-10">
+      <div class="d-flex ga-4 align-center">
+        <div>
+          <v-img src="/images/seat/seat.png" height="22" width="22"></v-img>
+        </div>
+        <span class="text-body-2">Seating: <strong>{{ selectedSeatsDisplay }}</strong></span>
+      </div>
+      
+      <v-btn 
+        size="large" 
+        density="comfortable" 
+        :variant="buttonState.disabled ? 'outlined' : 'tonal'"
+        min-width="150" 
+        rounded
+        :disabled="buttonState.disabled"
+        :color="buttonState.color"
+        @click="proceedToTrip"
+      >
+        {{ buttonState.text }}
+      </v-btn>
+    </div>
   </div>
 </template>
 
 <style scoped>
+.seat-wrapper {
+  position: relative;
+  min-height: 300px;
+}
+
+.loading-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: rgba(255, 255, 255, 0.7);
+  z-index: 10;
+}
+
 .seat-container {
   height: 165px;
   width: 100%;
@@ -88,17 +257,7 @@ const toggleSeat = (id) => {
   background-repeat: no-repeat;
   position: relative;
   z-index: 1;
-}
-
-.seat-mobile-container {
-  height: 600px;
-  width: 100%;
-  background-image: url("/images/seat/m-plan-plate.png");
-  background-position: center;
-  background-size: contain;
-  background-repeat: no-repeat;
-  position: relative;
-  z-index: 1;
+  margin: 0 auto;
 }
 
 .seat-item {
@@ -109,77 +268,87 @@ const toggleSeat = (id) => {
   background-size: contain;
   background-repeat: no-repeat;
   position: absolute;
+  transition: all 0.2s ease;
 }
 
 /* Seat positioning and background */
 .seat-1 {
-  background-image: url(/public/images/seat/seat-1.png);
+  background-image: url(/images/seat/seat-1.png);
   top: 25px;
   left: 185px;
 }
 
 .seat-2 {
-  background-image: url(/public/images/seat/seat-2.png);
+  background-image: url(/images/seat/seat-2.png);
   top: 25px;
   left: 280px;
 }
 
 .seat-3 {
-  background-image: url(/public/images/seat/seat-3.png);
+  background-image: url(/images/seat/seat-3.png);
   top: 25px;
   left: 390px;
 }
 
 .seat-4 {
-  background-image: url(/public/images/seat/seat-4.png);
+  background-image: url(/images/seat/seat-4.png);
   top: 25px;
   right: 260px;
 }
 
 .seat-5 {
-  background-image: url(/public/images/seat/seat-5.png);
+  background-image: url(/images/seat/seat-5.png);
   bottom: 27px;
   left: 280px;
 }
 
 .seat-6 {
-  background-image: url(/public/images/seat/seat-6.png);
+  background-image: url(/images/seat/seat-6.png);
   bottom: 27px;
   left: 390px;
 }
 
 .seat-7 {
-  background-image: url(/public/images/seat/seat-7.png);
+  background-image: url(/images/seat/seat-7.png);
   bottom: 27px;
   right: 260px;
 }
 
 .selected {
   background-color: #1E4721 !important;
-  color: white;
+  color: white !important;
+  transform: scale(1.05);
 }
 
-/* Booked seat style */
 .booked {
   background-color: #eeeeeea8;
   pointer-events: none;
   opacity: 0.8;
 }
 
-.booked .booked-text {
-  position: relative;
-  z-index: 111;
+.limit-reached {
+  animation: pulse 0.5s;
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.1); }
+  100% { transform: scale(1); }
 }
 
 .seat-overview {
   display: flex;
   align-items: center;
-  gap: 60px;
+  justify-content: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  max-width: 800px;
+  margin: 0 auto;
 }
 
 .seat-shape {
-  height: 20px;
-  width: 25px;
+  height: 16px;
+  width: 20px;
   border-top-left-radius: 10px;
   border-top-right-radius: 5px;
   border-bottom-left-radius: 6px;
@@ -191,7 +360,18 @@ const toggleSeat = (id) => {
 }
 
 .choosen-seat {
-  background-color: #1E4721;
+  background-color: #346838;
+}
+
+.available-seat {
+  background-color: #353434d9;
+  border: 1px solid #9E9E9E;
+}
+
+.seat-footer {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 0 16px;
 }
 
 @media (max-width: 1260px) {
@@ -334,6 +514,19 @@ const toggleSeat = (id) => {
     top: auto;
     left: 30px;
     right: auto;
+  }
+  
+  .seat-overview {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+    padding: 0 16px;
+  }
+  
+  .seat-footer {
+    flex-direction: column;
+    gap: 16px;
+    align-items: center;
   }
 }
 </style>

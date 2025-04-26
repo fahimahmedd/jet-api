@@ -36,9 +36,18 @@ const filteredFlights = computed(() => {
   return flightStore.flightList.outbound.filter((flight) => {
     const flightDate = new Date(flight.departure_date);
     const flightMonth = flightDate.getMonth() + 1;
-    return flightMonth === selectedMonth.value && flightDate >= today;
+    
+    // Create date-only versions for comparison (ignoring time)
+    const todayDateOnly = new Date(today);
+    todayDateOnly.setHours(0, 0, 0, 0);
+    
+    const flightDateOnly = new Date(flightDate);
+    flightDateOnly.setHours(0, 0, 0, 0);
+    
+    return flightMonth === selectedMonth.value && flightDateOnly >= todayDateOnly;
   });
 });
+
 
 const monthNames = [
   "Jan",

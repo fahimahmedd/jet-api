@@ -49,7 +49,6 @@ const handleLogin = async () => {
       },
     });
 
-    // Handle both direct API response and possible wrapped response
     const res = response?.response?.value || response;
     
     if (res?.status === 200) {
@@ -60,7 +59,20 @@ const handleLogin = async () => {
         localStorage.setItem("token", token);
         localStorage.setItem("user", JSON.stringify(user));
         useUser.setTokenAndFetchUser(token);
-        router.push("/");
+        
+        // Check for stored booking data and redirect accordingly
+        const bookingData = sessionStorage.getItem('bookingData');
+        const authRedirect = sessionStorage.getItem('authRedirect');
+        
+        if (bookingData && authRedirect) {
+          // Redirect to the trip page after successful login
+          router.push(authRedirect);
+          // Clear the redirect storage
+          sessionStorage.removeItem('authRedirect');
+        } else {
+          // Default redirect if no booking flow in progress
+          router.push("/");
+        }
       } else {
         showError.value = "Invalid response from server";
       }
