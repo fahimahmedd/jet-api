@@ -64,7 +64,9 @@ body,
 .sub-container{
     max-width: 850px;
 }
-
+.letter-space-2{
+    letter-spacing: 2px !important;
+}
 @media (min-width: 1920px) {
     .v-container {
         max-width: 1440px;

@@ -131,9 +131,6 @@ h3 {
   position: relative;
   top: -50px;
 }
-.feature-item {
-  padding: 20px;
-}
 .feature-item p {
   font-size: 14px;
   font-weight: 700;

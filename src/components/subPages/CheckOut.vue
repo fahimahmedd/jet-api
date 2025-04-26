@@ -7,7 +7,6 @@
       <span class="text-black font-weight-regular text-caption-1"
         >Guest - 1
       </span>
-      <span class="mdi mdi-close"></span>
     </div>
 
     <Coupon />

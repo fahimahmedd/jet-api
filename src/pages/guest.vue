@@ -1,6 +1,67 @@
 <script setup>
 import GuestForm from "@/components/subPages/GuestForm.vue";
 import SubHeader from "@/components/subPages/SubHeader.vue";
+import { ref, onMounted, computed } from 'vue';
+
+const guestData = ref({
+  flight_id: null,
+  total_guests: 1,
+  selected_seats: []
+});
+
+const currentGuestIndex = ref(0);
+const guestForms = ref([]);
+
+onMounted(() => {
+  try {
+    const storedData = sessionStorage.getItem('guestData');
+    if (storedData) {
+      const parsedData = JSON.parse(storedData);
+      guestData.value = {
+        ...guestData.value,
+        ...parsedData
+      };
+    }
+  } catch (error) {
+    console.error('Error loading guest data:', error);
+  }
+
+  guestForms.value = Array(guestData.value.total_guests).fill(null).map((_, i) => ({
+    id: i + 1,
+    completed: false,
+    data: null
+  }));
+});
+
+const handleGuestSubmit = (formData) => {
+  if (!formData.firstName || !formData.lastName || 
+      !formData.birthDate || !formData.gender) {
+    return;
+  }
+
+  const guestWithNumber = {
+    ...formData,
+    guestNumber: currentGuestIndex.value + 1
+  };
+
+  guestForms.value[currentGuestIndex.value].data = guestWithNumber;
+  guestForms.value[currentGuestIndex.value].completed = true;
+  
+  if (currentGuestIndex.value < guestData.value.total_guests - 1) {
+    currentGuestIndex.value++;
+  } else {
+    const allGuestInfo = guestForms.value
+      .filter(g => g.completed && g.data)
+      .map(g => g.data);
+    
+    sessionStorage.setItem('guestInfo', JSON.stringify(allGuestInfo));
+    window.location.href = '/checkout';
+  }
+};
+
+const isLastGuest = computed(() => {
+  return currentGuestIndex.value === (guestData.value?.total_guests || 1) - 1;
+});
 </script>
 
 <template>
@@ -23,32 +84,20 @@ import SubHeader from "@/components/subPages/SubHeader.vue";
           <div class="guest-list mt-10">
             <h4 class="text-white">Guests</h4>
             <v-btn
+              v-for="(guest, index) in guestForms"
+              :key="guest.id"
               class="guest-item"
               height="auto"
               min-height="unset"
               variant="flat"
               rounded="lg"
-              color="#6C7A90"
+              :color="index === currentGuestIndex ? '#657ca2' : '#6C7A90'"
+              @click="currentGuestIndex = index"
             >
               <div class="text-left">
-                <h5 class="text-h6 text-white font-weight-medium">Adult 1</h5>
-                <p class="font-weight-medium text-grey-lighten-2">
-                  Missing Information
-                </p>
-              </div>
-            </v-btn>
-            <v-btn
-              class="guest-item"
-              height="auto"
-              min-height="unset"
-              variant="flat"
-              rounded="lg"
-              color="#6C7A90"
-            >
-              <div class="text-left">
-                <h5 class="text-h6 text-white font-weight-medium">Adult 2</h5>
-                <p class="font-weight-medium text-grey-lighten-2">
-                  Missing Information
+                <h5 class="text-h6 text-white font-weight-medium">Adult {{ guest.id }}</h5>
+                <p class="font-weight-medium" :class="guest.completed ? 'text-green-lighten-2' : 'text-grey-lighten-2'">
+                  {{ guest.completed ? 'Completed' : 'Missing Information' }}
                 </p>
               </div>
             </v-btn>
@@ -59,26 +108,30 @@ import SubHeader from "@/components/subPages/SubHeader.vue";
         <div class="subpage-content">
           <SubHeader />
           <div class="sub-container">
+            <v-container>
+              <div class="guest-form">
+                <h2 class="text-black font-weight-medium text-h4 mt-5">
+                  Guest Info
+                  <span class="placeholder-text text-grey-darken-1 font-weight-medium text-h6 mt-10">
+                    (Adult {{ currentGuestIndex + 1 }})
+                  </span>
+                </h2>
 
-          <v-container>
-            <div class="guest-form">
-              <h2 class="text-black font-weight-medium text-h4 mt-5">
-                Guest Info
-                <span
-                  class="placeholder-text text-grey-darken-1 font-weight-medium text-h6 mt-10"
-                  >(Adult 1)</span
-                >
-              </h2>
-
-              <GuestForm />
-            </div>
-          </v-container>
+                <GuestForm 
+                  :key="currentGuestIndex"
+                  @submit="handleGuestSubmit"
+                  :is-last-guest="isLastGuest"
+                  :current-guest-data="guestForms[currentGuestIndex]?.data"
+                />
+              </div>
+            </v-container>
           </div>
         </div>
       </v-col>
     </v-row>
   </div>
 </template>
+
 
 <style scoped>
 .subpage-container {
