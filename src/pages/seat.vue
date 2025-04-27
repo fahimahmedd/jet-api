@@ -16,7 +16,7 @@ const featureItems = [
     text: "Fly in comfort with generous space, Italian leather seats, and a relaxing ambiance.",
   },
   {
-    img: "/images/feature/feature-icon-4.svg",
+    img: "/images/feature/feature-icon-4.svg", 
     text: "Enjoy a premium open bar oboard.",
   },
 ];
@@ -34,10 +34,10 @@ const featureItems = [
         >
           <router-link to="/">
             <div class="logo">
-              <v-img src="/images/logo/logo.png" max-width="130"></v-img>
+              <v-img src="/images/logo/logo.png" max-width="220"></v-img>
             </div>
           </router-link>
-
+          <div class="sub-middle-content">
           <h3 class="sub-text-content text-white font-weight-medium">
             Lets fly to Stockholm
           </h3>
@@ -60,6 +60,7 @@ const featureItems = [
                 </div>
               </v-col>
             </v-row>
+          </div>
         </div>
       </v-col>
       <v-col cols="12" lg="7" md="7">
@@ -137,7 +138,10 @@ h3 {
   max-width: 230px;
   color: #fff;
 }
-
+.sub-middle-content{
+  max-width: 600px;
+  margin: 0 auto;
+}
 @media (max-width: 991px) {
   .feature-item {
     padding: 0px;

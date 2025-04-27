@@ -56,15 +56,8 @@ const searchParams = JSON.parse(sessionStorage.getItem('searchParams'))
   padding: 0px;
 }
 ::v-deep(.v-breadcrumbs-item) {
-  color: #52627b;
+  color: #000;
   font-size: 14px;
-  font-weight: 400;
-  border-radius: 4px;
-}
-
-::v-deep(.v-breadcrumbs-item:first-child) {
-  background-color: #6d93cf25;
-  font-weight: 700;
-  padding: 4px 10px;
+  font-weight: 500;
 }
 </style>

@@ -13,7 +13,7 @@ import SubHeader from "@/components/subPages/SubHeader.vue";
         >
           <router-link to="/">
             <div class="logo">
-              <v-img src="/images/logo/logo.png" max-width="130"></v-img>
+              <v-img src="/images/logo/logo.png" max-width="220"></v-img>
             </div>
           </router-link>
           <DepartureHistory />

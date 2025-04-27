@@ -17,11 +17,11 @@ const router = useRouter();
         >
           <router-link to="/">
             <div class="logo">
-              <v-img src="/public/images/logo/logo.png" max-width="130"></v-img>
+              <v-img src="/public/images/logo/logo.png" max-width="220"></v-img>
             </div>
           </router-link>
 
-          <h3 class="text-grey-lighten-2 font-weight-regular">
+          <h3 class="sub-text-content text-grey-lighten-2 font-weight-medium">
             Login to book your next <strong class="text-white">journey! </strong>
           </h3>
           
@@ -85,6 +85,10 @@ const router = useRouter();
 h3 {
   font-size: 32px;
   margin-top: 120px;
+}
+.sub-text-content{
+  max-width: 340px;
+  margin: 120px auto 0;
 }
 .gap {
   gap: 18px;

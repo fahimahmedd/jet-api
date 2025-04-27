@@ -73,10 +73,10 @@ const seatStatus = computed(() => {
           <v-col cols="6" lg="4" md="4">
             <div>
               <h3 class="text-h5 text-white font-weight-medium letter-space-2">{{ formatTime24(item.departure_start_time) }}</h3>
-              <h5 class="text-body-1 text-grey-lighten-4 font-weight-medium">
+              <h5 class="text-body-1 text-grey-lighten-4 font-weight-bold">
                 {{ item.origin.city }}
               </h5>
-              <p class="text-caption text-grey-lighten-2">
+              <p class="text-caption text-white font-weight-medium">
                 {{ item.origin.name }}
               </p>
             </div>
@@ -97,10 +97,10 @@ const seatStatus = computed(() => {
           <v-col cols="6" lg="4" md="4">
             <div class="text-right">
               <h3 class="text-h5 text-white font-weight-medium letter-space-2">{{ formatTime24(item.departure_land_time) }}</h3>
-              <h5 class="text-body-1 text-grey-lighten-4 font-weight-medium">
+              <h5 class="text-body-1 text-grey-lighten-4 font-weight-bold">
                 {{ item.destination.city }}
               </h5>
-              <p class="text-caption text-grey-lighten-2">
+              <p class="text-caption text-white font-weight-medium">
                 {{ item.destination.name }}
               </p>
             </div>

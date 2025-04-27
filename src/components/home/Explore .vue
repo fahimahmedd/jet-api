@@ -23,7 +23,7 @@
                     </div>
                 </v-col>
                 <v-col cols="12" lg="7" md="6">
-                    <v-img src="/public/images/explore/map.webp"   cover
+                    <v-img src="/public/images/explore/map.jpg"   cover
                     rounded="xl"></v-img>
                 </v-col>
             </v-row>

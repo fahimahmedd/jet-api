@@ -99,7 +99,7 @@ function reverseTrip() {
 }
 // Total guest count
 const totalGuests = computed(() => {
-  return addGuest.value.reduce((sum, item) => sum + item.value, 0);
+  return addGuest.value[0].value; // Only count adults
 });
 
 const isRoundTrip = ref(false);
@@ -111,10 +111,12 @@ const isSearchDisabled = computed(() => {
 async function searchFlight() {
   try {
     await flightStore.searchFlightExecute(
-      `${url}/flights?origin_id=${originPlaceholder.value.id}&destination_id=${destinationPlaceholder.value.id}&departure_date=&trip=${isRoundTrip.value ? 'twoway' : 'oneway'}`,
+      `${url}/flights?origin_id=${originPlaceholder.value.id}&destination_id=${
+        destinationPlaceholder.value.id
+      }&departure_date=&trip=${isRoundTrip.value ? "return" : "oneway"}`,
       originPlaceholder.value.code,
       destinationPlaceholder.value.code,
-      totalGuests.value  // Pass total guests count
+      totalGuests.value // Pass total guests count
     );
     router.push({ path: "departure" });
   } catch (error) {
@@ -122,9 +124,7 @@ async function searchFlight() {
   }
 }
 
-
 onMounted(() => {
-
   isRoundTrip.value = false;
   // Set initial placeholder structure
   originPlaceholder.value = {
@@ -139,7 +139,7 @@ onMounted(() => {
     const matchingOrigin = originList.value?.find(
       (origin) => origin.id === flightStore.searchParams.origin_id
     );
-    
+
     // If found, update the originPlaceholder
     if (matchingOrigin) {
       originPlaceholder.value = {
@@ -155,7 +155,7 @@ onMounted(() => {
     const matchingDestination = destinationList.value?.find(
       (dest) => dest.id === flightStore.searchParams.destination_id
     );
-    
+
     // If found, update the destinationPlaceholder
     if (matchingDestination) {
       destinationPlaceholder.value = {
@@ -166,12 +166,37 @@ onMounted(() => {
         value: matchingDestination.id || "",
       };
     }
-    
     // Restore trip type
-    isRoundTrip.value = flightStore.searchParams.trip === 'twoway';
+    // isRoundTrip.value = flightStore.searchParams.trip === 'twoway';
   }
 });
 
+const shouldDisable = (title, isIncrement) => {
+  if (title === "Adult") return false;
+
+  const adultsCount = addGuest.value[0].value;
+  const specialItems = addGuest.value.slice(1);
+  const totalSelected = specialItems.reduce((sum, item) => sum + item.value, 0);
+
+  // Disable "+" if totalSelected >= Adults OR if incrementing would exceed Adults
+  if (isIncrement && totalSelected >= adultsCount) {
+    return true;
+  }
+
+  return false;
+};
+
+watch(() => addGuest.value[0].value, (newAdults, oldAdults) => {
+  if (newAdults < oldAdults) {
+    const specialItems = addGuest.value.slice(1);
+    const totalSelected = specialItems.reduce((sum, item) => sum + item.value, 0);
+    
+    // Reset if selections exceed new Adults count
+    if (totalSelected > newAdults) {
+      specialItems.forEach(item => item.value = 0);
+    }
+  }
+});
 
 const userData = computed(() => {
   return userStore.user;
@@ -201,7 +226,7 @@ onUnmounted(() => {
     <router-link to="/" class="logo">
       <v-img
         src="/public/images/logo/logo.png"
-        max-height="20"
+        max-height="40"
         contain
         class="logo-img"
       ></v-img>
@@ -354,7 +379,8 @@ onUnmounted(() => {
                   class="guest-content d-flex justify-space-between align-center"
                 >
                   <h2 class="text-h4 text-grey-lighten-2 font-weight-regular">
-                    {{ totalGuests }}
+                    {{ addGuest[0].value }}
+                    <!-- Show only adults count -->
                   </h2>
                   <span class="mdi mdi-chevron-down"></span>
                 </div>
@@ -377,7 +403,11 @@ onUnmounted(() => {
                 <h3 class="text-h5 font-weight-regular text-white">
                   {{ item.title }}
                 </h3>
-                <CounterPlate v-model:count="item.value" />
+                <CounterPlate
+                  v-model:count="item.value"
+                  :disableIncrement="shouldDisable(item.title, true)"
+                  :disableDecrement="false"
+                />
               </div>
               <p class="guest-text text-grey-darken-1">
                 {{ item.description }}
@@ -407,7 +437,6 @@ onUnmounted(() => {
 
           <!-- Labels -->
           <div>
-           
             <div
               class="text-body-2 font-weight-medium cursor-pointer"
               :class="!isRoundTrip ? 'text-white' : 'text-grey-darken-1'"
@@ -422,7 +451,6 @@ onUnmounted(() => {
             >
               Round Trip
             </div>
-           
           </div>
         </div>
 
@@ -554,7 +582,7 @@ onUnmounted(() => {
 .logo {
   border-right: 1px solid #6c7a908e;
   height: 100%;
-  width: 150px;
+  width: 220px;
   display: flex;
   align-items: center;
   padding-right: 20px;

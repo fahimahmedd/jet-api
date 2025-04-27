@@ -17,11 +17,11 @@ const router = useRouter();
         >
           <router-link to="/">
             <div class="logo">
-              <v-img src="/public/images/logo/logo.png" max-width="130"></v-img>
+              <v-img src="/public/images/logo/logo.png" max-width="220"></v-img>
             </div>
           </router-link>
 
-          <h3 class="text-grey-lighten-2 font-weight-regular">
+          <h3 class="sub-text-content text-grey-lighten-2 font-weight-regular">
             Register now and start your <strong class="text-white">travel adventure.  </strong>
           </h3>
           
@@ -81,6 +81,10 @@ const router = useRouter();
   width: 100%;
   background-color: rgba(0, 0, 0, 0.9);
   z-index: -1;
+}
+.sub-text-content{
+  max-width: 340px;
+  margin: 120px auto 0;
 }
 h3 {
   font-size: 32px;
