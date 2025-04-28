@@ -3,13 +3,21 @@
 <template>
   <div class="detail-content mt-5">
     <h3 class="text-black font-weight-medium text-h5 mt-10">Guest Info</h3>
-    <div class="selected-guest mt-5">
-      <span class="text-black font-weight-regular text-caption-1"
-        >Guest - 1
+    <div class="selected-guest mt-4">
+      <span class="text-black font-weight-regular text-caption-1">
+        Guest - 1
       </span>
     </div>
 
+    <h3 class="text-black font-weight-medium text-h5 mt-10">Luggage Details</h3>
+    <div class="font-weight-regular mt-3 text-body-2 text-grey-darken-1">
+      The luggage capacity has been met. If you’d like to bring additional
+      luggage beyond what’s included, please contact our Concierge team
+      by email or web chat.
+    </div>
+
     <Coupon />
+
     <h3 class="text-black font-weight-medium text-h5 mt-10">Order Details</h3>
     <div class="detail-item">
       <span>Adult (1) </span>
@@ -47,13 +55,21 @@
       different offerings.
     </div>
     <div class="text-medium-emphasis font-weight-regular text-caption mt-5">
-        Contact concierge@jivair.se to add redress numbers.
+      Contact concierge@jivair.se to add redress numbers.
     </div>
     <div class="text-medium-emphasis font-weight-regular text-caption mt-5">
-        By confirming this reservation, you acknowledge that you have read and hereby accept the Operator Participant Agreement and Conditions of Carriage as applicable to your flight(s). An email with the details of your reservation will be sent to your email address.
+      By confirming this reservation, you acknowledge that you have read and
+      hereby accept the Operator Participant Agreement and Conditions of
+      Carriage as applicable to your flight(s). An email with the details of
+      your reservation will be sent to your email address.
     </div>
     <div class="text-medium-emphasis font-weight-regular text-caption mt-5">
-        Unless otherwise advised: All flights within Europe are operated by JIVAIR AOC. We will notify you as soon as possible if the air carrier operating your flight changes or is not one of the above companies. JIVAIR AB acts as an indirect air carrier under US-DOT Part 380. All passengers are required to accept the applicable Operator Participant Agreement and/or Conditions of Carriage at the time of booking. © 2025 JIVAIR AB
+      Unless otherwise advised: All flights within Europe are operated by JIVAIR
+      AOC. We will notify you as soon as possible if the air carrier operating
+      your flight changes or is not one of the above companies. JIVAIR AB acts
+      as an indirect air carrier under US-DOT Part 380. All passengers are
+      required to accept the applicable Operator Participant Agreement and/or
+      Conditions of Carriage at the time of booking. © 2025 JIVAIR AB
     </div>
   </div>
 </template>
