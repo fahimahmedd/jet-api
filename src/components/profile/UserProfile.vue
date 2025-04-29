@@ -10,7 +10,6 @@
             src="https://cdn.vuetifyjs.com/images/john.jpg"
           ></v-img>
         </v-avatar> -->
-
         <v-avatar color="blue"  size="130">
           <span class="text-h2">CJ</span>
         </v-avatar>

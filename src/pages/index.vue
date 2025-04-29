@@ -17,7 +17,7 @@ import { useFlightStore } from '@/stores/useFlight';
    <Header/>
    <Hero/>
    <Feature/>
-   <Explore />
+   <Explore/>
    <Traveling/>
    <Package/>
    <DarkFeature/>

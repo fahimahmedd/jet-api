@@ -1,4 +1,58 @@
-<script setup></script>
+<script setup>
+import { ref } from 'vue';
+import { useBookFlight } from '@/stores/useBookFlight';
+import { useRouter } from 'vue-router';
+
+const bookStore = useBookFlight();
+const router = useRouter();
+const isConfirming = ref(false);
+
+const handleConfirmation = async () => {
+  try {
+    isConfirming.value = true;
+    
+    // Get booking data for verification
+    const outboundBooking = JSON.parse(sessionStorage.getItem('outboundBookingData') || 'null');
+    const returnBooking = JSON.parse(sessionStorage.getItem('returnBookingData') || 'null');
+    const bookingData = JSON.parse(sessionStorage.getItem('bookingData') || 'null');
+    
+    console.log('Current booking data:', {
+      outbound: outboundBooking,
+      return: returnBooking,
+      oneWay: bookingData
+    });
+    
+    const result = await bookStore.confirmBooking();
+    
+    // Prepare seat information for confirmation page
+    let seatInfo = '';
+    if (outboundBooking && returnBooking) {
+      seatInfo = `Outbound: ${outboundBooking.seat_ids.join(',')}, Return: ${returnBooking.seat_ids.join(',')}`;
+    } else {
+      seatInfo = bookingData?.seat_ids?.join(',') || '';
+    }
+    
+    router.push({
+      path: '/booked',
+      query: {
+        bookingId: result.booking_id,
+        seats: seatInfo,
+        tripType: outboundBooking && returnBooking ? 'roundtrip' : 'oneway'
+      }
+    });
+    
+  } catch (error) {
+    const errorMessage = error.response?.data?.message || 
+                        error.message || 
+                        'Booking failed. Please check your selected seats and try again.';
+    alert(errorMessage);
+    console.error('Confirmation error:', error);
+  } finally {
+    isConfirming.value = false;
+  }
+};
+</script>
+
 
 <template>
   <div class="detail-content mt-5">
@@ -11,31 +65,27 @@
 
     <h3 class="text-black font-weight-medium text-h5 mt-10">Luggage Details</h3>
     <div class="font-weight-regular mt-3 text-body-2 text-grey-darken-1">
-      The luggage capacity has been met. If you’d like to bring additional
-      luggage beyond what’s included, please contact our Concierge team
-      by email or web chat.
+      The luggage capacity has been met. If you'd like to bring additional
+      luggage beyond what's included, please contact our Concierge team
+      by email or web chat.
     </div>
 
     <Coupon />
 
-    <h3 class="text-black font-weight-medium text-h5 mt-10">Order Details</h3>
-    <div class="detail-item">
-      <span>Adult (1) </span>
-      <span> 1 x 15 990 SEK </span>
-    </div>
-    <div class="detail-item">
-      <span>Taxes and fees </span>
-      <span> 6% </span>
-    </div>
-    <div class="detail-item">
-      <span>Subtotal </span>
-      <span> 6% </span>
-    </div>
-    <v-divider class="my-5"></v-divider>
-    <div class="detail-item">
-      <span class="text-h5"> Total : </span>
-      <span class="text-h4"> <strong>5990 $</strong> </span>
-    </div>
+    <OrderDetail />
+    <v-btn 
+    class="booking-btn mt-10" 
+    variant="flat"
+    rounded="lg" 
+    size="large" 
+    block 
+    color="#657ca2"
+    @click="handleConfirmation"
+    :loading="isConfirming"
+    :disabled="isConfirming"
+  >
+    Confirm Your Booking
+  </v-btn>
     <h3 class="text-black font-weight-medium text-h5 mt-10">Payment</h3>
     <div class="payment-container mt-5">
       <v-btn
@@ -46,31 +96,23 @@
       ></v-btn>
       <span class="text-caption-1 mt-3">Add payment method</span>
     </div>
-    <v-btn block height="48" variant="tonal" rounded class="mt-4">
+    <v-btn 
+      block 
+      height="48" 
+      variant="tonal" 
+      rounded 
+      class="mt-4"
+      :loading="isLoading"
+      @click="handlePayment"
+    >
       Pay with Credit Card
     </v-btn>
 
     <div class="text-medium-emphasis font-weight-regular text-caption mt-15">
-      Please click here to view the change and cancellation policy for our
+      Please click here to view the change and cancellation policy for our
       different offerings.
     </div>
-    <div class="text-medium-emphasis font-weight-regular text-caption mt-5">
-      Contact concierge@jivair.se to add redress numbers.
-    </div>
-    <div class="text-medium-emphasis font-weight-regular text-caption mt-5">
-      By confirming this reservation, you acknowledge that you have read and
-      hereby accept the Operator Participant Agreement and Conditions of
-      Carriage as applicable to your flight(s). An email with the details of
-      your reservation will be sent to your email address.
-    </div>
-    <div class="text-medium-emphasis font-weight-regular text-caption mt-5">
-      Unless otherwise advised: All flights within Europe are operated by JIVAIR
-      AOC. We will notify you as soon as possible if the air carrier operating
-      your flight changes or is not one of the above companies. JIVAIR AB acts
-      as an indirect air carrier under US-DOT Part 380. All passengers are
-      required to accept the applicable Operator Participant Agreement and/or
-      Conditions of Carriage at the time of booking. © 2025 JIVAIR AB
-    </div>
+    <!-- Rest of your legal text -->
   </div>
 </template>
 

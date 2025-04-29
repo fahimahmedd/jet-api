@@ -25,15 +25,14 @@ onMounted(async () => {
       router.push('/');
     }
   } else if (!flightStore.searchParams) {
-    // If no search params exist, redirect to home
     router.push('/');
   }
 });
 
 const filteredFlights = computed(() => {
-  if (!flightStore.flightList || !flightStore.flightList.outbound) return [];
+  if (!flightStore.flightList || !flightStore.flightList.return) return [];
   
-  return flightStore.flightList.outbound.filter((flight) => {
+  return flightStore.flightList.return.filter((flight) => {
     const flightDate = new Date(flight.departure_date);
     const flightMonth = flightDate.getMonth() + 1;
     
@@ -75,6 +74,11 @@ const months = computed(() => {
 // const seatBook = ()=>{
 //   router.push({ path: `seat/${}` });
 // }
+const selectReturnFlight = (flight) => {
+  flightStore.setSelectedFlight(flight, 'return');
+};
+
+
 </script>
 
 <template>
@@ -102,7 +106,7 @@ const months = computed(() => {
           <v-container>
             <div class="sub-container">
             <h2 class="text-black font-weight-regular text-h3 mt-10">
-              Departure
+              Return
             </h2>
             <div class="d-flex gap-4 mt-6">
               <span
@@ -123,12 +127,13 @@ const months = computed(() => {
 
             <div class="departure-content mt-8">
               <router-link
-                :to="`/seat/${item.id}`"
-                v-for="item in filteredFlights"
-                :key="item.id"
-              >
-                <DepartureItem :item="item" />
-              </router-link>
+  :to="`/seat/${item.id}`"
+  v-for="item in filteredFlights"
+  :key="item.id"
+  @click="selectReturnFlight(item)"
+>
+  <DepartureItem :item="item" />
+</router-link>
             </div>
             <div
               v-if="filteredFlights.length === 0"

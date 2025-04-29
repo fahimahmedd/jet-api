@@ -8,13 +8,12 @@ import { storeToRefs } from 'pinia'
 
 const userStore = useUserStore()
 const { user, loadingUser } = storeToRefs(userStore)
-
 const route = useRoute()
 const router = useRouter()
 const flightStore = useFlightStore()
 const isLoading = ref(false)
 
-// Get guest count from session storage with error handling
+// Get guest count from session storage
 const getSearchParams = () => {
   try {
     return JSON.parse(sessionStorage.getItem('searchParams')) || {}
@@ -53,47 +52,45 @@ const fetchSeats = async () => {
 }
 
 onMounted(() => {
-  fetchSeats();
+  fetchSeats()
   
   // Restore previous selection if exists
-  const savedBooking = sessionStorage.getItem('bookingData');
+  const savedBooking = sessionStorage.getItem(
+    flightStore.isRoundTrip && !flightStore.selectedReturnFlight 
+      ? 'outboundBookingData' 
+      : 'bookingData'
+  )
   if (savedBooking) {
-    const bookingData = JSON.parse(savedBooking);
+    const bookingData = JSON.parse(savedBooking)
     if (bookingData.flight_id === flightId) {
-      // Match the seats with stored selection
       bookingData.selected_seats?.forEach(savedSeat => {
-        const seat = seats.find(s => s.id === savedSeat.id);
+        const seat = seats.find(s => s.id === savedSeat.id)
         if (seat && !seat.booked) {
-          seat.selected = true;
-          selectedSeats.push(savedSeat);
+          seat.selected = true
+          selectedSeats.push(savedSeat)
         }
-      });
+      })
     }
   }
-});
+})
 
-// Watch route param changes
 watch(() => route.params.id, fetchSeats)
 
-// Toggle Seat Logic with better feedback
 const toggleSeat = (id) => {
   const seat = seats.find((s) => s.id === id)
   if (!seat || seat.booked) return
 
   if (seat.selected) {
-    // Deselect seat
     seat.selected = false
     const index = selectedSeats.findIndex(s => s.id === id)
     if (index !== -1) selectedSeats.splice(index, 1)
   } else if (selectedSeats.length < totalGuests) {
-    // Select seat if under limit
     seat.selected = true
     selectedSeats.push({
       id: seat.id,
       seat_number: seat.seat_number
     })
   } else {
-    // Show visual feedback when trying to select beyond limit
     const seatElement = document.querySelector(`.${seat.class}`)
     seatElement.classList.add('limit-reached')
     setTimeout(() => seatElement.classList.remove('limit-reached'), 500)
@@ -111,52 +108,94 @@ const selectedSeatsDisplay = computed(() => {
   return selectedSeats.map(s => s.seat_number).join(', ')
 })
 
-
 const proceedToTrip = async () => {
   if (buttonState.value.disabled) return
   
   try {
-    // Prepare booking data
     const bookingData = {
       flight_id: flightId,
       seat_ids: selectedSeats.map(seat => seat.id),
       trip_type: searchParams.trip,
+      selected_seats: selectedSeats
     };
 
     const guestData = {
       flight_id: flightId,
       total_guests: totalGuests,
       selected_seats: selectedSeats
-    }
-    // Store in sessionStorage
-    sessionStorage.setItem('bookingData', JSON.stringify(bookingData));
+    };
+
+    // ALWAYS store guestData - for both trip types
     sessionStorage.setItem('guestData', JSON.stringify(guestData));
-    
-    // Wait if user data is still loading
-    if (loadingUser.value) {
-      await new Promise(resolve => {
-        const unwatch = watch(() => loadingUser.value, (isLoading) => {
-          if (!isLoading) {
-            unwatch()
-            resolve()
-          }
-        })
-      })
-    }
-    
-    // Check authentication and redirect
-    if (user.value) {
-      router.push('/trip');
+
+    if (flightStore.isRoundTrip) {
+      if (!flightStore.selectedReturnFlight) {
+        // Outbound flight for round trip
+        sessionStorage.setItem('outboundBookingData', JSON.stringify(bookingData));
+        router.push('/return-departure');
+      } else {
+        // Return flight for round trip
+        sessionStorage.setItem('returnBookingData', JSON.stringify(bookingData));
+        
+        // For round trip, combine both flights' data before trip page
+        combineRoundTripData();
+        
+        if (user.value) {
+          router.push('/trip');
+        } else {
+          sessionStorage.setItem('authRedirect', '/trip');
+          router.push('/signin');
+        }
+      }
     } else {
-      // Optional: Store intended path for post-login redirect
-      sessionStorage.setItem('authRedirect', '/trip');
-      router.push('/signin');
+      // One-way trip
+      sessionStorage.setItem('bookingData', JSON.stringify(bookingData));
+      
+      if (user.value) {
+        router.push('/trip');
+      } else {
+        sessionStorage.setItem('authRedirect', '/trip');
+        router.push('/signin');
+      }
     }
   } catch (error) {
-    console.error('Navigation error:', error)
-    // Handle error (show toast, etc.)
+    console.error('Navigation error:', error);
   }
-}
+};
+
+// Add this helper function
+const combineRoundTripData = () => {
+  try {
+    const outboundData = JSON.parse(sessionStorage.getItem('outboundBookingData'));
+    const returnData = JSON.parse(sessionStorage.getItem('returnBookingData'));
+    const guestData = JSON.parse(sessionStorage.getItem('guestData'));
+
+    if (!outboundData || !returnData || !guestData) {
+      throw new Error('Missing booking data for round trip');
+    }
+
+    // Create combined booking data
+    const combinedData = {
+      trip_type: 'return',
+      outbound: {
+        flight_id: outboundData.flight_id,
+        seat_ids: outboundData.seat_ids,
+        selected_seats: outboundData.selected_seats
+      },
+      return: {
+        flight_id: returnData.flight_id,
+        seat_ids: returnData.seat_ids,
+        selected_seats: returnData.selected_seats
+      },
+      total_guests: guestData.total_guests
+    };
+
+    sessionStorage.setItem('bookingData', JSON.stringify(combinedData));
+  } catch (error) {
+    console.error('Error combining round trip data:', error);
+    throw error;
+  }
+};
 </script>
 
 <template>

@@ -21,6 +21,8 @@ export const useFlightStore = defineStore("useFlight", () => {
   const flightList = ref(JSON.parse(sessionStorage.getItem('flightData')) || null);
   const searchParams = ref(JSON.parse(sessionStorage.getItem('searchParams')) || null);
   const searchLoading = ref(false);
+  const selectedOutboundFlight = ref(JSON.parse(sessionStorage.getItem('outboundFlight')) || null);
+  const selectedReturnFlight = ref(JSON.parse(sessionStorage.getItem('returnFlight')) || null);
 
   // Enhanced search function
   const searchFlightExecute = async (url, originCode, destinationCode, totalGuests) => {
@@ -36,7 +38,7 @@ export const useFlightStore = defineStore("useFlight", () => {
         destination_id: new URL(url).searchParams.get('destination_id'),
         destination_code: destinationCode,
         trip: new URL(url).searchParams.get('trip') || 'oneway',
-        totalGuests: totalGuests  // Add total guests count
+        totalGuests: totalGuests
       };
       
       sessionStorage.setItem('flightData', JSON.stringify(data.value));
@@ -49,13 +51,34 @@ export const useFlightStore = defineStore("useFlight", () => {
       throw error;
     }
   };
+
   // Clear flight data
   const clearFlightData = () => {
     flightList.value = null;
     searchParams.value = null;
+    selectedOutboundFlight.value = null;
+    selectedReturnFlight.value = null;
     sessionStorage.removeItem('flightData');
     sessionStorage.removeItem('searchParams');
+    sessionStorage.removeItem('outboundFlight');
+    sessionStorage.removeItem('returnFlight');
   };
+
+  // Set selected flight
+  const setSelectedFlight = (flight, type = 'outbound') => {
+    if (type === 'outbound') {
+      selectedOutboundFlight.value = flight;
+      sessionStorage.setItem('outboundFlight', JSON.stringify(flight));
+    } else {
+      selectedReturnFlight.value = flight;
+      sessionStorage.setItem('returnFlight', JSON.stringify(flight));
+    }
+  };
+
+  // Check if round trip
+  const isRoundTrip = computed(() => {
+    return searchParams.value?.trip === 'return';
+  });
 
   return {
     executeOrigin,
@@ -68,6 +91,10 @@ export const useFlightStore = defineStore("useFlight", () => {
     seats,
     seatLoading,
     searchParams,
-    clearFlightData
+    clearFlightData,
+    selectedOutboundFlight,
+    selectedReturnFlight,
+    setSelectedFlight,
+    isRoundTrip
   };
 });

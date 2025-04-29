@@ -116,9 +116,16 @@ async function searchFlight() {
       }&departure_date=&trip=${isRoundTrip.value ? "return" : "oneway"}`,
       originPlaceholder.value.code,
       destinationPlaceholder.value.code,
-      totalGuests.value // Pass total guests count
+      totalGuests.value
     );
-    router.push({ path: "departure" });
+    
+    // Clear any previous flight selections
+    flightStore.selectedOutboundFlight = null;
+    flightStore.selectedReturnFlight = null;
+    sessionStorage.removeItem('outboundFlight');
+    sessionStorage.removeItem('returnFlight');
+    
+    router.push({ path: "outbound-departure" });
   } catch (error) {
     console.error("Search failed:", error);
   }

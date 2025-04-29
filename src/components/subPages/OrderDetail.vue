@@ -3,69 +3,83 @@ import { ref, onMounted, computed } from 'vue'
 import { useFlightStore } from '@/stores/useFlight'
 
 const flightStore = useFlightStore()
+const outboundFlight = ref(null)
+const returnFlight = ref(null)
 const bookingData = ref(null)
-const selectedFlight = ref(null)
-const taxRate = 0.06 
+const guestData = ref(null)
+
 
 onMounted(() => {
-  const storedData = sessionStorage.getItem('guestData')
-  if (storedData) {
-    bookingData.value = JSON.parse(storedData)
-    
-    if (flightStore.flightList?.outbound) {
-      selectedFlight.value = flightStore.flightList.outbound.find(
-        flight => flight.id.toString() === bookingData.value.flight_id.toString()
-      )
-    }
-   
-  }
+  const storedBooking = sessionStorage.getItem('bookingData') || 
+                      sessionStorage.getItem('outboundBookingData')
+  const storedGuest = sessionStorage.getItem('guestData')
+  
+  if (storedBooking) bookingData.value = JSON.parse(storedBooking)
+  if (storedGuest) guestData.value = JSON.parse(storedGuest)
+  
+  outboundFlight.value = flightStore.selectedOutboundFlight || 
+                        JSON.parse(sessionStorage.getItem('outboundFlight'))
+  returnFlight.value = flightStore.selectedReturnFlight || 
+                      JSON.parse(sessionStorage.getItem('returnFlight'))
 })
 
-// Calculate total price
 const subtotal = computed(() => {
-  if (!selectedFlight.value || !bookingData.value) return 15990 // Fallback
-  return bookingData.value.total_guests * parseFloat(selectedFlight.value.price)
+  if (!outboundFlight.value) return 0
+  
+  let total = guestData.value?.total_guests * parseFloat(outboundFlight.value.price)
+  if (returnFlight.value) {
+    total += guestData.value?.total_guests * parseFloat(returnFlight.value.price)
+  }
+  return total
 })
 
 const taxAmount = computed(() => {
-  return subtotal.value * taxRate
+  return subtotal.value * 0.06 // 6% tax
 })
 
-// Calculate total with tax
 const totalWithTax = computed(() => {
   return subtotal.value + taxAmount.value
 })
 
+
+onMounted(() => {
+  const bookingData = JSON.parse(sessionStorage.getItem('bookingData'));
+  const guestData = JSON.parse(sessionStorage.getItem('guestData'));
+  
+  if (!bookingData || !guestData) {
+    router.push('/'); // Redirect home if missing data
+  }
+});
 </script>
 
 <template>
   <h3 class="text-black font-weight-medium text-h5 mt-10">Order Details</h3>
   <div class="detail-content mt-5">
     <div class="detail-item">
-      <span>Adults ({{ bookingData?.total_guests || 1 }})</span>
-      <span v-if="selectedFlight">
-        {{ bookingData?.total_guests || 1 }} × {{ selectedFlight.price }} SEK
+      <span> Outbond Flight <span class="font-weight-bold ml-3"> (Adults - {{ guestData?.total_guests || 1 }}) </span></span>
+      <span v-if="outboundFlight">
+        {{ guestData?.total_guests || 1 }} × {{ outboundFlight.price }} SEK
       </span>
       <span v-else>
         1 × 15 990 SEK
       </span>
     </div>
     
-    <!-- <div class="detail-item" v-if="bookingData?.selected_seats">
-      <span>Selected Seats</span>
+    <div v-if="returnFlight" class="detail-item">
+      <span>Return Flight <span class="font-weight-bold ml-3"> (Adults - {{ guestData?.total_guests || 1 }}) </span></span>
       <span>
-        {{ bookingData.selected_seats.map(s => s.seat_number).join(', ') }}
+        {{ guestData?.total_guests || 1 }} × {{ returnFlight.price }} SEK
       </span>
-    </div> -->
+    </div>
     
     <div class="detail-item">
       <span>Taxes and fees</span>
-      <span>{{ (taxRate * 100) }}%</span>
+      <span>6%</span>
     </div>
     
     <div class="detail-item">
       <span>Sub Total</span>
-      <span>{{ subtotal }} </span>
+      <span>{{ subtotal }} SEK</span>
     </div>
 
     <v-divider class="my-5"></v-divider>
@@ -86,7 +100,7 @@ const totalWithTax = computed(() => {
         block 
         color="#657ca2"
       >
-        Continue
+        Continue to Payment
       </v-btn>
     </router-link>
   </div>

@@ -60,17 +60,23 @@ const handleLogin = async () => {
         localStorage.setItem("user", JSON.stringify(user));
         useUser.setTokenAndFetchUser(token);
         
-        // Check for stored booking data and redirect accordingly
-        const bookingData = sessionStorage.getItem('bookingData');
+        // Check for auth redirect path
         const authRedirect = sessionStorage.getItem('authRedirect');
+        const hasBookingData = sessionStorage.getItem('bookingData') || 
+                             sessionStorage.getItem('outboundBookingData') || 
+                             sessionStorage.getItem('returnBookingData');
         
-        if (bookingData && authRedirect) {
-          // Redirect to the trip page after successful login
+        // Always prioritize the authRedirect if it exists
+        if (authRedirect) {
           router.push(authRedirect);
-          // Clear the redirect storage
           sessionStorage.removeItem('authRedirect');
-        } else {
-          // Default redirect if no booking flow in progress
+        } 
+        // If no redirect but has booking data, go to trip page
+        else if (hasBookingData) {
+          router.push('/trip');
+        } 
+        // Default to home
+        else {
           router.push("/");
         }
       } else {
@@ -86,7 +92,6 @@ const handleLogin = async () => {
     isLoading.value = false;
   }
 };
-
 const handleKeyPress = (event) => {
   if (event.key === 'Enter' && isFormValid.value) {
     handleLogin();
