@@ -1,36 +1,93 @@
-/**
- * router/index.ts
- *
- * Automatic routes for `./src/pages/*.vue`
- */
-
-// Composables
-import { createRouter, createWebHistory } from 'vue-router/auto'
-import { setupLayouts } from 'virtual:generated-layouts'
-import { routes } from 'vue-router/auto-routes'
+import { createRouter, createWebHistory , createWebHashHistory } from 'vue-router'
+import Index from '@/pages/index.vue'
+import Trip from '@/pages/trip.vue'
+import Signup from '@/pages/signup.vue'
+import Signin from '@/pages/signin.vue'
+import Seat from '@/pages/seat.vue'
+import ReturnDeparture from '@/pages/return-departure.vue'
+import OutboundDeparture from '@/pages/outbound-departure.vue'
+import Guest from '@/pages/guest.vue'
+import Flight from '@/pages/flight.vue'
+import Checkout from '@/pages/checkout.vue'
+import Booked from '@/pages/booked.vue'
+import Profile from '@/pages/profile.vue'
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
-  routes: setupLayouts(routes),
-})
-
-// Workaround for https://github.com/vitejs/vite/issues/11804
-router.onError((err, to) => {
-  if (err?.message?.includes?.('Failed to fetch dynamically imported module')) {
-    if (!localStorage.getItem('vuetify:dynamic-reload')) {
-      console.log('Reloading page to fix dynamic import error')
-      localStorage.setItem('vuetify:dynamic-reload', 'true')
-      location.assign(to.fullPath)
-    } else {
-      console.error('Dynamic import error, reloading page did not fix it', err)
-    }
-  } else {
-    console.error(err)
-  }
-})
-
-router.isReady().then(() => {
-  localStorage.removeItem('vuetify:dynamic-reload')
+  history: createWebHashHistory(import.meta.env.BASE_URL),
+  routes: [
+    {
+      path: '/',
+      name: 'home',
+      component: Index,
+    },
+    {
+      path: '/trip',
+      name: 'trip',
+      component: Trip,
+    },
+    {
+      path: '/signup',
+      name: 'signup',
+      component: Signup,
+    },
+    {
+      path: '/signin',
+      name: 'signin',
+      component: Signin,
+    },
+    {
+      path: '/seat',
+      name: 'seat',
+      component: Seat,
+    },
+    {
+      path: '/return-departure',
+      name: 'return-departure',
+      component: ReturnDeparture,
+    },
+    {
+      path: '/profile',
+      name: 'profile',
+      component: Profile,
+    },
+    {
+      path: '/outbound-departure',
+      name: 'outbound-departure',
+      component: OutboundDeparture,
+    },
+    {
+      path: '/guest',
+      name: 'guest',
+      component: Guest,
+    },
+    {
+      path: '/flight',
+      name: 'flight',
+      component: Flight,
+    },
+    {
+      path: '/checkout',
+      name: 'checkout',
+      component: Checkout,
+    },
+    {
+      path: '/booked',
+      name: 'booked',
+      component: Booked,
+    },
+    {
+      path: '/seat/:id',
+      name: 'seat',
+      component: Seat,
+    },
+ // Add a catch-all route for 404 errors
+//  {
+//   path: '/:pathMatch(.*)*',
+//   name: 'not-found',
+//   component: () => import('@/pages/NotFound.vue') // Lazy load 404 page
+// }
+    
+  ],
 })
 
 export default router
