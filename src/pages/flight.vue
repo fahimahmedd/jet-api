@@ -38,7 +38,7 @@ const featureItems = [
         >
           <router-link to="/">
             <div class="logo">
-              <v-img src="/public/images/logo/logo.png" max-width="220"></v-img>
+              <v-img src="/public/images/logo/logo.png" max-width="180"></v-img>
             </div>
           </router-link>
 

@@ -91,7 +91,7 @@ const selectReturnFlight = (flight) => {
         >
           <router-link to="/">
             <div class="logo">
-              <v-img src="/images/logo/logo.png" max-width="220"></v-img>
+              <v-img src="/images/logo/logo.png" max-width="180"></v-img>
             </div>
           </router-link>
 

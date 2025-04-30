@@ -226,6 +226,10 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener("scroll", handleScroll);
 });
+
+const toProfile = () =>{
+  router.push({ path: "profile" });
+}
 </script>
 
 <template>
@@ -506,6 +510,7 @@ onUnmounted(() => {
                 "
                 :subtitle="`${userData.user.email} `"
                 :title="userData.user.name"
+                @click="toProfile"
               >
                 <template v-slot:append> </template>
               </v-list-item>
