@@ -531,7 +531,7 @@ const toProfile = () =>{
                 <li
                   class="text-subtitle font-weight-medium text-grey-lighten-2"
                 >
-                  <router-link to="/">My Trips</router-link>
+                  <router-link to="/my-trip">My Trips</router-link>
                 </li>
                 <li
                   v-if="userData?.user"

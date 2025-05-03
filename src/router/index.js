@@ -11,6 +11,8 @@ import Flight from '@/pages/flight.vue'
 import Booked from '@/pages/booked.vue'
 import Profile from '@/pages/profile.vue'
 import Checkout from '@/pages/checkout.vue'
+import MyTrip from '@/pages/my-trip.vue'
+import Ticket from '@/pages/ticket.vue'
 
 const router = createRouter({
   history: createWebHashHistory(import.meta.env.BASE_URL),
@@ -79,6 +81,16 @@ const router = createRouter({
       path: '/seat/:id',
       name: 'seat',
       component: Seat,
+    },
+    {
+      path: '/my-trip',
+      name: 'myTrip',
+      component: MyTrip,
+    },
+    {
+      path: '/ticket',
+      name: 'ticket',
+      component: Ticket,
     },
  // Add a catch-all route for 404 errors
 //  {

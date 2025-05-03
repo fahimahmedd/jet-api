@@ -82,6 +82,22 @@ export const useUserStore = defineStore("useUser", () => {
       }
     });
   };
+
+
+  const updateProfile = async (profileData) => {
+    try {
+      const { execute } = useAxios(`${url}/profile/update`, {
+        method: "POST",
+        headers,
+        data: profileData
+      }, { immediate: false });
+      
+      await execute();
+      // The watchEffect will automatically update the user data if the response is successful
+    } catch (error) {
+      throw error;
+    }
+  };
   
 
   return {
@@ -90,6 +106,7 @@ export const useUserStore = defineStore("useUser", () => {
     loadingUser,
     logoutUser,
     loadingLogout,
-    setTokenAndFetchUser, // 👈 expose this
+    setTokenAndFetchUser,
+    updateProfile
   };
 });
