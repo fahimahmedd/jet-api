@@ -2,6 +2,9 @@
 import GuestForm from "@/components/subPages/GuestForm.vue";
 import SubHeader from "@/components/subPages/SubHeader.vue";
 import { ref, onMounted, computed } from 'vue';
+import { useRouter } from "vue-router";
+
+const router = useRouter();
 
 const guestData = ref({
   flight_id: null,
@@ -55,7 +58,7 @@ const handleGuestSubmit = (formData) => {
       .map(g => g.data);
     
     sessionStorage.setItem('guestInfo', JSON.stringify(allGuestInfo));
-    window.location.href = '/checkout';
+    router.push('/checkout');
   }
 };
 

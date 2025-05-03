@@ -8,9 +8,9 @@ import ReturnDeparture from '@/pages/return-departure.vue'
 import OutboundDeparture from '@/pages/outbound-departure.vue'
 import Guest from '@/pages/guest.vue'
 import Flight from '@/pages/flight.vue'
-import Checkout from '@/pages/checkout.vue'
 import Booked from '@/pages/booked.vue'
 import Profile from '@/pages/profile.vue'
+import Checkout from '@/pages/checkout.vue'
 
 const router = createRouter({
   history: createWebHashHistory(import.meta.env.BASE_URL),
@@ -37,7 +37,7 @@ const router = createRouter({
     },
     {
       path: '/seat',
-      name: 'seat',
+      name: 'seat-detail',
       component: Seat,
     },
     {
