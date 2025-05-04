@@ -139,24 +139,12 @@ const proceedToTrip = async () => {
         
         // For round trip, combine both flights' data before trip page
         combineRoundTripData();
-        
-        if (user.value) {
-          router.push('/trip');
-        } else {
-          sessionStorage.setItem('authRedirect', '/trip');
-          router.push('/signin');
-        }
+        router.push('/trip');
       }
     } else {
       // One-way trip
       sessionStorage.setItem('bookingData', JSON.stringify(bookingData));
-      
-      if (user.value) {
-        router.push('/trip');
-      } else {
-        sessionStorage.setItem('authRedirect', '/trip');
-        router.push('/signin');
-      }
+      router.push('/trip');
     }
   } catch (error) {
     console.error('Navigation error:', error);

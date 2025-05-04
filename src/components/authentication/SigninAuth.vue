@@ -72,9 +72,9 @@ const handleLogin = async () => {
           sessionStorage.removeItem('authRedirect');
         } 
         // If no redirect but has booking data, go to trip page
-        else if (hasBookingData) {
-          router.push('/trip');
-        } 
+        // else if (hasBookingData) {
+        //   router.push('/trip');
+        // } 
         // Default to home
         else {
           router.push("/");
@@ -139,7 +139,7 @@ const handleKeyPress = (event) => {
 
         <div class="d-flex justify-end">
           <div
-            class="text-black text-subtitle-1 font-weight-regular text-decoration-none"
+            class="text-black text-subtitle-2 font-weight-regular text-decoration-none"
           >
             Forgot password?
           </div>
@@ -164,12 +164,12 @@ const handleKeyPress = (event) => {
           Log In
         </v-btn>
 
-        <div
+        <!-- <div
           class="text-subtitle-2 mt-5 text-center font-weight-medium text-decoration-none cursor-pointer"
           @click="router.push('/signup')"
         >
           Don't have an account ? <span class="text-primary font-weight-bold">SIGN UP</span> now
-        </div>
+        </div> -->
       </v-form>
     </div>
   </div>

@@ -111,20 +111,19 @@ const isSearchDisabled = computed(() => {
 async function searchFlight() {
   try {
     await flightStore.searchFlightExecute(
-      `${url}/flights?origin_id=${originPlaceholder.value.id}&destination_id=${
-        destinationPlaceholder.value.id
+      `${url}/flights?origin_id=${originPlaceholder.value.id}&destination_id=${destinationPlaceholder.value.id
       }&departure_date=&trip=${isRoundTrip.value ? "return" : "oneway"}`,
       originPlaceholder.value.code,
       destinationPlaceholder.value.code,
       totalGuests.value
     );
-    
+
     // Clear any previous flight selections
     flightStore.selectedOutboundFlight = null;
     flightStore.selectedReturnFlight = null;
     sessionStorage.removeItem('outboundFlight');
     sessionStorage.removeItem('returnFlight');
-    
+
     router.push({ path: "outbound-departure" });
   } catch (error) {
     console.error("Search failed:", error);
@@ -197,7 +196,7 @@ watch(() => addGuest.value[0].value, (newAdults, oldAdults) => {
   if (newAdults < oldAdults) {
     const specialItems = addGuest.value.slice(1);
     const totalSelected = specialItems.reduce((sum, item) => sum + item.value, 0);
-    
+
     // Reset if selections exceed new Adults count
     if (totalSelected > newAdults) {
       specialItems.forEach(item => item.value = 0);
@@ -227,7 +226,7 @@ onUnmounted(() => {
   window.removeEventListener("scroll", handleScroll);
 });
 
-const toProfile = () =>{
+const toProfile = () => {
   router.push({ path: "profile" });
 }
 </script>
@@ -235,28 +234,14 @@ const toProfile = () =>{
 <template>
   <div :class="['header', { scrolled: isScrolled }]">
     <router-link to="/" class="logo">
-      <v-img
-        src="/public/images/logo/logo.png"
-        max-height="40"
-        contain
-        class="logo-img"
-      ></v-img>
+      <v-img src="/public/images/logo/logo.png" max-height="40" contain class="logo-img"></v-img>
     </router-link>
 
     <!-- Origin -->
     <div class="transport-wrapper d-none d-md-flex">
       <div class="transport-wrap">
-        <v-select
-          v-model="originPlaceholder"
-          item-value="value"
-          item-title="city"
-          :items="originList"
-          variant="plain"
-          return-object
-          density="compact"
-          hide-details
-          theme="dark"
-        >
+        <v-select v-model="originPlaceholder" item-value="value" item-title="city" :items="originList" variant="plain"
+          return-object density="compact" hide-details theme="dark">
           <template #item="data">
             <v-list-item v-bind="data.props" class="custom-select-item">
               <template #title>
@@ -265,10 +250,7 @@ const toProfile = () =>{
                   <div class="d-flex align-center justify-space-between">
                     <div class="select-item-content d-flex align-center mt-1">
                       <span class="mdi mdi-airplane air-icon"></span>
-                      <span
-                        class="select-text ml-2 text-truncate"
-                        style="max-width: 190px"
-                      >
+                      <span class="select-text ml-2 text-truncate" style="max-width: 190px">
                         {{ data.item.raw.name }}
                       </span>
                     </div>
@@ -306,27 +288,13 @@ const toProfile = () =>{
 
       <!-- Reverse Trip -->
       <div class="reverse-trip">
-        <v-btn
-          class="reverse-btn"
-          icon="mdi-autorenew"
-          size="x-small"
-          rounded="xl"
-          @click="reverseTrip"
-        ></v-btn>
+        <v-btn class="reverse-btn" icon="mdi-autorenew" size="x-small" rounded="xl" @click="reverseTrip"></v-btn>
       </div>
 
       <!-- Destination -->
       <div class="transport-wrap">
-        <v-select
-          v-model="destinationPlaceholder"
-          item-value="value"
-          item-title="city"
-          :items="destinationList"
-          variant="plain"
-          return-object
-          density="compact"
-          theme="dark"
-        >
+        <v-select v-model="destinationPlaceholder" item-value="value" item-title="city" :items="destinationList"
+          variant="plain" return-object density="compact" theme="dark">
           <template #item="data">
             <v-list-item v-bind="data.props" class="custom-select-item">
               <template #title>
@@ -335,10 +303,7 @@ const toProfile = () =>{
                   <div class="d-flex align-center justify-space-between">
                     <div class="select-item-content d-flex align-center mt-1">
                       <span class="mdi mdi-airplane air-icon"></span>
-                      <span
-                        class="select-text ml-2 text-truncate"
-                        style="max-width: 190px"
-                      >
+                      <span class="select-text ml-2 text-truncate" style="max-width: 190px">
                         {{ data.item.raw.name }}
                       </span>
                     </div>
@@ -377,18 +342,12 @@ const toProfile = () =>{
     <div class="h-100">
       <div class="header-right-content d-flex align-center">
         <!-- Guest -->
-        <v-menu
-          v-model="menu"
-          :close-on-content-click="false"
-          transition="scale-transition"
-        >
+        <v-menu v-model="menu" :close-on-content-click="false" transition="scale-transition">
           <template v-slot:activator="{ props }">
             <div class="add-guest d-none d-md-flex" v-bind="props">
               <div class="guest-container">
                 <div class="guest-title text-grey-darken-1">Guests</div>
-                <div
-                  class="guest-content d-flex justify-space-between align-center"
-                >
+                <div class="guest-content d-flex justify-space-between align-center">
                   <h2 class="text-h4 text-grey-lighten-2 font-weight-regular">
                     {{ addGuest[0].value }}
                     <!-- Show only adults count -->
@@ -398,27 +357,14 @@ const toProfile = () =>{
               </div>
             </div>
           </template>
-          <v-card
-            color="black"
-            class="guest-plate"
-            width="380"
-            max-height="440"
-            rounded="0"
-          >
-            <div
-              v-for="(item, index) in addGuest"
-              :key="index"
-              class="plate-item"
-            >
+          <v-card color="black" class="guest-plate" width="380" max-height="440" rounded="0">
+            <div v-for="(item, index) in addGuest" :key="index" class="plate-item">
               <div class="d-flex justify-space-between align-center">
                 <h3 class="text-h5 font-weight-regular text-white">
                   {{ item.title }}
                 </h3>
-                <CounterPlate
-                  v-model:count="item.value"
-                  :disableIncrement="shouldDisable(item.title, true)"
-                  :disableDecrement="false"
-                />
+                <CounterPlate v-model:count="item.value" :disableIncrement="shouldDisable(item.title, true)"
+                  :disableDecrement="false" />
               </div>
               <p class="guest-text text-grey-darken-1">
                 {{ item.description }}
@@ -436,11 +382,7 @@ const toProfile = () =>{
         <!-- Round trip -->
         <div class="d-none d-md-flex align-center">
           <!-- Vertical Switch -->
-          <v-switch
-            v-model="isRoundTrip"
-            class="custom-switch vertical-switch mr-3"
-            hide-details
-          >
+          <v-switch v-model="isRoundTrip" class="custom-switch vertical-switch mr-3" hide-details>
             <template #thumb>
               <!-- <span class="switch-check mdi mdi-check"></span> -->
             </template>
@@ -448,95 +390,49 @@ const toProfile = () =>{
 
           <!-- Labels -->
           <div>
-            <div
-              class="text-body-2 font-weight-medium cursor-pointer"
-              :class="!isRoundTrip ? 'text-white' : 'text-grey-darken-1'"
-              @click="isRoundTrip = false"
-            >
+            <div class="text-body-2 font-weight-medium cursor-pointer"
+              :class="!isRoundTrip ? 'text-white' : 'text-grey-darken-1'" @click="isRoundTrip = false">
               One Way
             </div>
-            <div
-              class="text-body-2 font-weight-medium cursor-pointer mt-1"
-              :class="isRoundTrip ? 'text-white' : 'text-grey-darken-1'"
-              @click="isRoundTrip = true"
-            >
+            <div class="text-body-2 font-weight-medium cursor-pointer mt-1"
+              :class="isRoundTrip ? 'text-white' : 'text-grey-darken-1'" @click="isRoundTrip = true">
               Round Trip
             </div>
           </div>
         </div>
 
         <!-- <router-link to="/departure"> -->
-        <v-btn
-          class="next-btn d-none d-md-flex"
-          icon="mdi-arrow-right"
-          size="large"
-          rounded="lg"
-          @click="searchFlight"
-          :disabled="isSearchDisabled"
-        ></v-btn>
+        <v-btn class="next-btn d-none d-md-flex" icon="mdi-arrow-right" size="large" rounded="lg" @click="searchFlight"
+          :disabled="isSearchDisabled"></v-btn>
 
-        <v-menu
-          v-model="dashboardMenu"
-          :close-on-content-click="false"
-          :close-on-click="false"
-          location="bottom"
-        >
+        <v-menu v-model="dashboardMenu" :close-on-content-click="false" :close-on-click="false" location="bottom">
           <template v-slot:activator="{ props }">
             <div class="dashboard-menu-btn" v-bind="props">
-              <v-btn
-                density="comfortable"
-                variant="text"
-                color="white"
-                icon="mdi-menu"
-                size="large"
-                rounded="lg"
-              ></v-btn>
+              <v-btn density="comfortable" variant="text" color="white" icon="mdi-menu" size="large"
+                rounded="lg"></v-btn>
             </div>
           </template>
 
-          <v-card
-            min-width="240"
-            color="black"
-            class="dashboard-menu-card"
-            max-height="440"
-          >
+          <v-card min-width="240" color="black" class="dashboard-menu-card" max-height="440">
             <div class="dashboard-menu">
-              <v-list-item
-                v-if="userData?.user"
-                class="py-3 profile-menu"
-                :prepend-avatar="
-                  userData.user.avatar ||
-                  'https://cdn.vuetifyjs.com/images/john.jpg'
-                "
-                :subtitle="`${userData.user.email} `"
-                :title="userData.user.name"
-                @click="toProfile"
-              >
-                <template v-slot:append> </template>
+              <v-list-item v-if="userData?.user" class="py-3 profile-menu" :prepend-avatar="userData.user.avatar ||
+                `https://ui-avatars.com/api/?name=${userData.user.name}&background=random&color=fff`
+                " :subtitle="`${userData.user.email}`" :title="userData.user.name" @click="toProfile">
+                <template v-slot:append></template>
               </v-list-item>
 
               <ul class="text-end">
                 <!-- Show login only when NOT logged in -->
-                <li
-                  v-if="!userData?.user"
-                  class="text-subtitle font-weight-medium text-grey-lighten-2"
-                >
+                <li v-if="!userData?.user" class="text-subtitle font-weight-medium text-grey-lighten-2">
                   <router-link to="/signin">Login</router-link>
                 </li>
-                <li
-                  class="text-subtitle font-weight-medium text-grey-lighten-2"
-                >
+                <li class="text-subtitle font-weight-medium text-grey-lighten-2">
                   <router-link to="/flight">Book Trip</router-link>
                 </li>
-                <li
-                  class="text-subtitle font-weight-medium text-grey-lighten-2"
-                >
+                <li class="text-subtitle font-weight-medium text-grey-lighten-2">
                   <router-link to="/my-trip">My Trips</router-link>
                 </li>
-                <li
-                  v-if="userData?.user"
-                  class="text-subtitle font-weight-medium text-grey-lighten-2"
-                >
+                <li v-if="userData?.user" class="text-subtitle font-weight-medium text-grey-lighten-2">
                   <a @click="onLogout">Log Out</a>
                 </li>
               </ul>
@@ -580,17 +476,21 @@ const toProfile = () =>{
   border: 1px solid transparent;
   border-bottom: 1px solid #a6acb53f;
 }
+
 .header-right-content {
   height: 100%;
   width: 500px;
   justify-content: space-between;
 }
+
 .profile-menu {
   border-bottom: 1px solid #6c7a908e;
 }
+
 .h-100 {
   height: 100%;
 }
+
 .logo {
   border-right: 1px solid #6c7a908e;
   height: 100%;
@@ -674,13 +574,16 @@ const toProfile = () =>{
 ::v-deep(.v-input) {
   height: 100%;
 }
+
 ::v-deep(.v-select__selection) {
   width: 100%;
 }
+
 .custom-select-item {
   border-top: 1px solid #c3c3c333;
   /* transition: background-color 0.3s ease; */
 }
+
 .dashboard-menu-card {
   margin-top: 1px;
 }
@@ -708,6 +611,7 @@ const toProfile = () =>{
   font-size: 12px;
   max-width: 220px;
 }
+
 .select-item {
   padding: 10px 0;
 }
@@ -715,28 +619,34 @@ const toProfile = () =>{
 .guest-title {
   font-size: 14px;
 }
+
 .dashboard-menu-btn {
   height: 100%;
   display: flex;
   align-items: center;
 }
+
 .dashboard-menu ul li {
   border-top: 1px solid #c3c3c334;
   width: 100%;
   cursor: pointer;
 }
+
 .dashboard-menu ul li a {
   display: block;
   width: 100%;
   height: 100%;
   padding: 18px 20px;
 }
+
 .dashboard-menu ul li:hover {
   background-color: #adcede2c;
 }
+
 .dashboard-menu ul li:first-child {
   border-top: 1px solid transparent;
 }
+
 .select-item h6 {
   font-size: 12px;
   color: #a4a3a3;

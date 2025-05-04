@@ -3,6 +3,8 @@
   import { useRouter } from 'vue-router';
   
   const router = useRouter();
+
+
   
   // Sample booking data - replace with actual data from store/route
   const booking = ref({
@@ -23,26 +25,7 @@
     return new Date(dateString).toLocaleDateString('en-US', options);
   };
   
-  const calculateDuration = () => {
-    const dep = booking.value.flight?.departure_time || '08:30:00';
-    const arr = booking.value.flight?.arrival_time || '11:45:00';
-    
-    const depHours = parseInt(dep.split(':')[0]);
-    const depMins = parseInt(dep.split(':')[1]);
-    const arrHours = parseInt(arr.split(':')[0]);
-    const arrMins = parseInt(arr.split(':')[1]);
-    
-    let hours = arrHours - depHours;
-    let mins = arrMins - depMins;
-    
-    if (mins < 0) {
-      hours--;
-      mins += 60;
-    }
-    
-    return `${hours}h ${mins}m`;
-  };
-  
+
   
   
   const downloadTicket = () => {
@@ -51,7 +34,7 @@
   };
   
   const goToBookings = () => {
-    router.push('/bookings');
+    router.push('/my-trip');
   };
 
   const goToHome = () => {
@@ -88,10 +71,10 @@
             </div>
   
             <div class="detail-item">
-              <v-icon color="#6d92cf">mdi-calendar</v-icon>
+              <v-icon color="#6d92cf">mdi-swap-horizontal</v-icon>
               <div>
-                <div class="detail-label">Departure Date</div>
-                <div class="detail-value">{{ formatDate(booking.flight?.departure_date) || 'June 15, 2023' }}</div>
+                <div class="detail-label">Trip Formate</div>
+                <div class="detail-value">Oneway</div>
               </div>
             </div>
   
@@ -111,7 +94,7 @@
             </div>
   
             <div class="flight-path">
-              <div class="duration">{{ calculateDuration() }}</div>
+              <div class="duration">Date: 00 </div>
               <div class="line"></div>
               <v-icon color="#6d92cf">mdi-airplane</v-icon>
             </div>

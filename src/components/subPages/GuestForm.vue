@@ -28,7 +28,6 @@ const lastName = ref("");
 const birthDate = ref("");
 const gender = ref("");
 const email = ref("");
-const shareDetails = ref(false);
 
 const countries = [
   { code: "+1", flag: "🇺🇸", label: "US", name: "USA" },
@@ -58,7 +57,6 @@ watch(() => props.currentGuestData, (newData) => {
     birthDate.value = newData.birthDate;
     gender.value = newData.gender;
     email.value = newData.email;
-    shareDetails.value = newData.shareDetails || false;
     
     // Improved phone number handling
     if (newData.phone) {
@@ -83,7 +81,6 @@ watch(() => props.currentGuestData, (newData) => {
     gender.value = "";
     email.value = "";
     phone.value = "";
-    shareDetails.value = false;
     selectedCountry.value = countries[0];
   }
 }, { immediate: true });
@@ -106,7 +103,6 @@ const handleSubmit = () => {
     email: email.value,
     phone: phone.value ? `${selectedCountry.value.code}${phone.value}` : null,
     country: selectedCountry.value.name,
-    shareDetails: shareDetails.value
   };
   
   emit('submit', formData);
@@ -201,7 +197,7 @@ const handleSubmit = () => {
             transactional messages. Please reply 'stop' at any time to opt out.
           </div>
           <div>
-            <v-checkbox v-model="shareDetails" class="text-subtitle-2">
+            <v-checkbox class="text-subtitle-2">
               <template #label>
                 <span class="text-subtitle-2 font-weight-medium">
                   Share trip details with this guest.

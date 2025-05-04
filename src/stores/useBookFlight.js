@@ -75,6 +75,7 @@ export const useBookFlight = defineStore("useBook", () => {
       sessionStorage.removeItem('outboundBookingData');
       sessionStorage.removeItem('returnBookingData');
       sessionStorage.removeItem('guestData');
+      sessionStorage.removeItem('guestInfo');
 
       console.log('Booking confirmed:', data.value);
       return data.value;

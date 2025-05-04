@@ -45,7 +45,7 @@ const router = useRouter();
               </template>
             </v-tooltip>
 
-            <div class="mt-10">
+            <div class="mt-2">
                 <TripList/>
             </div>
           </v-container>

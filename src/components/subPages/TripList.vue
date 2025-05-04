@@ -30,9 +30,10 @@ const currentBookings = computed(() => {
     <v-progress-linear
       v-if="bookStore.loading"
       indeterminate
-      color="primary"
+      color="#6d92cf"
       class="mb-4"
     ></v-progress-linear>
+
     
     <v-alert
       v-if="bookStore.error"

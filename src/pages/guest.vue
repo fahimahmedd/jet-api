@@ -3,8 +3,12 @@ import GuestForm from "@/components/subPages/GuestForm.vue";
 import SubHeader from "@/components/subPages/SubHeader.vue";
 import { ref, onMounted, computed } from 'vue';
 import { useRouter } from "vue-router";
+import { useGuestStore } from "@/stores/useGuest";
+import { useUserStore } from "@/stores/useUser";
 
+const userStore = useUserStore();
 const router = useRouter();
+const guestStore = useGuestStore();
 
 const guestData = ref({
   flight_id: null,
@@ -36,7 +40,7 @@ onMounted(() => {
   }));
 });
 
-const handleGuestSubmit = (formData) => {
+const handleGuestSubmit = async (formData) => {
   if (!formData.firstName || !formData.lastName || 
       !formData.birthDate || !formData.gender) {
     return;
@@ -53,12 +57,46 @@ const handleGuestSubmit = (formData) => {
   if (currentGuestIndex.value < guestData.value.total_guests - 1) {
     currentGuestIndex.value++;
   } else {
-    const allGuestInfo = guestForms.value
-      .filter(g => g.completed && g.data)
-      .map(g => g.data);
+    const allGuestInfo = guestForms.value.map(g => g.data);
     
-    sessionStorage.setItem('guestInfo', JSON.stringify(allGuestInfo));
-    router.push('/checkout');
+    try {
+      // Prepare payload - include user_id if user exists
+      const payload = {
+        guest: allGuestInfo,
+        user_id: userStore.user.user?.id || null,
+        flight_id: guestData.value.flight_id 
+      };
+
+      // Execute API call
+      const { data, error } = await guestStore.executeGuest({ 
+        data: payload 
+      });
+
+      if (error.value) {
+        throw error.value;
+      }
+
+      const responseData = data.value;
+      
+      if (responseData?.status === "success") {
+        // Only store token/user if we didn't send a user_id (new registration)
+        if (!payload.user_id && responseData.token && responseData.user) {
+          localStorage.setItem('token', responseData.token);
+          localStorage.setItem('user', JSON.stringify(responseData.user));
+          userStore.setTokenAndFetchUser(responseData.token);
+        }
+        
+        // Always store guest info
+        sessionStorage.setItem('guestInfo', JSON.stringify(allGuestInfo));
+        router.push('/checkout');
+      } else {
+        console.error('API Error:', responseData);
+        throw new Error(responseData?.message || 'Unknown API error');
+      }
+    } catch (error) {
+      console.error('Error submitting guests:', error.message || error);
+      alert(`Error submitting guest data: ${error.message || 'Please try again'}`);
+    }
   }
 };
 
