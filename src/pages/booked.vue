@@ -1,153 +1,193 @@
 <script setup>
-  import { ref } from 'vue';
-  import { useRouter } from 'vue-router';
-  
-  const router = useRouter();
+import { ref, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
+import { useBookFlight } from '@/stores/useBookFlight';
+import { useFlightStore } from '@/stores/useFlight';
 
+const router = useRouter();
+const bookFlightStore = useBookFlight();
+const flightStore = useFlightStore();
 
-  
-  // Sample booking data - replace with actual data from store/route
-  const booking = ref({
-    flight: {
-      id: 4521,
-      origin: { code: 'JFK', city: 'New York' },
-      destination: { code: 'LAX', city: 'Los Angeles' },
-      departure_date: '2023-06-15',
-      departure_time: '08:30:00',
-      arrival_time: '11:45:00'
-    },
-    seats: ['12A', '12B']
-  });
-  
-  const formatDate = (dateString) => {
-    if (!dateString) return '';
-    const options = { year: 'numeric', month: 'long', day: 'numeric' };
-    return new Date(dateString).toLocaleDateString('en-US', options);
-  };
-  
+const booking = ref({
+  outbound: null,
+  return: null,
+  isRoundTrip: false,
+  passengers: 0
+});
 
-  
-  
-  const downloadTicket = () => {
-    // Implement download functionality
-    console.log('Downloading ticket...');
-  };
-  
-  const goToBookings = () => {
-    router.push('/my-trip');
-  };
+// Format date helper
+const formatDate = (dateString) => {
+  if (!dateString) return '';
+  const date = new Date(dateString);
+  const options = { weekday: 'short', month: 'short', day: 'numeric' };
+  return date.toLocaleDateString('en-US', options);
+};
 
-  const goToHome = () => {
+// Get booking data from store
+onMounted(() => {
+  console.log(bookFlightStore.bookingResponse, 'hello')
+  try {
+    if (bookFlightStore.bookingResponse) {
+      booking.value.outbound = bookFlightStore.bookingResponse.outbound_booking;
+      booking.value.return = bookFlightStore.bookingResponse.return_booking;
+      booking.value.isRoundTrip = !!booking.value.return;
+      booking.value.passengers = bookFlightStore.bookingResponse.geust.value || 1;
+      
+      console.log('Booking data loaded:', booking.value);
+    } else {
+      console.warn('No booking response found in store');
+      router.push('/'); // Redirect if no booking data
+    }
+  } catch (error) {
+    console.error('Error loading booking data:', error);
     router.push('/');
-  };
+  }
+});
 
-  </script>
+const downloadTicket = () => {
+  console.log('Downloading ticket...');
+};
 
+const goToBookings = () => {
+  router.push('/my-trip');
+};
 
-
+const goToHome = () => {
+  router.push('/');
+};
+</script>
 <template>
-    <div class="confirmation-page">  
-      <!-- Main Content -->
-      <div class="confirmation-container">
-        <div class="confirmation-card">
-          <!-- Animated Checkmark -->
-          <div class="checkmark-animation">
-            <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
-              <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none"/>
-              <path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
-            </svg>
-          </div>
-  
-          <h1 class="confirmation-title">Booking Confirmed!</h1>
-          <p class="confirmation-subtitle">Your flight has been successfully booked</p>
-  
-          <div class="confirmation-details">
-            <div class="detail-item">
-              <v-icon color="#6d92cf">mdi-airplane</v-icon>
-              <div>
-                <div class="detail-label">Flight Number</div>
-                <div class="detail-value">SW{{ booking.flight?.id || '1234' }}</div>
-              </div>
-            </div>
-  
-            <div class="detail-item">
-              <v-icon color="#6d92cf">mdi-swap-horizontal</v-icon>
-              <div>
-                <div class="detail-label">Trip Formate</div>
-                <div class="detail-value">Oneway</div>
-              </div>
-            </div>
-  
-            <div class="detail-item">
-              <v-icon color="#6d92cf">mdi-account-multiple</v-icon>
-              <div>
-                <div class="detail-label">Passengers</div>
-                <div class="detail-value">{{ booking.seats?.length || 1 }} traveler(s)</div>
-              </div>
+  <div class="confirmation-page">  
+    <!-- Main Content -->
+    <div class="confirmation-container">
+      <div class="confirmation-card">
+        <!-- Animated Checkmark -->
+        <div class="checkmark-animation">
+          <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
+            <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none"/>
+            <path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8"/>
+          </svg>
+        </div>
+
+        <h1 class="confirmation-title">Booking Confirmed!</h1>
+        <p class="confirmation-subtitle">Your flight has been successfully booked</p>
+
+        <!-- Booking Details -->
+       <!-- Updated Booking Details -->
+       <div class="confirmation-details">
+          <div class="detail-item">
+            <v-icon color="#6d92cf">mdi-airplane</v-icon>
+            <div>
+              <div class="detail-label">Flight Number</div>
+              <div class="detail-value">SW{{ booking.outbound?.flight_id }}</div>
             </div>
           </div>
-  
-          <div class="route-display">
-            <div class="airport origin">
-              <div class="code">{{ booking.flight?.origin?.code || 'JFK' }}</div>
-              <div class="city">{{ booking.flight?.origin?.city || 'New York' }}</div>
-            </div>
-  
-            <div class="flight-path">
-              <div class="duration">Date: 00 </div>
-              <div class="line"></div>
-              <v-icon color="#6d92cf">mdi-airplane</v-icon>
-            </div>
-  
-            <div class="airport destination">
-              <div class="code">{{ booking.flight?.destination?.code || 'LAX' }}</div>
-              <div class="city">{{ booking.flight?.destination?.city || 'Los Angeles' }}</div>
+
+          <div class="detail-item">
+            <v-icon color="#6d92cf">mdi-swap-horizontal</v-icon>
+            <div>
+              <div class="detail-label">Trip Type</div>
+              <div class="detail-value">{{ booking.isRoundTrip ? 'Round Trip' : 'One Way' }}</div>
             </div>
           </div>
-  
-          <div class="confirmation-actions">
-            <v-btn 
-              color="#6d92cf" 
-              large 
-              class="action-btn"
-              @click="downloadTicket"
-            >
-              <v-icon left>mdi-download</v-icon>
-              Download Ticket
-            </v-btn>
-            
-            <v-btn 
-              outlined 
-              color="#6d92cf" 
-              large 
-              class="action-btn"
-              @click="goToBookings"
-            >
-              <v-icon left>mdi-text-box-outline</v-icon>
-              View All Bookings
-            </v-btn>
-            <v-btn 
-              outlined 
-              color="#6d92cf" 
-              large 
-              class="action-btn"
-              @click="goToHome"
-            >
-              <v-icon left>mdi-home</v-icon>
-              Back Home
-            </v-btn>
+
+          <div class="detail-item">
+            <v-icon color="#6d92cf">mdi-account-multiple</v-icon>
+            <div>
+              <div class="detail-label">Passengers</div>
+              <div class="detail-value">{{ booking.passengers }} traveler(s)</div>
+            </div>
           </div>
-  
-          <div class="confirmation-note">
-            <v-icon color="success" small>mdi-information-outline</v-icon>
-            <span>A confirmation email has been sent to your registered address</span>
+        </div>
+
+        <!-- Outbound Flight -->
+        <div class="route-display">
+          <div class="airport origin">
+            <div class="code">{{ booking.outbound?.origin_code || '---' }}</div>
+            <div class="city">{{ booking.outbound?.origin_city || 'Origin' }}</div>
           </div>
+
+          <div class="flight-path">
+            <div class="duration">
+              <span class="mdi mdi-calendar"></span>
+              {{ formatDate(booking.outbound?.created_at) }}
+            </div>
+            <div class="line"></div>
+            <v-icon color="#6d92cf">mdi-airplane</v-icon>
+          </div>
+
+          <div class="airport destination">
+            <div class="code">{{ flightStore.searchParams?.destination_code || '---' }}</div>
+            <div class="city">{{ flightStore.searchParams?.destination_city || 'Destination' }}</div>
+          </div>
+        </div>
+
+        <!-- Return Flight (only for round trips) -->
+        <div class="route-display" v-if="booking.isRoundTrip && booking.return">
+          <div class="airport origin">
+            <div class="code">{{ flightStore.searchParams?.destination_code || '---' }}</div>
+            <div class="city">{{ flightStore.searchParams?.destination_city || 'Destination' }}</div>
+          </div>
+
+          <div class="flight-path">
+            <div class="duration">
+              <span class="mdi mdi-calendar"></span>
+              {{ formatDate(booking.return.created_at) }}
+            </div>
+            <div class="line"></div>
+            <v-icon color="#6d92cf">mdi-airplane</v-icon>
+          </div>
+
+          <div class="airport destination">
+            <div class="code">{{ flightStore.searchParams?.origin_code || '---' }}</div>
+            <div class="city">{{ flightStore.searchParams?.origin_city || 'Origin' }}</div>
+          </div>
+        </div>
+
+        <div class="confirmation-actions">
+          <v-btn 
+            color="#6d92cf" 
+            large 
+            class="action-btn"
+            @click="downloadTicket"
+          >
+            <v-icon left>mdi-download</v-icon>
+            Download Ticket
+          </v-btn>
+          
+          <v-btn 
+            outlined 
+            color="#6d92cf" 
+            large 
+            class="action-btn"
+            @click="goToBookings"
+          >
+            <v-icon left>mdi-text-box-outline</v-icon>
+            View All Bookings
+          </v-btn>
+          
+          <v-btn 
+            outlined 
+            color="#6d92cf" 
+            large 
+            class="action-btn"
+            @click="goToHome"
+          >
+            <v-icon left>mdi-home</v-icon>
+            Back Home
+          </v-btn>
+        </div>
+
+        <div class="confirmation-note">
+          <v-icon color="success" small>mdi-information-outline</v-icon>
+          <span>A confirmation email has been sent to your registered address</span>
         </div>
       </div>
     </div>
-  </template>
+  </div>
+</template>
   
-  
+
   
   <style lang="scss" scoped>
   .confirmation-page {
@@ -292,7 +332,7 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin: 40px 0;
+    margin: 20px 0;
     padding: 20px;
     background: #f8f9fa;
     border-radius: 12px;
@@ -321,7 +361,7 @@
     
     .duration {
       font-size: 0.9rem;
-      color: #7f8c8d;
+      color: #757a7a;
       margin-bottom: 10px;
     }
     

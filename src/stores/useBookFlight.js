@@ -7,6 +7,7 @@ import { useFlightStore } from "@/stores/useFlight";
 export const useBookFlight = defineStore("useBook", () => {
   const token = ref(localStorage.getItem("token"));
   const flightStore = useFlightStore();
+  const bookingResponse = ref(null); // Add this line to store the response
 
   const headers = {
     Authorization: `Bearer ${token.value}`,
@@ -36,7 +37,6 @@ export const useBookFlight = defineStore("useBook", () => {
       const isRoundTrip = outboundBooking && returnBooking;
 
       if (isRoundTrip) {
-        // Round-trip payload structure
         payload = {
           flight_id: outboundBooking.flight_id,
           seat_ids: outboundBooking.seat_ids,
@@ -47,7 +47,6 @@ export const useBookFlight = defineStore("useBook", () => {
           },
         };
       } else {
-        // One-way payload structure
         if (!bookingData) {
           throw new Error('No booking data found');
         }
@@ -69,6 +68,10 @@ export const useBookFlight = defineStore("useBook", () => {
         throw error.value;
       }
 
+      // Store the response data
+      bookingResponse.value = data.value;
+      console.log('Booking confirmed:', bookingResponse.value);
+
       // Clear storage after successful booking
       flightStore.clearFlightData();
       sessionStorage.removeItem('bookingData');
@@ -77,25 +80,17 @@ export const useBookFlight = defineStore("useBook", () => {
       sessionStorage.removeItem('guestData');
       sessionStorage.removeItem('guestInfo');
 
-      console.log('Booking confirmed:', data.value);
-      return data.value;
+      return bookingResponse.value;
 
     } catch (error) {
-      console.error('Booking failed:', {
-        error: error.message,
-        timestamp: new Date().toISOString(),
-        storedData: {
-          outbound: sessionStorage.getItem('outboundBookingData'),
-          return: sessionStorage.getItem('returnBookingData'),
-          guest: sessionStorage.getItem('guestData')
-        }
-      });
+      console.error('Booking failed:', error);
       throw error;
     }
   };
 
   return {
     loadingBooking,
-    confirmBooking
+    confirmBooking,
+    bookingResponse // Make the response available to components
   };
 });
