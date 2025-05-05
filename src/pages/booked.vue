@@ -31,7 +31,7 @@ onMounted(() => {
       booking.value.outbound = bookFlightStore.bookingResponse.outbound_booking;
       booking.value.return = bookFlightStore.bookingResponse.return_booking;
       booking.value.isRoundTrip = !!booking.value.return;
-      booking.value.passengers = bookFlightStore.bookingResponse.geust.value || 1;
+      booking.value.passengers = bookFlightStore.bookingResponse.outbound_booking.total_seats || 1;
       
       console.log('Booking data loaded:', booking.value);
     } else {
@@ -103,44 +103,44 @@ const goToHome = () => {
         <!-- Outbound Flight -->
         <div class="route-display">
           <div class="airport origin">
-            <div class="code">{{ booking.outbound?.origin_code || '---' }}</div>
-            <div class="city">{{ booking.outbound?.origin_city || 'Origin' }}</div>
+            <div class="code">{{ booking.outbound?.flight.origin.code || '---' }}</div>
+            <div class="city">{{ booking.outbound?.flight.origin.city || 'Origin' }}</div>
           </div>
 
           <div class="flight-path">
             <div class="duration">
               <span class="mdi mdi-calendar"></span>
-              {{ formatDate(booking.outbound?.created_at) }}
+              {{ formatDate(booking.outbound?.flight.departure_date) }}
             </div>
             <div class="line"></div>
             <v-icon color="#6d92cf">mdi-airplane</v-icon>
           </div>
 
           <div class="airport destination">
-            <div class="code">{{ flightStore.searchParams?.destination_code || '---' }}</div>
-            <div class="city">{{ flightStore.searchParams?.destination_city || 'Destination' }}</div>
+            <div class="code">{{ booking.outbound?.flight.destination.code || '---' }}</div>
+            <div class="city">{{ booking.outbound?.flight.destination.city || 'Destination' }}</div>
           </div>
         </div>
 
         <!-- Return Flight (only for round trips) -->
         <div class="route-display" v-if="booking.isRoundTrip && booking.return">
           <div class="airport origin">
-            <div class="code">{{ flightStore.searchParams?.destination_code || '---' }}</div>
-            <div class="city">{{ flightStore.searchParams?.destination_city || 'Destination' }}</div>
+            <div class="code">{{ booking.return?.flight.origin.code || '---' }}</div>
+            <div class="city">{{ booking.return?.flight.origin.city || 'Origin' }}</div>
           </div>
 
           <div class="flight-path">
             <div class="duration">
               <span class="mdi mdi-calendar"></span>
-              {{ formatDate(booking.return.created_at) }}
+              {{ formatDate(booking.return?.flight.departure_date) }}
             </div>
             <div class="line"></div>
             <v-icon color="#6d92cf">mdi-airplane</v-icon>
           </div>
 
           <div class="airport destination">
-            <div class="code">{{ flightStore.searchParams?.origin_code || '---' }}</div>
-            <div class="city">{{ flightStore.searchParams?.origin_city || 'Origin' }}</div>
+            <div class="code">{{ booking.return?.flight.destination.code || '---' }}</div>
+            <div class="city">{{ booking.return?.flight.destination.city || 'Destination' }}</div>
           </div>
         </div>
 
