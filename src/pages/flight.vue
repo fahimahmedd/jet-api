@@ -1,28 +1,26 @@
 <script setup>
-import SeatBox from "@/components/subPages/SeatBox.vue";
-import SubHeader from "@/components/subPages/SubHeader.vue";
 import { useRouter } from "vue-router";
 
 const router = useRouter();
 
 const featureItems = [
   {
-    img: "/public/images/feature/feature-icon-1.svg",
+    img: "/images/feature/feature-icon-1.svg",
     text:
       "Save precious time by traveling between our private terminals—skip the lines and crowds.",
   },
   {
-    img: "/public/images/feature/feature-icon-2.svg",
+    img: "/images/feature/feature-icon-2.svg",
     text:
       "Check in curbside just 20 minutes before your flight and effortlessly board the jet.",
   },
   {
-    img: "/public/images/feature/feature-icon-3.svg",
+    img: "/images/feature/feature-icon-3.svg",
     text:
       "Fly in comfort with generous space, Italian leather seats, and a relaxing ambiance.",
   },
   {
-    img: "/public/images/feature/feature-icon-4.svg",
+    img: "/images/feature/feature-icon-4.svg",
     text: "Enjoy a premium open bar oboard.",
   },
 ];
@@ -34,11 +32,11 @@ const featureItems = [
       <v-col cols="12" lg="5" md="6" sm="12">
         <div
           class="subpage-left"
-          style="background-image: url('/public/images/subPage/plane.svg')"
+          style="background-image: url('/images/subPage/plane.svg')"
         >
           <router-link to="/">
             <div class="logo">
-              <v-img src="/public/images/logo/logo.png" max-width="180"></v-img>
+              <v-img src="/images/logo/logo.png" max-width="180"></v-img>
             </div>
           </router-link>
 

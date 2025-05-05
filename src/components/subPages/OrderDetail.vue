@@ -1,12 +1,17 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
 import { useFlightStore } from '@/stores/useFlight'
+import { useRoute } from 'vue-router';
+
 
 const flightStore = useFlightStore()
 const outboundFlight = ref(null)
 const returnFlight = ref(null)
 const bookingData = ref(null)
 const guestData = ref(null)
+
+const route = useRoute();
+const isCheckoutRoute = computed(() => route.path === '/checkout');
 
 
 onMounted(() => {
@@ -91,7 +96,7 @@ onMounted(() => {
       </span>
     </div>
     
-    <router-link to="/guest">
+    <router-link to="/guest" v-if="!isCheckoutRoute">
       <v-btn 
         class="booking-btn mt-10" 
         variant="flat"

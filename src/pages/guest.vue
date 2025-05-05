@@ -63,7 +63,7 @@ const handleGuestSubmit = async (formData) => {
       // Prepare payload - include user_id if user exists
       const payload = {
         guest: allGuestInfo,
-        user_id: userStore.user.user?.id || null,
+        user_id: userStore.user?.user?.id || null,
         flight_id: guestData.value.flight_id 
       };
 
@@ -103,6 +103,10 @@ const handleGuestSubmit = async (formData) => {
 const isLastGuest = computed(() => {
   return currentGuestIndex.value === (guestData.value?.total_guests || 1) - 1;
 });
+
+console.log(userStore.user, 'hell')
+
+
 </script>
 
 <template>

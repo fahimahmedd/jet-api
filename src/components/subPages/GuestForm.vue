@@ -89,7 +89,8 @@ const validateForm = () => {
   return firstName.value && 
          lastName.value && 
          birthDate.value && 
-         gender.value;
+         email.value &&
+         phone.value
 };
 
 const handleSubmit = () => {

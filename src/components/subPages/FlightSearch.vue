@@ -1,7 +1,7 @@
 <script setup>
 import { useFlightStore } from "@/stores/useFlight";
 import { storeToRefs } from "pinia";
-import { ref } from "vue";
+import { ref, computed, watch, onMounted } from "vue";
 import { url } from "@/plugins/baseUrl";
 import { useAxios } from "@vueuse/integrations/useAxios";
 import { useRoute, useRouter } from "vue-router";
@@ -31,7 +31,7 @@ const {
 } = useAxios("", { immediate: true });
 
 watch(originPlaceholder, (newVal) => {
-  if (newVal) {
+  if (newVal?.id) {
     executeDestination(`${url}/airport-routes/${newVal.id}`);
   }
 });
@@ -39,7 +39,7 @@ watch(originPlaceholder, (newVal) => {
 watch(destinationData, (newVal) => {
   if (Array.isArray(newVal)) {
     if (newVal.length === 1) {
-      destinationPlaceholder.value = newVal[0]; // Auto-select if only one
+      destinationPlaceholder.value = newVal[0];
     } else {
       destinationPlaceholder.value = {
         city: "Destination",
@@ -58,7 +58,7 @@ const destinationPlaceholder = ref({
   value: "",
 });
 
-// Guest data
+// Guest data - updated to match header component
 const addGuest = ref([
   {
     title: "Adult",
@@ -67,7 +67,7 @@ const addGuest = ref([
   },
   {
     title: "Infants",
-    description: "Ages 2–12",
+    description: "",
     value: 0,
   },
   {
@@ -94,47 +94,136 @@ function reverseTrip() {
   originPlaceholder.value = destinationTmp;
   destinationPlaceholder.value = originTmp;
 }
-// Total guest count
+
+// Total guest count - only count adults like in header
 const totalGuests = computed(() => {
-  return addGuest.value.reduce((sum, item) => sum + item.value, 0);
+  return addGuest.value[0].value;
 });
-const filteredGuest = computed(() => addGuest.value.slice(1));
+
 const isSearchDisabled = computed(() => {
   return !originPlaceholder.value?.id || !destinationPlaceholder.value?.id;
 });
 
+// Improved searchFlight function from header
 async function searchFlight() {
-  await flightStore.searchFlightExecute(
-    `https://appsdevelopmentfirm.agency/admin/site/api/flights?origin_id=${
-      originPlaceholder.value.id
-    }&destination_id=${destinationPlaceholder.value.id}&departure_date=&trip=${
-      isRoundTrip ? "twoway" : "oneway"
-    }`
-  );
-  console.log(flightStore.flightList);
-  // router.push({ path: "departure" });
+  try {
+    await flightStore.searchFlightExecute(
+      `${url}/flights?origin_id=${originPlaceholder.value.id}&destination_id=${destinationPlaceholder.value.id
+      }&departure_date=&trip=${isRoundTrip.value ? "return" : "oneway"}`,
+      originPlaceholder.value.code,
+      destinationPlaceholder.value.code,
+      totalGuests.value
+    );
+
+    // Clear any previous flight selections
+    flightStore.selectedOutboundFlight = null;
+    flightStore.selectedReturnFlight = null;
+    sessionStorage.removeItem('outboundFlight');
+    sessionStorage.removeItem('returnFlight');
+
+    router.push({ path: "outbound-departure" });
+  } catch (error) {
+    console.error("Search failed:", error);
+  }
 }
+
+// Guest counter logic from header
+const shouldDisable = (title, isIncrement) => {
+  if (title === "Adult") return false;
+
+  const adultsCount = addGuest.value[0].value;
+  const specialItems = addGuest.value.slice(1);
+  const totalSelected = specialItems.reduce((sum, item) => sum + item.value, 0);
+
+  // Disable "+" if totalSelected >= Adults OR if incrementing would exceed Adults
+  if (isIncrement && totalSelected >= adultsCount) {
+    return true;
+  }
+
+  return false;
+};
+
+// Watch for adults count changes to reset other counts if needed
+watch(() => addGuest.value[0].value, (newAdults, oldAdults) => {
+  if (newAdults < oldAdults) {
+    const specialItems = addGuest.value.slice(1);
+    const totalSelected = specialItems.reduce((sum, item) => sum + item.value, 0);
+
+    // Reset if selections exceed new Adults count
+    if (totalSelected > newAdults) {
+      specialItems.forEach(item => item.value = 0);
+    }
+  }
+});
+
+// Restore search params on mount like in header
+onMounted(() => {
+  if (flightStore.searchParams) {
+    // Find the matching origin in originList
+    const matchingOrigin = originList.value?.find(
+      (origin) => origin.id === flightStore.searchParams.origin_id
+    );
+
+    // If found, update the originPlaceholder
+    if (matchingOrigin) {
+      originPlaceholder.value = {
+        ...matchingOrigin,
+        city: matchingOrigin.city || "Origin",
+        airport: matchingOrigin.name || "",
+        code: matchingOrigin.code || "",
+        value: matchingOrigin.id || "",
+      };
+    }
+
+    // Find the matching destination in destinationList
+    const matchingDestination = destinationList.value?.find(
+      (dest) => dest.id === flightStore.searchParams.destination_id
+    );
+
+    // If found, update the destinationPlaceholder
+    if (matchingDestination) {
+      destinationPlaceholder.value = {
+        ...matchingDestination,
+        city: matchingDestination.city || "Destination",
+        airport: matchingDestination.name || "",
+        code: matchingDestination.code || "",
+        value: matchingDestination.id || "",
+      };
+    }
+  }
+});
 </script>
 
 <template>
   <div class="flight-container">
-    <v-radio-group
-      v-model="isRoundTrip"
-      class="trip-toggle"
-      hide-details
-      inline
-    >
-      <v-radio
-        label="One Way"
-        :value="false"
-        :class="['radio-option pb-3', !isRoundTrip ? 'active-border' : '']"
-      />
-      <v-radio
-        label="Round Trip"
-        :value="true"
-        :class="['radio-option pb-3', isRoundTrip ? 'active-border' : '']"
-      />
-    </v-radio-group>
+    <!-- Modified Radio Group with full clickable tabs -->
+    <div class="trip-toggle-wrapper">
+      <div 
+        class="trip-option"
+        :class="{ 'active-border': !isRoundTrip }"
+        @click="isRoundTrip = false"
+      >
+        <span class="trip-label">One Way</span>
+        <v-radio
+          :value="false"
+          hide-details
+          class="hidden-radio"
+        />
+      </div>
+      
+      <div 
+        class="trip-option"
+        :class="{ 'active-border': isRoundTrip }"
+        @click="isRoundTrip = true"
+      >
+        <span class="trip-label">Round Trip</span>
+        <v-radio
+          :value="true"
+          hide-details
+          class="hidden-radio"
+        />
+      </div>
+    </div>
 
     <div class="transport-relative">
       <v-select
@@ -188,14 +277,17 @@ async function searchFlight() {
           </div>
         </template>
       </v-select>
-      <!-- <div class="reverse-trip">
+      
+      <div class="reverse-trip">
         <v-btn
           class="reverse-btn"
           icon="mdi-autorenew"
           size="x-small"
           rounded="xl"
+          @click="reverseTrip"
         ></v-btn>
-      </div> -->
+      </div>
+      
       <v-select
         v-model="destinationPlaceholder"
         item-value="value"
@@ -270,16 +362,15 @@ async function searchFlight() {
     </div>
 
     <v-btn
-        class="booking-btn mt-5"
-        variant="outlined"
-        rounded="xl"
-        color="#fff"
-        size="large"
-        block
-        @click="searchFlight"
-        :disabled="isSearchDisabled"
-        >Search FLight</v-btn
-      >
+      class="booking-btn mt-5"
+      variant="outlined"
+      rounded="xl"
+      color="#fff"
+      size="large"
+      block
+      @click="searchFlight"
+      :disabled="isSearchDisabled"
+    >Search Flight</v-btn>
   </div>
 
   <!-- Modal List -->
@@ -300,7 +391,7 @@ async function searchFlight() {
         </div>
 
         <div
-          v-for="(item, index) in filteredGuest"
+          v-for="(item, index) in addGuest.slice(1)"
           :key="index"
           class="plate-item"
         >
@@ -308,7 +399,11 @@ async function searchFlight() {
             <h3 class="plate-text font-weight-medium text-black">
               {{ item.title }}
             </h3>
-            <CounterPlate v-model:count="item.value" />
+            <CounterPlate 
+              v-model:count="item.value" 
+              :disableIncrement="shouldDisable(item.title, true)"
+              :disableDecrement="false"
+            />
           </div>
           <p class="text-caption-2 text-grey-darken-2" style="max-width: 350px">
             {{ item.description }}
@@ -323,8 +418,7 @@ async function searchFlight() {
           size="large"
           block
           @click="guestModal = false"
-          >Complete
-        </v-btn>
+        >Complete</v-btn>
       </div>
     </div>
   </transition>
@@ -340,21 +434,42 @@ async function searchFlight() {
   margin: 0 auto;
 }
 
-.radio-option {
+/* New trip toggle styles */
+.trip-toggle-wrapper {
+  display: flex;
+  width: 100%;
+}
+
+.trip-option {
   width: 50%;
-  font-size: 20px;
+  padding: 12px 0;
+  text-align: center;
+  cursor: pointer;
+  position: relative;
   border-bottom: 1px solid #d8d8d8;
 }
-.active-border {
+
+.trip-option.active-border {
   border-bottom: 2px solid rgb(240, 32, 17);
 }
-::v-deep(.v-selection-control__wrapper) {
-  display: none;
-}
-::v-deep(.trip-toggle .v-label) {
-  font-size: 20px !important;
+
+.trip-label {
+  font-size: 20px;
   font-weight: 300;
 }
+
+.hidden-radio {
+  position: absolute;
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.trip-option:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Existing styles */
 .transport-place-container {
   width: 100%;
   cursor: pointer;
