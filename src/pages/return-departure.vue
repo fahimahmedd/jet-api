@@ -32,53 +32,49 @@ onMounted(async () => {
 const filteredFlights = computed(() => {
   if (!flightStore.flightList || !flightStore.flightList.return) return [];
   
+  // Get the selected outbound flight's date
+  const outboundDate = flightStore.selectedFlight?.departure?.departure_date;
+  if (!outboundDate) return []; // If no outbound selected, show nothing
+  
+  // Create minimum return date (outbound date + 1 day)
+  const minReturnDate = new Date(outboundDate);
+  minReturnDate.setDate(minReturnDate.getDate() + 1);
+  minReturnDate.setHours(0, 0, 0, 0); // Normalize time
+
   return flightStore.flightList.return.filter((flight) => {
     const flightDate = new Date(flight.departure_date);
+    flightDate.setHours(0, 0, 0, 0); // Normalize flight date
+    
     const flightMonth = flightDate.getMonth() + 1;
     
-    // Create date-only versions for comparison (ignoring time)
-    const todayDateOnly = new Date(today);
-    todayDateOnly.setHours(0, 0, 0, 0);
-    
-    const flightDateOnly = new Date(flightDate);
-    flightDateOnly.setHours(0, 0, 0, 0);
-    
-    return flightMonth === selectedMonth.value && flightDateOnly >= todayDateOnly;
+    return (
+      flightDate >= minReturnDate && // Must be after outbound date
+      flightMonth === selectedMonth.value // Must match selected month
+    );
   });
 });
 
-
 const monthNames = [
-  "Jan",
-  "Feb",
-  "Mar",
-  "Apr",
-  "May",
-  "Jun",
-  "Jul",
-  "Aug",
-  "Sept",
-  "Oct",
-  "Nov",
-  "Dec",
+  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+  "Jul", "Aug", "Sept", "Oct", "Nov", "Dec"
 ];
 
 const months = computed(() => {
-  const current = today.getMonth();
-  return monthNames.slice(current).map((name, index) => ({
+  // Start from the month of the outbound flight or current month
+  const outboundDate = flightStore.selectedFlight?.departure?.departure_date;
+  const startMonth = outboundDate 
+    ? new Date(outboundDate).getMonth()
+    : today.getMonth();
+    
+  return monthNames.slice(startMonth).map((name, index) => ({
     label: name,
-    value: current + index + 1,
+    value: startMonth + index + 1,
   }));
 });
 
-// const seatBook = ()=>{
-//   router.push({ path: `seat/${}` });
-// }
 const selectReturnFlight = (flight) => {
   flightStore.setSelectedFlight(flight, 'return');
 };
-
-
 </script>
 
 <template>
@@ -96,8 +92,9 @@ const selectReturnFlight = (flight) => {
           </router-link>
 
           <h3 class="sub-text-content text-white font-weight-medium">
-            When would you like to depart from Gothenburg?
+            When would you like to return {{ flightStore.searchParams?.origin_city }}
           </h3>
+          
         </div>
       </v-col>
       <v-col cols="12" lg="8" md="12">

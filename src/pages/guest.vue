@@ -123,11 +123,13 @@ console.log(userStore.user, 'hell')
             </div>
           </router-link>
 
-          <h3 class="text-grey-lighten-2 font-weight-regular">
-            Who will be flying to <strong class="text-white">Stockholm?</strong>
+        
+          <div class="guest-list">
+            <h3 class="text-grey-lighten-2 font-weight-regular">
+            Who will be flying ?
           </h3>
-          <div class="guest-list mt-10">
-            <h4 class="text-white">Guests</h4>
+
+            <h4 class="text-white mt-4">Guests</h4>
             <v-btn
               v-for="(guest, index) in guestForms"
               :key="guest.id"
@@ -207,7 +209,7 @@ console.log(userStore.user, 'hell')
 }
 
 h3 {
-  font-size: 24px;
+  font-size: 32px;
   margin-top: 120px;
 }
 
@@ -224,7 +226,8 @@ h3 {
 }
 
 .guest-list {
-  max-width: 350px;
+  max-width: 400px;
+  margin: 20px auto 0;
 }
 
 .guest-item {

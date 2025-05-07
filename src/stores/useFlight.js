@@ -25,7 +25,7 @@ export const useFlightStore = defineStore("useFlight", () => {
   const selectedReturnFlight = ref(JSON.parse(sessionStorage.getItem('returnFlight')) || null);
 
   // Enhanced search function
-  const searchFlightExecute = async (url, originCode, destinationCode, totalGuests) => {
+  const searchFlightExecute = async (url, originCode, originCity, destinationCode, totalGuests) => {
     searchLoading.value = true;
     try {
       const { data } = await useAxios(url, { immediate: true });
@@ -35,6 +35,7 @@ export const useFlightStore = defineStore("useFlight", () => {
       const params = {
         origin_id: new URL(url).searchParams.get('origin_id'),
         origin_code: originCode,
+        origin_city: originCity,
         destination_id: new URL(url).searchParams.get('destination_id'),
         destination_code: destinationCode,
         trip: new URL(url).searchParams.get('trip') || 'oneway',

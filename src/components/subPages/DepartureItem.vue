@@ -52,15 +52,17 @@ const formattedDate = computed(() => {
 })
 
 const seatStatus = computed(() => {
-  const booked = props.item.total_seats - props.item.available_seats
-  const seatArray = Array(7).fill(false)
-
-  for (let i = 0; i < Math.min(booked, 7); i++) {
-    seatArray[i] = true
+  if (props.item.seats && props.item.seats.length > 0) {
+    const bookedCount = props.item.seats.filter(seat => seat.is_booked === 1).length;
+    return Array(props.item.seats.length).fill(false)
+      .map((_, index) => index < bookedCount);
   }
+  
+  const booked = props.item.total_seats - props.item.available_seats;
+  return Array(props.item.total_seats || 7).fill(false)
+    .map((_, index) => index < booked);
+});
 
-  return seatArray
-})
 </script>
 
 <template>

@@ -92,10 +92,12 @@ const addGuest = ref([
 ]);
 
 function reverseTrip() {
-  let originTmp = originPlaceholder.value;
-  let destinationTmp = destinationPlaceholder.value;
-  originPlaceholder.value = destinationTmp;
-  destinationPlaceholder.value = originTmp;
+  if (originPlaceholder.value.id && destinationPlaceholder.value.id) {
+    let originTmp = originPlaceholder.value;
+    let destinationTmp = destinationPlaceholder.value;
+    originPlaceholder.value = destinationTmp;
+    destinationPlaceholder.value = originTmp;
+  }
 }
 // Total guest count
 const totalGuests = computed(() => {
@@ -114,6 +116,7 @@ async function searchFlight() {
       `${url}/flights?origin_id=${originPlaceholder.value.id}&destination_id=${destinationPlaceholder.value.id
       }&departure_date=&trip=${isRoundTrip.value ? "return" : "oneway"}`,
       originPlaceholder.value.code,
+      originPlaceholder.value.city, 
       destinationPlaceholder.value.code,
       totalGuests.value
     );

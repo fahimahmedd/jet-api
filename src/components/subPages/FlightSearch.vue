@@ -89,10 +89,12 @@ const addGuest = ref([
 ]);
 
 function reverseTrip() {
-  let originTmp = originPlaceholder.value;
-  let destinationTmp = destinationPlaceholder.value;
-  originPlaceholder.value = destinationTmp;
-  destinationPlaceholder.value = originTmp;
+  if (originPlaceholder.value.id && destinationPlaceholder.value.id) {
+    let originTmp = originPlaceholder.value;
+    let destinationTmp = destinationPlaceholder.value;
+    originPlaceholder.value = destinationTmp;
+    destinationPlaceholder.value = originTmp;
+  }
 }
 
 // Total guest count - only count adults like in header
@@ -111,6 +113,7 @@ async function searchFlight() {
       `${url}/flights?origin_id=${originPlaceholder.value.id}&destination_id=${destinationPlaceholder.value.id
       }&departure_date=&trip=${isRoundTrip.value ? "return" : "oneway"}`,
       originPlaceholder.value.code,
+      originPlaceholder.value.city, // Added city parameter from header
       destinationPlaceholder.value.code,
       totalGuests.value
     );
@@ -158,6 +161,16 @@ watch(() => addGuest.value[0].value, (newAdults, oldAdults) => {
 
 // Restore search params on mount like in header
 onMounted(() => {
+  isRoundTrip.value = false;
+  
+  // Set initial placeholder structure
+  originPlaceholder.value = {
+    city: "Origin",
+    airport: "",
+    code: "",
+    value: "",
+  };
+
   if (flightStore.searchParams) {
     // Find the matching origin in originList
     const matchingOrigin = originList.value?.find(
@@ -190,6 +203,8 @@ onMounted(() => {
         value: matchingDestination.id || "",
       };
     }
+    // Restore trip type
+    isRoundTrip.value = flightStore.searchParams.trip === 'return';
   }
 });
 </script>
@@ -346,7 +361,11 @@ onMounted(() => {
         <h3 class="text-h5 font-weight-regular text-black">
           {{ addGuest[0].title }}
         </h3>
-        <CounterPlate v-model:count="addGuest[0].value" />
+        <CounterPlate 
+          v-model:count="addGuest[0].value" 
+          :disableIncrement="false"
+          :disableDecrement="addGuest[0].value <= 1" 
+        />
       </div>
       <p class="text-caption-2 text-grey-darken-2" style="max-width: 320px">
         {{ addGuest[0].description }}

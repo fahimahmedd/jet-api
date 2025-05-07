@@ -46,7 +46,7 @@ onMounted(() => {
 
 const downloadTicket = computed(() => {
   if (!booking.value.outbound?.id) return '#';
-  return `${url}/bookings/${booking.value.outbound.id}/download`;
+  return `https://appsdevelopmentfirm.agency/admin/site/bookings/${booking.value.outbound.id}/download`;
 });
 const goToBookings = () => {
   router.push('/my-trip');

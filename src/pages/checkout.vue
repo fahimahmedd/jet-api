@@ -1,6 +1,7 @@
 <script setup>
-import GuestForm from "@/components/subPages/GuestForm.vue";
-import SubHeader from "@/components/subPages/SubHeader.vue";
+import { useRouter } from 'vue-router';
+
+const router = useRouter()
 </script>
 
 <template>
@@ -19,13 +20,28 @@ import SubHeader from "@/components/subPages/SubHeader.vue";
 
           <h3 class="text-grey-lighten-2 font-weight-regular">
             let's Checkout your Trip!
-            <strong class="text-white">Stockholm</strong>
           </h3>
         </div>
       </v-col>
       <v-col cols="12" lg="7" md="8">
         <div class="subpage-content">
-          <SubHeader />
+          <v-tooltip text="Go Back" location="bottom">
+          <template #activator="{ props }">
+            <v-btn
+              density="compact"
+              size="large"
+              variant="plain"
+              color="black"
+              icon="mdi-arrow-left"
+              rounded="sm"
+              v-bind="props"
+              class="mt-5"
+              @click="router.back()"
+            ></v-btn>
+          </template>
+        </v-tooltip>
+
+
           <v-container>
             <div class="guest-form">
               <h2 class="text-black font-weight-medium text-h4 mt-5">
@@ -69,7 +85,7 @@ import SubHeader from "@/components/subPages/SubHeader.vue";
 }
 
 h3 {
-  font-size: 24px;
+  font-size: 32px;
   margin-top: 120px;
 }
 
