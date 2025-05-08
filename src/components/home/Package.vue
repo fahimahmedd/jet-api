@@ -58,4 +58,10 @@
     font-weight: 700;
     color: #000;
 }
+@media (max-width: 991px) {
+  .package-bg {
+      height: 300px;
+      padding: 20px;
+  }
+}
 </style>

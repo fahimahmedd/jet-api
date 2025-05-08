@@ -35,13 +35,13 @@ const currentBookings = computed(() => {
     ></v-progress-linear>
 
     
-    <v-alert
+    <!-- <v-alert
       v-if="bookStore.error"
       type="error"
       class="mb-4"
     >
       {{ bookStore.error }}
-    </v-alert>
+    </v-alert> -->
 
     <v-row class="booking-grid">
       <v-col
@@ -151,6 +151,7 @@ const currentBookings = computed(() => {
     >
       You don't have any bookings yet
     </v-alert>
+    
   </div>
 </template>
 

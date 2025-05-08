@@ -3,6 +3,7 @@ import { ref, computed, onMounted } from "vue";
 import { useFlightStore } from "@/stores/useFlight";
 import SubHeader from "@/components/subPages/SubHeader.vue";
 import { useRouter } from "vue-router";
+import DepartureItem from "@/components/subPages/DepartureItem.vue";
 
 const flightStore = useFlightStore();
 const router = useRouter();
@@ -32,44 +33,67 @@ onMounted(async () => {
 const filteredFlights = computed(() => {
   if (!flightStore.flightList || !flightStore.flightList.return) return [];
   
-  // Get the selected outbound flight's date
-  const outboundDate = flightStore.selectedFlight?.departure?.departure_date;
-  if (!outboundDate) return []; // If no outbound selected, show nothing
-  
-  // Create minimum return date (outbound date + 1 day)
-  const minReturnDate = new Date(outboundDate);
-  minReturnDate.setDate(minReturnDate.getDate() + 1);
-  minReturnDate.setHours(0, 0, 0, 0); // Normalize time
-
   return flightStore.flightList.return.filter((flight) => {
     const flightDate = new Date(flight.departure_date);
-    flightDate.setHours(0, 0, 0, 0); // Normalize flight date
-    
     const flightMonth = flightDate.getMonth() + 1;
     
-    return (
-      flightDate >= minReturnDate && // Must be after outbound date
-      flightMonth === selectedMonth.value // Must match selected month
-    );
+    // Create date-only versions for comparison (ignoring time)
+    const todayDateOnly = new Date(today);
+    todayDateOnly.setHours(0, 0, 0, 0);
+    
+    const flightDateOnly = new Date(flightDate);
+    flightDateOnly.setHours(0, 0, 0, 0);
+    
+    return flightMonth === selectedMonth.value && flightDateOnly >= todayDateOnly;
   });
 });
 
+// Get all unique months that have return flights
+const monthsWithFlights = computed(() => {
+  if (!flightStore.flightList || !flightStore.flightList.return) return [];
+
+  const uniqueMonths = new Set();
+  const todayDateOnly = new Date(today);
+  todayDateOnly.setHours(0, 0, 0, 0);
+
+  flightStore.flightList.return.forEach(flight => {
+    const flightDate = new Date(flight.departure_date);
+    const flightDateOnly = new Date(flightDate);
+    flightDateOnly.setHours(0, 0, 0, 0);
+    
+    if (flightDateOnly >= todayDateOnly) {
+      const flightMonth = flightDate.getMonth() + 1;
+      uniqueMonths.add(flightMonth);
+    }
+  });
+
+  return Array.from(uniqueMonths).sort((a, b) => a - b);
+});
+
 const monthNames = [
-  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-  "Jul", "Aug", "Sept", "Oct", "Nov", "Dec"
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sept",
+  "Oct",
+  "Nov",
+  "Dec",
 ];
 
 const months = computed(() => {
-  // Start from the month of the outbound flight or current month
-  const outboundDate = flightStore.selectedFlight?.departure?.departure_date;
-  const startMonth = outboundDate 
-    ? new Date(outboundDate).getMonth()
-    : today.getMonth();
-    
-  return monthNames.slice(startMonth).map((name, index) => ({
-    label: name,
-    value: startMonth + index + 1,
-  }));
+  const current = today.getMonth();
+  // Only show months that have return flights
+  return monthNames
+    .map((name, index) => ({
+      label: name,
+      value: index + 1,
+    }))
+    .filter(month => monthsWithFlights.value.includes(month.value) && month.value >= current + 1);
 });
 
 const selectReturnFlight = (flight) => {
@@ -81,10 +105,7 @@ const selectReturnFlight = (flight) => {
   <div class="subpage-container">
     <v-row no-gutters>
       <v-col cols="12" lg="4" md="12">
-        <div
-          class="subpage-left"
-          style="background-image: url('/images/subPage/departure.svg')"
-        >
+        <div class="subpage-left" style="background-image: url('/images/subPage/departure.svg')">
           <router-link to="/">
             <div class="logo">
               <v-img src="/images/logo/logo.png" max-width="180"></v-img>
@@ -94,7 +115,6 @@ const selectReturnFlight = (flight) => {
           <h3 class="sub-text-content text-white font-weight-medium">
             When would you like to return {{ flightStore.searchParams?.origin_city }}
           </h3>
-          
         </div>
       </v-col>
       <v-col cols="12" lg="8" md="12">
@@ -102,42 +122,31 @@ const selectReturnFlight = (flight) => {
           <SubHeader />
           <v-container>
             <div class="sub-container">
-            <h2 class="text-black font-weight-regular text-h3 mt-10">
-              Return
-            </h2>
-            <div class="d-flex gap-4 mt-6">
-              <span
-                v-for="month in months"
-                :key="month.value"
-                class="cursor-pointer text-subtitle font-weight-regular px-1 mx-3 py-1 border-b-2"
-                :class="{
-                  'border-b-active font-weight-bold':
-                    selectedMonth === month.value,
-                  'border-transparent text-gray-600':
-                    selectedMonth !== month.value,
-                }"
-                @click="selectedMonth = month.value"
-              >
-                {{ month.label }}
-              </span>
-            </div>
+              <h2 class="text-black font-weight-regular text-h3 mt-10">
+                Return
+              </h2>
+              <div class="month-wrapper d-flex gap-4 mt-6">
+                <span v-for="month in months" :key="month.value"
+                  class="cursor-pointer text-subtitle font-weight-regular px-1 mx-3 py-1 border-b-2" :class="{
+                    'border-b-active font-weight-bold':
+                      selectedMonth === month.value,
+                    'border-transparent text-gray-600':
+                      selectedMonth !== month.value,
+                  }" @click="selectedMonth = month.value">
+                  {{ month.label }}
+                </span>
+              </div>
 
-            <div class="departure-content mt-8">
-              <router-link
-  :to="`/seat/${item.id}`"
-  v-for="item in filteredFlights"
-  :key="item.id"
-  @click="selectReturnFlight(item)"
->
-  <DepartureItem :item="item" />
-</router-link>
-            </div>
-            <div
-              v-if="filteredFlights.length === 0"
-              class="mt-20 text-center font-weight-bold text-grey mt-6 text-h6"
-            >
-              No Flights available for this month
-            </div>
+              <div class="departure-content mt-8">
+                <router-link :to="`/seat/${item.id}`" v-for="item in filteredFlights" :key="item.id"
+                  @click="selectReturnFlight(item)">
+                  <DepartureItem :item="item" />
+                </router-link>
+              </div>
+              <div v-if="filteredFlights.length === 0"
+                class="mt-20 text-center font-weight-bold text-grey mt-6 text-h6">
+                No Flights available for this month
+              </div>
             </div>
           </v-container>
         </div>
@@ -151,9 +160,11 @@ const selectReturnFlight = (flight) => {
   height: 100vh;
   width: 100%;
 }
-.border-b-active{
+
+.border-b-active {
   border-bottom: 2px solid #6C7A90;
 }
+
 .subpage-left {
   height: 100vh;
   width: 100%;
@@ -179,16 +190,23 @@ const selectReturnFlight = (flight) => {
 h3 {
   font-size: 28px;
 }
-.sub-text-content{
+
+.sub-text-content {
   max-width: 340px;
   margin: 120px auto 0;
 }
+
 .gap {
   gap: 18px;
 }
 
 .subpage-content {
   padding-left: 20px;
+}
+
+.month-wrapper {
+  width: 100%;
+  overflow-x: scroll;
 }
 
 @media (max-width: 991px) {
@@ -200,7 +218,8 @@ h3 {
     height: auto;
     padding: 20px;
   }
-  .subpage-content[data-v-49e4dc52] {
+
+  .subpage-content {
     padding-left: 0px;
   }
 
@@ -208,5 +227,9 @@ h3 {
     margin-top: 15px !important;
     font-size: 36px !important;
   }
+  .sub-text-content {
+  max-width: 100%;
+  margin: 40px auto 0;
+}
 }
 </style>

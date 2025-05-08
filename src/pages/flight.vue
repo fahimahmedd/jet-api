@@ -41,7 +41,7 @@ const featureItems = [
           </router-link>
 
           <h3 class="text-grey-lighten-2 font-weight-regular">
-            Let's fly to Gothenburg?
+            Let's fly !
           </h3>
           <v-row class="mt-5 d-none d-lg-flex">
             <v-col
@@ -80,9 +80,8 @@ const featureItems = [
               </template>
             </v-tooltip>
 
-            <div class="mt-10">
-              <FlightSearch />
-            </div>
+            <FlightSearch />
+
           </v-container>
         </div>
       </v-col>
@@ -152,5 +151,8 @@ h3 {
   .subpage-content {
     padding-left: 0px;
   }
+  h3 {
+    margin-top: 30px;
+}
 }
 </style>

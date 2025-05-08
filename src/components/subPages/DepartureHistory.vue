@@ -262,4 +262,10 @@ onMounted(() => {
 .letter-space-2 {
   letter-spacing: 2px;
 }
+
+@media (max-width: 991px) {
+  .history-title{
+    font-size: 34px;
+  }
+}
 </style>

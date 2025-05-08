@@ -20,10 +20,10 @@ const router = useRouter();
             </div>
           </router-link>
 
-          <h3 class="sub-text-content text-grey-lighten-2 font-weight-medium">
+          <h3 class="sub-text-content text-grey-lighten-2 font-weight-medium d-none d-md-block">
             Back to your <strong class="text-white">Diary!</strong>
           </h3>
-          <h3 class="sub-text-content text-grey-lighten-2 font-weight-medium">Explore all the memories you've made so far – and get inspired for the next one!
+          <h3 class="sub-text-content text-grey-lighten-2 font-weight-medium d-none d-md-block">Explore all the memories you've made so far – and get inspired for the next one!
         </h3>
         </div>
       </v-col>

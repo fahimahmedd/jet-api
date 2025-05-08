@@ -536,7 +536,7 @@ onMounted(() => {
   left: 0;
 }
 .modal-content {
-  height: 600px;
+  // height: 600px;
   max-width: 500px;
   margin: 80px auto 0;
 }
@@ -627,5 +627,13 @@ onMounted(() => {
   .plate-item-wrapper p {
     display: none;
   }
+  .modal-container {
+    position: fixed;
+    z-index: 2;
+}
+.modal-content{
+    margin: 40px auto 0;
+    padding: 0 25px;
+}
 }
 </style>

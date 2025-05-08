@@ -90,6 +90,8 @@ h3 {
 .subpage-left {
   height: auto;
 }
-
+.title-text {
+    font-size: 26px;
+}
 }
 </style>

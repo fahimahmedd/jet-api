@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory , createWebHashHistory } from 'vue-router'
+import { createRouter, createWebHistory, createWebHashHistory } from 'vue-router'
 import Index from '@/pages/index.vue'
 import Trip from '@/pages/trip.vue'
 import Signup from '@/pages/signup.vue'
@@ -13,9 +13,10 @@ import Profile from '@/pages/profile.vue'
 import Checkout from '@/pages/checkout.vue'
 import MyTrip from '@/pages/my-trip.vue'
 import Ticket from '@/pages/ticket.vue'
+import NotFound from '@/pages/notFound.vue'
 
 const router = createRouter({
-  history: createWebHashHistory(import.meta.env.BASE_URL),
+  history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/',
@@ -92,13 +93,12 @@ const router = createRouter({
       name: 'ticket',
       component: Ticket,
     },
- // Add a catch-all route for 404 errors
-//  {
-//   path: '/:pathMatch(.*)*',
-//   name: 'not-found',
-//   component: () => import('@/pages/NotFound.vue') // Lazy load 404 page
-// }
-    
+    {
+      path: '/:pathMatch(.*)*',
+      name: 'not-found',
+      component: NotFound
+    }
+
   ],
 })
 

@@ -107,7 +107,7 @@ const selectOutboundFlight = (flight) => {
               <h2 class="text-black font-weight-regular text-h3 mt-10">
                 Departure
               </h2>
-              <div class="d-flex gap-4 mt-6">
+              <div class="month-wrapper d-flex gap-4 mt-6">
                 <span v-for="month in months" :key="month.value"
                   class="cursor-pointer text-subtitle font-weight-regular px-1 mx-3 py-1 border-b-2" :class="{
                     'border-b-active font-weight-bold':
@@ -185,6 +185,10 @@ h3 {
 .subpage-content {
   padding-left: 20px;
 }
+.month-wrapper{
+  width: 100%;
+  overflow-x: scroll;
+}
 
 @media (max-width: 991px) {
   .subpage-container {
@@ -196,7 +200,7 @@ h3 {
     padding: 20px;
   }
 
-  .subpage-content[data-v-49e4dc52] {
+  .subpage-content {
     padding-left: 0px;
   }
 
@@ -204,5 +208,6 @@ h3 {
     margin-top: 15px !important;
     font-size: 36px !important;
   }
+
 }
 </style>

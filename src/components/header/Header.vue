@@ -681,8 +681,16 @@ const toProfile = () => {
   display: flex;
   justify-content: center;
   align-items: center;
+  z-index: 1;
 }
-
+.reverse-trip::after {
+  content: "";
+  position: absolute;
+  width: 1px;
+  height: 100%;
+  background-color: #6c7a908e;
+  z-index: -1;
+}
 .reverse-btn {
   margin: 0 20px;
 }
@@ -762,12 +770,31 @@ const toProfile = () => {
   display: none !important;
 }
 
+
+
+@media (max-width: 1299px) {
+  .header-right-content {
+  width: 450px;
+}
+}
+
 @media (max-width: 991px) {
   .header {
     height: 60px;
-    width: 95%;
+    width: 100%;
     border-radius: 10px;
     padding: 0 20px;
+    top: 0px;
+    left: 0px;
+    right: 0px;
+    border-radius: 0px;
   }
+  .header-right-content {
+  width: 100%;
+  }
+  .logo {
+    border-right: none;
 }
+}
+
 </style>

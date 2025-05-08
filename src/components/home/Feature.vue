@@ -130,5 +130,10 @@ const featureItems = [
   .feature-item {
     padding: 0px;
   }
+  .feature-item p {
+    font-size: 14px;
+    font-weight: 700;
+    max-width: 100%;
+}
 }
 </style>

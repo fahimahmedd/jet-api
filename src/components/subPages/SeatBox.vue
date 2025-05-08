@@ -12,6 +12,7 @@ const route = useRoute()
 const router = useRouter()
 const flightStore = useFlightStore()
 const isLoading = ref(false)
+const showSeatWarning = ref(false) // New modal state
 
 // Get guest count from session storage
 const getSearchParams = () => {
@@ -27,6 +28,10 @@ const totalGuests = searchParams?.totalGuests || 1
 const flightId = route.params.id
 const seats = reactive([])
 const selectedSeats = reactive([])
+
+const availableSeatsCount = computed(() => {
+  return seats.filter(seat => !seat.booked).length
+})
 
 const fetchSeats = async () => {
   try {
@@ -44,6 +49,11 @@ const fetchSeats = async () => {
         seat_number: seat.seat_number || `Seat ${index + 1}`
       })
     })
+
+    // Check if enough seats are available after loading
+    if (availableSeatsCount.value < totalGuests) {
+      showSeatWarning.value = true
+    }
   } catch (error) {
     console.error('Error fetching seats:', error)
   } finally {
@@ -108,6 +118,16 @@ const selectedSeatsDisplay = computed(() => {
   return selectedSeats.map(s => s.seat_number).join(', ')
 })
 
+const goBackToFlights = () => {
+  if (flightStore.isRoundTrip && !flightStore.selectedReturnFlight) {
+    router.push('/outbound-departure')
+  } else if (flightStore.isRoundTrip && flightStore.selectedReturnFlight) {
+    router.push('/return-departure')
+  } else {
+    router.push('/outbound-departure')
+  }
+}
+
 const proceedToTrip = async () => {
   if (buttonState.value.disabled) return
   
@@ -125,24 +145,18 @@ const proceedToTrip = async () => {
       selected_seats: selectedSeats
     };
 
-    // ALWAYS store guestData - for both trip types
     sessionStorage.setItem('guestData', JSON.stringify(guestData));
 
     if (flightStore.isRoundTrip) {
       if (!flightStore.selectedReturnFlight) {
-        // Outbound flight for round trip
         sessionStorage.setItem('outboundBookingData', JSON.stringify(bookingData));
         router.push('/return-departure');
       } else {
-        // Return flight for round trip
         sessionStorage.setItem('returnBookingData', JSON.stringify(bookingData));
-        
-        // For round trip, combine both flights' data before trip page
         combineRoundTripData();
         router.push('/trip');
       }
     } else {
-      // One-way trip
       sessionStorage.setItem('bookingData', JSON.stringify(bookingData));
       router.push('/trip');
     }
@@ -151,7 +165,6 @@ const proceedToTrip = async () => {
   }
 };
 
-// Add this helper function
 const combineRoundTripData = () => {
   try {
     const outboundData = JSON.parse(sessionStorage.getItem('outboundBookingData'));
@@ -162,7 +175,6 @@ const combineRoundTripData = () => {
       throw new Error('Missing booking data for round trip');
     }
 
-    // Create combined booking data
     const combinedData = {
       trip_type: 'return',
       outbound: {
@@ -210,9 +222,6 @@ const combineRoundTripData = () => {
         <span v-if="seat.booked" class="booked-text text-caption text-white font-weight-bold">
           BOKAD
         </span>
-        <!-- <span v-else class="text-caption font-weight-medium">
-          {{ seat.seat_number }}
-        </span> -->
       </v-btn>
     </div>
 
@@ -252,8 +261,29 @@ const combineRoundTripData = () => {
         {{ buttonState.text }}
       </v-btn>
     </div>
+
+    <!-- Seat Warning Modal -->
+    <v-dialog v-model="showSeatWarning" persistent max-width="500">
+      <v-card class="pa-6 text-center">
+        <v-icon color="warning" size="64" class="mb-4 mx-auto">mdi-alert-circle-outline</v-icon>
+        <h2 class="text-h5 text-black font-weight-bold mb-3">Not Enough Seats Available</h2>
+        <p class="text-caption-2 text-grey-darken-2 mb-6">
+          Only <strong> {{ availableSeatsCount }}</strong> seats remain, but you’re booking for <strong>{{ totalGuests }}</strong> guests. Please select another flight that can accommodate your group.
+        </p>
+        <div class="d-flex justify-center gap-4">
+          <v-btn 
+            color="#6d92cf" 
+            @click="goBackToFlights"
+          >
+            <v-icon start>mdi-arrow-left</v-icon>
+            Back to Flights
+          </v-btn>
+        </div>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
+
 
 <style scoped>
 .seat-wrapper {
