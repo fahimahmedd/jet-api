@@ -145,12 +145,12 @@ const goToHome = () => {
         </div>
 
         <div class="confirmation-actions">
-          <a :href="downloadTicket" target="_blank" rel="noopener noreferrer">
+          <!-- <a :href="downloadTicket" target="_blank" rel="noopener noreferrer">
             <v-btn color="#6d92cf" large class="action-btn">
               <v-icon left>mdi-download</v-icon>
               Download Ticket
             </v-btn>
-          </a>
+          </a> -->
 
 
           <v-btn outlined color="#6d92cf" large class="action-btn" @click="goToBookings">
@@ -211,7 +211,7 @@ const goToHome = () => {
     left: 0;
     right: 0;
     height: 8px;
-    background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%);
+    background: linear-gradient(to right, #749fe4 0%, #5880c0 100%);
   }
 }
 
@@ -237,7 +237,7 @@ const goToHome = () => {
     stroke-dashoffset: 166;
     stroke-width: 4;
     stroke-miterlimit: 10;
-    stroke: #4bb71b;
+    stroke: #6d92cf;
     fill: none;
     animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
   }
@@ -270,7 +270,7 @@ const goToHome = () => {
 
 @keyframes fill {
   100% {
-    box-shadow: inset 0 0 0 100px #4bb71b;
+    box-shadow: inset 0 0 0 100px #6d92cf;
   }
 }
 
@@ -279,7 +279,7 @@ const goToHome = () => {
   font-weight: 700;
   color: #2c3e50;
   margin-bottom: 10px;
-  background: linear-gradient(to right, #4facfe 0%, #00f2fe 100%);
+  background: linear-gradient(to right, #89afed 0%, #5a80bc 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }

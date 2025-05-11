@@ -1,5 +1,5 @@
 <script setup>
-import { reactive, onMounted, watch, computed, ref } from 'vue'
+import { reactive, onMounted, computed, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { useFlightStore } from '@/stores/useFlight'
 import { url } from '@/plugins/baseUrl'
@@ -12,7 +12,6 @@ const route = useRoute()
 const router = useRouter()
 const flightStore = useFlightStore()
 const isLoading = ref(false)
-const showSeatWarning = ref(false) // New modal state
 
 // Get guest count from session storage
 const getSearchParams = () => {
@@ -25,7 +24,26 @@ const getSearchParams = () => {
 const searchParams = getSearchParams()
 const totalGuests = searchParams?.totalGuests || 1
 
-const flightId = route.params.id
+// Get flight ID from session storage based on trip type
+const getFlightId = () => {
+  if (flightStore.isRoundTrip) {
+    if (!flightStore.selectedReturnFlight) {
+      // Outbound flight case
+      const outboundFlight = JSON.parse(sessionStorage.getItem('outboundFlight'))
+      return outboundFlight?.id || null
+    } else {
+      // Return flight case
+      const returnFlight = JSON.parse(sessionStorage.getItem('returnFlight'))
+      return returnFlight?.id || null
+    }
+  } else {
+    // One-way trip case
+    const outboundFlight = JSON.parse(sessionStorage.getItem('outboundFlight'))
+    return outboundFlight?.id || null
+  }
+}
+
+const flightId = ref(null)
 const seats = reactive([])
 const selectedSeats = reactive([])
 
@@ -35,8 +53,16 @@ const availableSeatsCount = computed(() => {
 
 const fetchSeats = async () => {
   try {
+    // Get flight ID first
+    flightId.value = getFlightId()
+    if (!flightId.value) {
+      console.error('No flight ID found in session storage')
+      router.push('/')
+      return
+    }
+
     isLoading.value = true
-    await flightStore.flightSeat(`${url}/flights/${flightId}/seats`)
+    await flightStore.flightSeat(`${url}/flights/${flightId.value}/seats`)
     seats.splice(0, seats.length)
     const apiSeats = flightStore.seats?.seats || []
 
@@ -72,7 +98,7 @@ onMounted(() => {
   )
   if (savedBooking) {
     const bookingData = JSON.parse(savedBooking)
-    if (bookingData.flight_id === flightId) {
+    if (bookingData.flight_id === flightId.value) {
       bookingData.selected_seats?.forEach(savedSeat => {
         const seat = seats.find(s => s.id === savedSeat.id)
         if (seat && !seat.booked) {
@@ -84,7 +110,7 @@ onMounted(() => {
   }
 })
 
-watch(() => route.params.id, fetchSeats)
+// watch(() => route.params.id, fetchSeats)
 
 const toggleSeat = (id) => {
   const seat = seats.find((s) => s.id === id)
@@ -118,29 +144,20 @@ const selectedSeatsDisplay = computed(() => {
   return selectedSeats.map(s => s.seat_number).join(', ')
 })
 
-const goBackToFlights = () => {
-  if (flightStore.isRoundTrip && !flightStore.selectedReturnFlight) {
-    router.push('/outbound-departure')
-  } else if (flightStore.isRoundTrip && flightStore.selectedReturnFlight) {
-    router.push('/return-departure')
-  } else {
-    router.push('/outbound-departure')
-  }
-}
 
 const proceedToTrip = async () => {
   if (buttonState.value.disabled) return
   
   try {
     const bookingData = {
-      flight_id: flightId,
+      flight_id: flightId.value,
       seat_ids: selectedSeats.map(seat => seat.id),
       trip_type: searchParams.trip,
       selected_seats: selectedSeats
     };
 
     const guestData = {
-      flight_id: flightId,
+      flight_id: flightId.value,
       total_guests: totalGuests,
       selected_seats: selectedSeats
     };
@@ -262,25 +279,7 @@ const combineRoundTripData = () => {
       </v-btn>
     </div>
 
-    <!-- Seat Warning Modal -->
-    <v-dialog v-model="showSeatWarning" persistent max-width="500">
-      <v-card class="pa-6 text-center">
-        <v-icon color="warning" size="64" class="mb-4 mx-auto">mdi-alert-circle-outline</v-icon>
-        <h2 class="text-h5 text-black font-weight-bold mb-3">Not Enough Seats Available</h2>
-        <p class="text-caption-2 text-grey-darken-2 mb-6">
-          Only <strong> {{ availableSeatsCount }}</strong> seats remain, but you’re booking for <strong>{{ totalGuests }}</strong> guests. Please select another flight that can accommodate your group.
-        </p>
-        <div class="d-flex justify-center gap-4">
-          <v-btn 
-            color="#6d92cf" 
-            @click="goBackToFlights"
-          >
-            <v-icon start>mdi-arrow-left</v-icon>
-            Back to Flights
-          </v-btn>
-        </div>
-      </v-card>
-    </v-dialog>
+ 
   </div>
 </template>
 

@@ -7,6 +7,14 @@ import { useRouter } from "vue-router";
 const flightStore = useFlightStore();
 const router = useRouter();
 
+// Modal control
+const showSeatWarning = ref(false);
+const availableSeatsCount = ref(0);
+
+// Get search params
+const searchParams = JSON.parse(sessionStorage.getItem('searchParams'));
+const totalGuests = computed(() => searchParams?.totalGuests || 1);
+
 // Get today's date
 const today = new Date();
 const currentMonth = today.getMonth() + 1;
@@ -25,7 +33,6 @@ onMounted(async () => {
       router.push('/');
     }
   } else if (!flightStore.searchParams) {
-    // If no search params exist, redirect to home
     router.push('/');
   }
 });
@@ -36,11 +43,8 @@ const filteredFlights = computed(() => {
   return flightStore.flightList.outbound.filter((flight) => {
     const flightDate = new Date(flight.departure_date);
     const flightMonth = flightDate.getMonth() + 1;
-
-    // Create date-only versions for comparison (ignoring time)
     const todayDateOnly = new Date(today);
     todayDateOnly.setHours(0, 0, 0, 0);
-
     const flightDateOnly = new Date(flightDate);
     flightDateOnly.setHours(0, 0, 0, 0);
 
@@ -48,20 +52,9 @@ const filteredFlights = computed(() => {
   });
 });
 
-
 const monthNames = [
-  "Jan",
-  "Feb",
-  "Mar",
-  "Apr",
-  "May",
-  "Jun",
-  "Jul",
-  "Aug",
-  "Sept",
-  "Oct",
-  "Nov",
-  "Dec",
+  "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+  "Jul", "Aug", "Sept", "Oct", "Nov", "Dec",
 ];
 
 const months = computed(() => {
@@ -72,15 +65,22 @@ const months = computed(() => {
   }));
 });
 
-// const seatBook = ()=>{
-//   router.push({ path: `seat/${}` });
-// }
-
 const selectOutboundFlight = (flight) => {
-  flightStore.setSelectedFlight(flight, 'outbound');
+  // Calculate available seats
+  const availableSeats = flight.seats.filter(seat => !seat.is_booked).length;
+  
+  if (availableSeats >= totalGuests.value) {
+    flightStore.setSelectedFlight(flight, 'outbound');
+    router.push(`/seat`);
+  } else {
+    availableSeatsCount.value = availableSeats;
+    showSeatWarning.value = true;
+  }
 };
 
-
+const goBackToFlights = () => {
+  showSeatWarning.value = false;
+};
 </script>
 
 <template>
@@ -110,23 +110,19 @@ const selectOutboundFlight = (flight) => {
               <div class="month-wrapper d-flex gap-4 mt-6">
                 <span v-for="month in months" :key="month.value"
                   class="cursor-pointer text-subtitle font-weight-regular px-1 mx-3 py-1 border-b-2" :class="{
-                    'border-b-active font-weight-bold':
-                      selectedMonth === month.value,
-                    'border-transparent text-gray-600':
-                      selectedMonth !== month.value,
+                    'border-b-active font-weight-bold': selectedMonth === month.value,
+                    'border-transparent text-gray-600': selectedMonth !== month.value,
                   }" @click="selectedMonth = month.value">
                   {{ month.label }}
                 </span>
               </div>
 
               <div class="departure-content mt-8">
-                <router-link :to="`/seat/${item.id}`" v-for="item in filteredFlights" :key="item.id"
-                  @click="selectOutboundFlight(item)">
+                <div v-for="item in filteredFlights" :key="item.id" @click="selectOutboundFlight(item)" class="cursor-pointer">
                   <DepartureItem :item="item" />
-                </router-link>
+                </div>
               </div>
-              <div v-if="filteredFlights.length === 0"
-                class="mt-20 text-center font-weight-bold text-grey mt-6 text-h6">
+              <div v-if="filteredFlights.length === 0" class="mt-20 text-center font-weight-bold text-grey mt-6 text-h6">
                 No Flights available for this month
               </div>
             </div>
@@ -134,8 +130,27 @@ const selectOutboundFlight = (flight) => {
         </div>
       </v-col>
     </v-row>
+
+    <!-- Seat Warning Modal -->
+    <v-dialog v-model="showSeatWarning" persistent max-width="500">
+      <v-card class="pa-6 text-center">
+        <v-icon color="warning" size="64" class="mb-4 mx-auto">mdi-alert-circle-outline</v-icon>
+        <h2 class="text-h5 text-black font-weight-bold mb-3">Not Enough Seats Available</h2>
+        <p class="text-caption-2 text-grey-darken-2 mb-6">
+          Only <strong>{{ availableSeatsCount }}</strong> seats remain, but you're booking for 
+          <strong>{{ totalGuests }}</strong> guests. Please select another flight.
+        </p>
+        <div class="d-flex justify-center gap-4">
+          <v-btn color="#6d92cf" @click="goBackToFlights">
+            <v-icon start>mdi-arrow-left</v-icon>
+           Select Another Flight
+          </v-btn>
+        </div>
+      </v-card>
+    </v-dialog>
   </div>
 </template>
+
 
 <style scoped>
 .subpage-container {

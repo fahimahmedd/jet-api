@@ -1,7 +1,7 @@
 <script setup>
 import { ref, onMounted, computed } from 'vue'
-import { useFlightStore } from '@/stores/useFlight'
 import { useRoute } from 'vue-router'
+import { useFlightStore } from '@/stores/useFlight'
 
 const route = useRoute()
 const flightStore = useFlightStore()
@@ -48,18 +48,28 @@ onMounted(() => {
   // Get flight data from store or sessionStorage
   const bookingData = JSON.parse(sessionStorage.getItem('bookingData'))
   
+  // Extract flight ID properly from the ref object
+  const getFlightId = (flightIdObj) => {
+    if (!flightIdObj) return null
+    // Handle both ref object and plain value cases
+    return flightIdObj._rawValue !== undefined ? flightIdObj._rawValue : flightIdObj
+  }
+
   // For round trips, bookingData contains both flights
   if (isRoundTrip.value && bookingData?.outbound) {
+    const outboundId = getFlightId(bookingData.outbound.flight_id)
+    const returnId = getFlightId(bookingData.return.flight_id)
+    
     outboundFlight.value = flightStore.flightList?.outbound?.find(
-      f => f.id.toString() === bookingData.outbound.flight_id.toString()
+      f => f.id.toString() === outboundId.toString()
     )
     returnFlight.value = flightStore.flightList?.return?.find(
-      f => f.id.toString() === bookingData.return.flight_id.toString()
+      f => f.id.toString() === returnId.toString()
     )
   } 
   // For one-way trips or direct access
   else {
-    const flightId = route.params.id || bookingData?.flight_id
+    const flightId = getFlightId(bookingData?.flight_id) || route.params.id
     if (flightId && flightStore.flightList) {
       outboundFlight.value = flightStore.flightList.outbound?.find(
         f => f.id.toString() === flightId.toString()
@@ -72,6 +82,7 @@ onMounted(() => {
 </script>
 
 <template>
+  <!-- Your template remains exactly the same -->
   <div class="departure-history">
     <!-- Outbound Flight -->
     <div class="flight-section">
@@ -79,7 +90,7 @@ onMounted(() => {
         Outbound
       </h3>
       <h3 class="history-title font-weight-regular text-white text-up">
-        {{ outboundFlight ? formatDate(outboundFlight.departure_date) : 'Loading...' }}
+        {{ outboundFlight ? formatDate(outboundFlight.departure_date) : 'No flight selected' }}
       </h3>
       
       <div class="departure-item" v-if="outboundFlight">
@@ -132,18 +143,21 @@ onMounted(() => {
           </v-row>
         </div>
       </div>
+      <div v-else class="text-caption text-grey-lighten-3 mt-2">
+        No outbound flight selected
+      </div>
     </div>
 
     <!-- Return Flight (only for round trips) -->
-    <div class="flight-section mt-8" v-if="isRoundTrip && returnFlight">
+    <div class="flight-section mt-8" v-if="isRoundTrip">
       <h3 class="history-title font-weight-regular text-grey-lighten-2">
         Return
       </h3>
       <h3 class="history-title font-weight-regular text-white text-up">
-        {{ returnFlight ? formatDate(returnFlight.departure_date) : 'Loading...' }}
+        {{ returnFlight ? formatDate(returnFlight.departure_date) : 'No return flight' }}
       </h3>
       
-      <div class="departure-item">
+      <div class="departure-item" v-if="returnFlight">
         <div class="flight-content">
           <v-row no-gutters align="center">
             <!-- Origin Info -->
@@ -193,9 +207,12 @@ onMounted(() => {
           </v-row>
         </div>
       </div>
+      <div v-else class="text-caption text-grey-lighten-3 mt-2">
+        No return flight selected
+      </div>
     </div>
 
-    <p class="text-body-2 font-weight-light text-grey-lighten-5 mt-5  inf-text">
+    <p class="text-body-2 font-weight-light text-grey-lighten-5 mt-5 inf-text">
       Flight Operated by JIVAIR AB AOC. Jivair AB is the oldest commercial
       operator of private jets in Sweden since 1981.
     </p>

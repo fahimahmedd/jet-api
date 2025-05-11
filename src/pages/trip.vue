@@ -44,7 +44,7 @@ import SubHeader from "@/components/subPages/SubHeader.vue";
 }
 
 .subpage-left {
-  height: 100vh;
+  min-height: 100vh;
   width: 100%;
   background-position: center;
   background-size: cover;
@@ -81,7 +81,9 @@ h3 {
   position: relative;
   top: -30px;
 }
-
+.subpage-content{
+    max-height: 100%;
+}
 @media (max-width: 991px) {
   .subpage-container {
   height: auto;
