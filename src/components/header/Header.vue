@@ -692,7 +692,7 @@ const toProfile = () => {
   z-index: -1;
 }
 .reverse-btn {
-  margin: 0 20px;
+  margin: 0 2px;
 }
 
 .add-guest {

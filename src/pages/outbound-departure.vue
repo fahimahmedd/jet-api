@@ -1,5 +1,5 @@
 <script setup>
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, watch } from "vue";
 import { useFlightStore } from "@/stores/useFlight";
 import SubHeader from "@/components/subPages/SubHeader.vue";
 import { useRouter } from "vue-router";
@@ -58,15 +58,50 @@ const monthNames = [
 ];
 
 const months = computed(() => {
+  if (!flightStore.flightList?.outbound) return [];
+  
   const current = today.getMonth();
-  return monthNames.slice(current).map((name, index) => ({
-    label: name,
-    value: current + index + 1,
-  }));
+  const monthsWithFlights = new Set();
+  
+  // Find all months that have flights
+  flightStore.flightList.outbound.forEach((flight) => {
+    const flightDate = new Date(flight.departure_date);
+    const flightMonth = flightDate.getMonth() + 1;
+    const flightDateOnly = new Date(flightDate);
+    flightDateOnly.setHours(0, 0, 0, 0);
+    const todayDateOnly = new Date(today);
+    todayDateOnly.setHours(0, 0, 0, 0);
+    
+    if (flightDateOnly >= todayDateOnly) {
+      monthsWithFlights.add(flightMonth);
+    }
+  });
+  
+  // Create array of available months
+  const availableMonths = monthNames
+    .slice(current)
+    .map((name, index) => ({
+      label: name,
+      value: current + index + 1,
+    }))
+    .filter(month => monthsWithFlights.has(month.value));
+
+  // Auto-select first available month if current selection has no flights
+  if (availableMonths.length > 0 && !monthsWithFlights.has(selectedMonth.value)) {
+    selectedMonth.value = availableMonths[0].value;
+  }
+
+  return availableMonths;
+});
+
+// Watch for flight data changes to auto-select first month
+watch(() => flightStore.flightList, (newVal) => {
+  if (newVal?.outbound && months.value.length > 0) {
+    selectedMonth.value = months.value[0].value;
+  }
 });
 
 const selectOutboundFlight = (flight) => {
-  // Calculate available seats
   const availableSeats = flight.seats.filter(seat => !seat.is_booked).length;
   
   if (availableSeats >= totalGuests.value) {
@@ -104,26 +139,41 @@ const goBackToFlights = () => {
           <SubHeader />
           <v-container>
             <div class="sub-container">
-              <h2 class="text-black font-weight-regular text-h3 mt-10">
+              <h2 class="text-black font-weight-regular text-h3">
                 Departure
               </h2>
-              <div class="month-wrapper d-flex gap-4 mt-6">
-                <span v-for="month in months" :key="month.value"
-                  class="cursor-pointer text-subtitle font-weight-regular px-1 mx-3 py-1 border-b-2" :class="{
+              
+              <div v-if="months.length > 0" class="month-wrapper d-flex gap-4 mt-6">
+                <span 
+                  v-for="month in months" 
+                  :key="month.value"
+                  class="cursor-pointer text-subtitle font-weight-regular px-1 mx-3 py-1 border-b-2" 
+                  :class="{
                     'border-b-active font-weight-bold': selectedMonth === month.value,
                     'border-transparent text-gray-600': selectedMonth !== month.value,
-                  }" @click="selectedMonth = month.value">
+                  }" 
+                  @click="selectedMonth = month.value"
+                >
                   {{ month.label }}
                 </span>
               </div>
 
               <div class="departure-content mt-8">
-                <div v-for="item in filteredFlights" :key="item.id" @click="selectOutboundFlight(item)" class="cursor-pointer">
+                <div 
+                  v-for="item in filteredFlights" 
+                  :key="item.id" 
+                  @click="selectOutboundFlight(item)" 
+                  class="cursor-pointer"
+                >
                   <DepartureItem :item="item" />
                 </div>
               </div>
-              <div v-if="filteredFlights.length === 0" class="mt-20 text-center font-weight-bold text-grey mt-6 text-h6">
-                No Flights available for this month
+              
+              <div v-if="months.length === 0" class="mt-20 text-center font-weight-bold text-grey mt-6 text-h6">
+                No Flights Available
+              </div>
+              <div v-else-if="filteredFlights.length === 0" class="mt-20 text-center font-weight-bold text-grey mt-6 text-h6">
+                No Flights available for selected month
               </div>
             </div>
           </v-container>

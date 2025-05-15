@@ -152,7 +152,6 @@ const goToHome = () => {
             </v-btn>
           </a> -->
 
-
           <v-btn outlined color="#6d92cf" large class="action-btn" @click="goToBookings">
             <v-icon left>mdi-text-box-outline</v-icon>
             View All Bookings
