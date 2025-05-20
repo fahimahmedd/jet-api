@@ -62,15 +62,12 @@ const goToHome = () => {
     <div class="confirmation-container">
       <div class="confirmation-card">
         <!-- Animated Checkmark -->
-        <div class="checkmark-animation">
-          <svg class="checkmark" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 52 52">
-            <circle class="checkmark__circle" cx="26" cy="26" r="25" fill="none" />
-            <path class="checkmark__check" fill="none" d="M14.1 27.2l7.1 7.2 16.7-16.8" />
-          </svg>
-        </div>
+        <div class="exclamation-animation">
+  <span class="mdi mdi-exclamation-thick"></span>
+</div>
 
-        <h1 class="confirmation-title">Booking Confirmed!</h1>
-        <p class="confirmation-subtitle">Your flight has been successfully booked</p>
+        <h1 class="confirmation-title">Booking Pending..</h1>
+        <p class="confirmation-subtitle">Your flight request has been successfully submitted</p>
 
         <!-- Booking Details -->
         <!-- Updated Booking Details -->
@@ -443,6 +440,61 @@ const goToHome = () => {
     transform: translateY(100vh) rotate(calc(var(--angle) * 2));
   }
 }
+
+.exclamation-animation {
+  position: relative;
+  display: inline-block;
+  width: 52px;
+  height: 52px;
+}
+
+.exclamation-animation::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 2px solid #5a80bc; /* Circle color */
+  border-radius: 50%;
+  box-sizing: border-box;
+  animation: exclamation-circle 0.6s ease-in-out both;
+}
+
+.exclamation-animation .mdi-exclamation-thick {
+  position: relative;
+  display: block;
+  font-size: 24px; /* Icon size */
+  color: #5a80bc; /* Icon color */
+  text-align: center;
+  line-height: 52px;
+  opacity: 0;
+  transform: scale(0.8);
+  animation: exclamation-mark 0.4s 0.4s ease-in-out both;
+}
+
+@keyframes exclamation-circle {
+  0% {
+    transform: scale(0);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@keyframes exclamation-mark {
+  0% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 
 @media (max-width: 768px) {
   .confirmation-card {

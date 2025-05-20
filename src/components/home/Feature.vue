@@ -22,7 +22,7 @@ const featureItems = [
 <template>
   <div
     class="feature"
-    style="background-image: url('/images/feature/feature-bg.svg')"
+    style="background-image: url('/images/feature/feature-bg.jpg')"
   >
     <v-container>
       <v-row>

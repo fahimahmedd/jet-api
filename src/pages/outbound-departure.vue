@@ -122,7 +122,7 @@ const goBackToFlights = () => {
   <div class="subpage-container">
     <v-row no-gutters>
       <v-col cols="12" lg="4" md="12">
-        <div class="subpage-left" style="background-image: url('/images/subPage/departure.svg')">
+        <div class="subpage-left" style="background-image: url('/images/subPage/departure.jpg')">
           <router-link to="/">
             <div class="logo">
               <v-img src="/images/logo/logo.png" max-width="180"></v-img>
@@ -252,7 +252,7 @@ h3 {
 }
 .month-wrapper{
   width: 100%;
-  overflow-x: scroll;
+  overflow-x: auto;
 }
 
 @media (max-width: 991px) {

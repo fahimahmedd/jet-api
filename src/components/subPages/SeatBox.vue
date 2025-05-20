@@ -480,7 +480,7 @@ const combineRoundTripData = () => {
 @media (max-width: 1160px) {
   .seat-container {
     max-width: 600px;
-    background-image: url("/images/seat/md-seat-plan.svg");
+    background-image: url("/images/seat/md-seat-plan.jpg");
   }
 
   .seat-1 {
@@ -523,7 +523,7 @@ const combineRoundTripData = () => {
   .seat-container {
     height: 600px;
     width: 180px;
-    background-image: url("/images/seat/m-seat-plan.svg");
+    background-image: url("/images/seat/m-seat-plan.jpg");
     margin: 0 auto;
   }
 

@@ -23,7 +23,7 @@ const destinationCity = computed(() => {
   <div class="subpage-container">
     <v-row no-gutters>
       <v-col cols="12" lg="4" md="4">
-        <div class="subpage-left" style="background-image: url('/images/subPage/seat.svg')">
+        <div class="subpage-left" style="background-image: url('/images/subPage/seat.jpg')">
           <router-link to="/">
             <div class="logo">
               <v-img src="/images/logo/logo.png" max-width="180"></v-img>

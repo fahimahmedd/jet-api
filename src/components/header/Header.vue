@@ -454,28 +454,26 @@ const toProfile = () => {
   background-color: #000000;
   position: fixed;
   top: 24px;
-  left: 32px;
-  right: 32px;
+  left: 0;
+  right: 0;
+  margin: 0 32px; /* Instead of left/right positioning */
   border-radius: 16px;
   z-index: 10;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 0 20px;
-  transition: top 0.5s cubic-bezier(0.4, 0, 0.2, 1),
-    left 0.5s cubic-bezier(0.4, 0, 0.2, 1),
-    right 0.5s cubic-bezier(0.4, 0, 0.2, 1),
-    border-radius 0.5s cubic-bezier(0.4, 0, 0.2, 1),
-    width 0.5s cubic-bezier(0.4, 0, 0.2, 1),
-    transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: 
+    top 0.3s ease,
+    border-radius 0.3s ease,
+    margin 0.3s ease,
+    border-color 0.3s ease;
 }
 
 .header.scrolled {
-  width: 100%;
-  top: 0px;
-  left: 0px;
-  right: 0px;
-  border-radius: 0px;
+  top: 0;
+  margin: 0;
+  border-radius: 0;
   border: 1px solid transparent;
   border-bottom: 1px solid #a6acb53f;
 }
