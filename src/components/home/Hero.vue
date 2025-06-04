@@ -5,10 +5,18 @@ import "swiper/css";
 import "swiper/css/effect-fade";
 import "swiper/css/navigation";
 import "swiper/css/pagination";
-
+import { useSettingStore } from "@/stores/useSetting";
 import { Autoplay, EffectFade } from "swiper/modules";
+import { storeToRefs } from "pinia";
+
+
+const settingStore = useSettingStore();
+const { settingsData } = storeToRefs(settingStore);
+
+
 
 const modules = [Autoplay, EffectFade];
+
 </script>
 
 <template>
@@ -46,7 +54,7 @@ const modules = [Autoplay, EffectFade];
    <div class="hero-text">
       <div class="container">
         <v-container>
-            <h1>Nu är det Officiellt: Flyg direkt till Stockholm, Bromma Från och med Juni 2025</h1>
+            <h1>{{ settingsData?.tagline }}</h1>
             <div class="btn-max">
             <router-link to="/flight">
             <v-btn class="booking-btn mt-5" variant="outlined"
@@ -111,3 +119,7 @@ const modules = [Autoplay, EffectFade];
 }
 }
 </style>
+
+
+
+

@@ -9,7 +9,7 @@
                 <v-col cols="12" lg="5" md="6">
                     <div class="explore-content">
                     <h2 class=" text-black font-weight-regular">Explore Destinations</h2>
-                    <h3 class="text-black font-weight-light">Wherever you choose to wander, fly in signature Aero style.</h3>
+                    <h3 class="text-black font-weight-light">Wherever you choose to wander, fly in signature Jetshare style.</h3>
                     <p class="font-weight-light text-grey-darken-2">Jet to a collection of sought-after leisure destinations or seek out an elevated travel experience to the world's largest entertainment and sporting events.</p>
                     <div class="mt-10 text-h6 text-black font-weight-medium">Where should we jet next? <span class="mdi mdi-arrow-right"></span> </div>
                     </div>

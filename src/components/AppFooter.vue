@@ -1,41 +1,55 @@
+<script setup>
+import { usePagesStore } from '@/stores/usePages';
+import { useSettingStore } from '@/stores/useSetting';
+import { storeToRefs } from 'pinia';
+import { ref, onMounted } from 'vue';
+
+const pagesStore = usePagesStore();
+
+const settingStore = useSettingStore();
+const { settingsData } = storeToRefs(settingStore);
+
+const pages = ref([]);
+
+onMounted(async () => {
+  const { data } = await pagesStore.fetchPages();
+  pages.value = data.value;
+});
+</script>
+
+
 <template>
   <v-footer class="py-10">
     <v-container>
       <v-row>
         <v-col cols="6" xs="6" sm="4" lg="3" md="3">
-          <h4 class="text-grey-darken-1 font-weight-regular">Aero</h4>
+          <h4 class="text-grey-darken-1 font-weight-regular">Jetshare</h4>
           <ul>
             <li><a href="#"> Safety </a></li>
             <li><a href="#"> Our Story </a></li>
             <li><a href="#"> Reviews </a></li>
             <li><a href="#"> Travel Advisors </a></li>
-            <li><a href="#"> Charters by Aero </a></li>
-            <li><a href="#"> AeroPrivate™ </a></li>
+            <li><a href="#"> Charters by Jetshare </a></li>
+            <li><a href="#"> JetsharePrivate™ </a></li>
             <li><a href="#"> Careers </a></li>
           </ul>
         </v-col>
         <v-col cols="6" xs="6" sm="4" lg="3" md="3">
           <h4 class="text-grey-darken-1 font-weight-regular">
-            Guest Resources
+            Resources
           </h4>
-          <ul>
-            <li><a href="#"> FAQs </a></li>
-            <li><a href="#"> Destinations </a></li>
-            <li><a href="#"> Travel Packages </a></li>
-            <li><a href="#"> Reservation Lookup </a></li>
-            <li><a href="#"> Group Travel </a></li>
-            <li><a href="#"> Operator Participant Agreement </a></li>
-            <li><a href="#"> Careers </a></li>
+         <ul>
+            <li v-for="page in pages" :key="page.id">
+              <router-link :to="`/${page.slug}`">{{ page.slug }}</router-link>
+            </li>
           </ul>
         </v-col>
         <v-col cols="5" xs="6" sm="4" lg="2" md="3">
           <h4 class="text-grey-darken-1 font-weight-regular">Connect</h4>
           <ul>
-            <li><a href="#"> Contact Us </a></li>
-            <li><a href="#"> Instagram </a></li>
-            <li><a href="#"> Facebook </a></li>
-            <li><a href="#"> LinkedIn </a></li>
-            <li><a href="#"> X </a></li>
+            <li><a :href="`${settingsData?.instagram}`"> Instagram </a></li>
+            <li><a :href="`${settingsData?.facebook}`"> Facebook </a></li>
+            <li><a :href="`${settingsData?.linkedIn}`"> LinkedIn </a></li>
           </ul>
         </v-col>
         <v-col cols="7" xs="12" sm="12" lg="4" md="3">
@@ -54,7 +68,7 @@
             append-inner-icon="mdi-arrow-right"
           ></v-text-field>
           <p class="text-caption text-grey-darken-1 font-weight-regular mt-10">
-            By subscribing you are accepting to receive marketing information from Aero and agree to the terms of Aero’s Privacy Policy.
+            By subscribing you are accepting to receive marketing information from Jetshare and agree to the terms of Jetshare’s Privacy Policy.
           </p>
         </v-col>
       </v-row>
@@ -63,7 +77,7 @@
         <v-row>
           <v-col cols="12" lg="6" md="6"><p class="text-caption text-grey-darken-1 font-weight-regular">
               Unless otherwise advised: All flights within North America are
-              operated by USAC Airways 695 LLC dba Aero, and Aero Technologies
+              operated by USAC Airways 695 LLC dba Jetshare, and Jetshare Technologies
               Inc. Acts as an indirect air carrier under US-DOT Part 380.
             </p></v-col
           >
@@ -94,6 +108,7 @@ ul li {
 ul li a {
   font-weight: 700;
   color: #000;
+  text-transform: capitalize;
 }
 ul li a:hover {
   text-decoration: underline;

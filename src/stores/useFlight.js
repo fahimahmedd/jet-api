@@ -81,6 +81,56 @@ export const useFlightStore = defineStore("useFlight", () => {
     return searchParams.value?.trip === 'return';
   });
 
+  const coupon = ref(null);
+  const couponError = ref(null);
+  const isCouponLoading = ref(false);
+  const couponSuccess = ref(null);
+
+  const validateCoupon = async (code) => {
+    isCouponLoading.value = true;
+    couponError.value = null;
+    couponSuccess.value = null;
+    
+    try {
+      const { data } = await useAxios(
+        `${url}/coupons/validate`,
+        {
+          method: 'POST',
+          data: { code }
+        }
+      );
+      
+      if (data.value.valid) {
+        coupon.value = data.value.coupon;
+        couponSuccess.value = `Coupon applied successfully! ${data.value.coupon.value}${data.value.coupon.type === 'fixed' ? ' SEK' : '%'} discount`;
+        sessionStorage.setItem('coupon', JSON.stringify(data.value.coupon));
+      } else {
+        couponError.value = 'Invalid coupon code';
+      }
+      return data.value;
+    } catch (error) {
+      couponError.value = 'Please! Enter a validate coupon';
+      throw error;
+    } finally {
+      isCouponLoading.value = false;
+    }
+  };
+
+  const getCouponCodeForBooking = () => {
+    return coupon.value?.code || null;
+  };
+
+
+  // Clear all coupon data including session storage
+  const clearCoupon = () => {
+    coupon.value = null;
+    couponError.value = null;
+    couponSuccess.value = null;
+    sessionStorage.removeItem('coupon');
+  };
+
+
+
   return {
     executeOrigin,
     originData,
@@ -96,6 +146,13 @@ export const useFlightStore = defineStore("useFlight", () => {
     selectedOutboundFlight,
     selectedReturnFlight,
     setSelectedFlight,
-    isRoundTrip
+    isRoundTrip,
+    coupon,
+    couponError,
+    isCouponLoading,
+    validateCoupon,
+    clearCoupon,
+    couponSuccess,
+    getCouponCodeForBooking
   };
 });

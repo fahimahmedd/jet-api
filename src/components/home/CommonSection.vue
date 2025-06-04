@@ -9,7 +9,7 @@
             <h2 class="text-grey-darken-1">Interested in private charters?</h2>
             <h2>Fly anywhere, anytime</h2>
             <p class="font-weight-light text-black mt-3">
-                In addition to our ongoing scheduled routes, Aero also offers private charter bookings. Fly with flexibility, convenience and ease, and enjoy our unparalleled service from the comfort of your own jet.
+                In addition to our ongoing scheduled routes, Jetshare also offers private charter bookings. Fly with flexibility, convenience and ease, and enjoy our unparalleled service from the comfort of your own jet.
             </p>
           </div>
         </v-col>

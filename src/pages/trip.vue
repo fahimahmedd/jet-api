@@ -81,9 +81,9 @@ h3 {
   position: relative;
   top: -30px;
 }
-.subpage-content{
+/* .subpage-content{
     max-height: 100%;
-}
+} */
 @media (max-width: 991px) {
   .subpage-container {
   height: auto;

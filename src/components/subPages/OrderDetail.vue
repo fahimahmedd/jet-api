@@ -3,24 +3,23 @@ import { ref, onMounted, computed } from 'vue'
 import { useFlightStore } from '@/stores/useFlight'
 import { useRoute } from 'vue-router';
 
-
 const flightStore = useFlightStore()
 const outboundFlight = ref(null)
 const returnFlight = ref(null)
 const bookingData = ref(null)
 const guestData = ref(null)
-
 const route = useRoute();
 const isCheckoutRoute = computed(() => route.path === '/checkout');
-
 
 onMounted(() => {
   const storedBooking = sessionStorage.getItem('bookingData') || 
                       sessionStorage.getItem('outboundBookingData')
   const storedGuest = sessionStorage.getItem('guestData')
+  const storedCoupon = sessionStorage.getItem('coupon')
   
   if (storedBooking) bookingData.value = JSON.parse(storedBooking)
   if (storedGuest) guestData.value = JSON.parse(storedGuest)
+  if (storedCoupon) flightStore.coupon = JSON.parse(storedCoupon)
   
   outboundFlight.value = flightStore.selectedOutboundFlight || 
                         JSON.parse(sessionStorage.getItem('outboundFlight'))
@@ -42,26 +41,39 @@ const taxAmount = computed(() => {
   return subtotal.value * 0.06 // 6% tax
 })
 
-const totalWithTax = computed(() => {
-  return subtotal.value + taxAmount.value
+const discountAmount = computed(() => {
+  if (!flightStore.coupon) return 0
+  
+  if (flightStore.coupon.type === 'fixed') {
+    return parseFloat(flightStore.coupon.value)
+  } else if (flightStore.coupon.type === 'percentage') {
+    return subtotal.value * (parseFloat(flightStore.coupon.value) / 100)
+  }
+  return 0
 })
 
-
-onMounted(() => {
-  const bookingData = JSON.parse(sessionStorage.getItem('bookingData'));
-  const guestData = JSON.parse(sessionStorage.getItem('guestData'));
-  
-  if (!bookingData || !guestData) {
-    router.push('/'); // Redirect home if missing data
+const totalWithTaxAndDiscount = computed(() => {
+  let total = subtotal.value + taxAmount.value
+  if (flightStore.coupon) {
+    total -= discountAmount.value
+    // Ensure total doesn't go below 0
+    return Math.max(total, 0)
   }
+  return total
+})
+
+const appliedCoupon = computed(() => {
+  return flightStore.coupon ? `Applied: ${flightStore.coupon.code}` : null;
 });
+
+
 </script>
 
 <template>
   <h3 class="text-black font-weight-medium text-h5 mt-10">Order Details</h3>
   <div class="detail-content mt-5">
     <div class="detail-item">
-      <span> Outbond Flight <span class="font-weight-bold ml-3"> (Adults - {{ guestData?.total_guests || 1 }}) </span></span>
+      <span> Outbound Flight <span class="font-weight-bold ml-3"> (Adults - {{ guestData?.total_guests || 1 }}) </span></span>
       <span v-if="outboundFlight">
         {{ guestData?.total_guests || 1 }} × {{ outboundFlight.price }} SEK
       </span>
@@ -82,9 +94,14 @@ onMounted(() => {
       <span>6%</span>
     </div>
     
+    <div v-if="flightStore.coupon" class="detail-item text-success">
+      <span>Discount  <span class="text-caption text-grey-darken-3">(Code : {{ flightStore.coupon.code }})</span> </span>
+      <span>-{{ discountAmount.toFixed(2) }} SEK</span>
+    </div>
+    
     <div class="detail-item">
       <span>Sub Total</span>
-      <span>{{ subtotal }} SEK</span>
+      <span>{{ subtotal.toFixed(2) }} SEK</span>
     </div>
 
     <v-divider class="my-5"></v-divider>
@@ -92,7 +109,7 @@ onMounted(() => {
     <div class="detail-item">
       <span class="text-h5">Total:</span>
       <span class="text-h4">
-        <strong>{{ totalWithTax }} SEK</strong>
+        <strong>{{ totalWithTaxAndDiscount.toFixed(2) }} SEK</strong>
       </span>
     </div>
     

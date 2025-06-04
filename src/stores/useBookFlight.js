@@ -7,7 +7,7 @@ import { useFlightStore } from "@/stores/useFlight";
 export const useBookFlight = defineStore("useBook", () => {
   const token = ref(localStorage.getItem("token"));
   const flightStore = useFlightStore();
-  const bookingResponse = ref(null); // Add this line to store the response
+  const bookingResponse = ref(null);
 
   const headers = {
     Authorization: `Bearer ${token.value}`,
@@ -32,6 +32,9 @@ export const useBookFlight = defineStore("useBook", () => {
         throw new Error('No guest data found');
       }
 
+      // Get coupon code if available
+      const couponCode = flightStore.getCouponCodeForBooking();
+
       // Prepare payload based on trip type
       let payload;
       const isRoundTrip = outboundBooking && returnBooking;
@@ -45,6 +48,7 @@ export const useBookFlight = defineStore("useBook", () => {
             flight_id: returnBooking.flight_id,
             seat_ids: returnBooking.seat_ids
           },
+          coupon: couponCode 
         };
       } else {
         if (!bookingData) {
@@ -54,6 +58,7 @@ export const useBookFlight = defineStore("useBook", () => {
           flight_id: bookingData.flight_id,
           seat_ids: bookingData.seat_ids,
           trip_type: 'oneway',
+          coupon: couponCode // Add coupon to payload
         };
       }
 
@@ -70,15 +75,17 @@ export const useBookFlight = defineStore("useBook", () => {
 
       // Store the response data
       bookingResponse.value = data.value;
-      console.log('Booking confirmed:', bookingResponse.value);
+      // console.log('Booking confirmed:', bookingResponse.value);
 
-      // Clear storage after successful booking
+      // Clear storage after successful booking including coupon
       flightStore.clearFlightData();
+      flightStore.clearCoupon(); // Clear the coupon after successful booking
       sessionStorage.removeItem('bookingData');
       sessionStorage.removeItem('outboundBookingData');
       sessionStorage.removeItem('returnBookingData');
       sessionStorage.removeItem('guestData');
       sessionStorage.removeItem('guestInfo');
+      sessionStorage.removeItem('coupon');
 
       return bookingResponse.value;
 
@@ -91,6 +98,6 @@ export const useBookFlight = defineStore("useBook", () => {
   return {
     loadingBooking,
     confirmBooking,
-    bookingResponse // Make the response available to components
+    bookingResponse
   };
 });

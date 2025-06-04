@@ -70,7 +70,7 @@ const handleConfirmation = async () => {
       by email or web chat.
     </div>
 
-    <Coupon />
+    <!-- <Coupon /> -->
 
     <OrderDetail />
     <v-btn 

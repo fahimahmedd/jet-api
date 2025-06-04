@@ -6,8 +6,11 @@ import { url } from "@/plugins/baseUrl";
 import { useAxios } from "@vueuse/integrations/useAxios";
 import { useRoute, useRouter } from "vue-router";
 import { useUserStore } from "@/stores/useUser";
-import { useAuthStore } from "@/stores/useAuth";
+import { useSettingStore } from "@/stores/useSetting";
 
+// Add this in your script setup
+const settingStore = useSettingStore();
+const { settingsData } = storeToRefs(settingStore);
 const dashboardMenu = ref(false);
 
 const flightStore = useFlightStore();
@@ -17,6 +20,13 @@ const originList = computed(() => originData.value);
 const destinationList = computed(() => destinationData.value);
 
 const router = useRouter();
+const showNoFlightsModal = ref(false);
+const modalMessage = ref("");
+
+
+onMounted(async () => {
+  await settingStore.fetchSettings();
+});
 
 const originPlaceholder = ref({
   city: "Origin",
@@ -112,7 +122,7 @@ const isSearchDisabled = computed(() => {
 
 async function searchFlight() {
   try {
-    await flightStore.searchFlightExecute(
+    const response = await flightStore.searchFlightExecute(
       `${url}/flights?origin_id=${originPlaceholder.value.id}&destination_id=${destinationPlaceholder.value.id
       }&departure_date=&trip=${isRoundTrip.value ? "return" : "oneway"}`,
       originPlaceholder.value.code,
@@ -121,15 +131,40 @@ async function searchFlight() {
       totalGuests.value
     );
 
-    // Clear any previous flight selections
+    // Clear previous selections
     flightStore.selectedOutboundFlight = null;
     flightStore.selectedReturnFlight = null;
     sessionStorage.removeItem('outboundFlight');
     sessionStorage.removeItem('returnFlight');
 
+    // Check if we got any flights
+    if (!response || (Array.isArray(response) && response.length === 0)) {
+      // Only show modal for Round Trip with no return flights
+      if (isRoundTrip.value) {
+        showNoFlightsModal.value = true;
+        modalMessage.value = "No return flights available for this route";
+      }
+      // For One Way - silently fail (don't show modal)
+      return;
+    }
+
+    // For Round Trips - check return flights specifically
+    if (isRoundTrip.value) {
+      const hasReturn = response.some(flight => flight.type === 'return');
+      if (!hasReturn) {
+        showNoFlightsModal.value = true;
+        modalMessage.value = "No return flights available for this route";
+        return;
+      }
+    }
+
+    // If we have flights, proceed
     router.push({ path: "outbound-departure" });
+
   } catch (error) {
     console.error("Search failed:", error);
+    showNoFlightsModal.value = true;
+    modalMessage.value = "Error searching for flights. Please try again.";
   }
 }
 
@@ -237,7 +272,7 @@ const toProfile = () => {
 <template>
   <div :class="['header', { scrolled: isScrolled }]">
     <router-link to="/" class="logo">
-      <v-img src="/public/images/logo/logo.png" max-height="40" contain class="logo-img"></v-img>
+      <v-img :src="settingsData?.logo ? `${settingsData.logo}` : 'No Image'" max-height="40" contain class="logo-img"></v-img>
     </router-link>
 
     <!-- Origin -->
@@ -445,6 +480,20 @@ const toProfile = () => {
       </div>
     </div>
   </div>
+
+  <v-dialog v-model="showNoFlightsModal" max-width="500">
+  <v-card>
+    <v-card-title class="text-h5">Flight Unavailable</v-card-title>
+    <v-card-text>
+      {{ modalMessage }}
+    </v-card-text>
+    <v-card-actions>
+      <v-spacer></v-spacer>
+      <v-btn color="primary" @click="showNoFlightsModal = false">OK</v-btn>
+    </v-card-actions>
+  </v-card>
+</v-dialog>
+
 </template>
 
 <style scoped>

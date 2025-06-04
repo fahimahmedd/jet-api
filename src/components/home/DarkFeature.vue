@@ -9,7 +9,7 @@
                 <v-col cols="12" lg="5" md="6">
                     <div class="explore-content">
                     <h2 class="font-weight-regular text-white">Safety Always</h2>
-                    <h3 class="text-white font-weight-light">Aero holds itself to the highest safety standards, mirroring many of the requirements governing commercial airlines.</h3>
+                    <h3 class="text-white font-weight-light">Jetshare holds itself to the highest safety standards, mirroring many of the requirements governing commercial airlines.</h3>
                     <p class="font-weight-light text-grey-darken-1 mt-2">In addition to our specialization in a single fleet type, owning and operating all of our Embraer Aircraft, we've earned the prestigious ARGUS Platinum rating, which recognizes our safety procedures and places us among the top 5% of private aviation operators worldwide.</p>
                     </div>
 
