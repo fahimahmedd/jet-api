@@ -40,7 +40,7 @@
   z-index: -1;
 }
 .package h2{
-    font-size: 38px;
+    font-size: 36px;
 }
 .package-content{
     padding: 20px;

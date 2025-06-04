@@ -12,7 +12,7 @@ const router = useRouter();
       <v-col cols="12" lg="5" md="6" sm="12">
         <div
           class="subpage-left"
-          style="background-image: url('/images/subPage/departure.svg')"
+          style="background-image: url('/images/subPage/departure.jpg')"
         >
           <router-link to="/">
             <div class="logo">

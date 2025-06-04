@@ -33,7 +33,7 @@
 
 <style lang="scss" scoped>
   .explore-content h2{
-    font-size: 40px;
+    font-size: 36px;
    }
    .explore-content h3{
     font-size: 18px;

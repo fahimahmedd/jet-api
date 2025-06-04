@@ -20,8 +20,8 @@ const originList = computed(() => originData.value);
 const destinationList = computed(() => destinationData.value);
 
 const router = useRouter();
-const showNoFlightsModal = ref(false);
-const modalMessage = ref("");
+
+const mobileMenuOpen = ref(false);
 
 
 onMounted(async () => {
@@ -120,6 +120,13 @@ const isSearchDisabled = computed(() => {
   return !originPlaceholder.value?.id || !destinationPlaceholder.value?.id;
 });
 
+const snackbar = ref({
+  show: false,
+  message: "",
+  color: "error"
+});
+
+
 async function searchFlight() {
   try {
     const response = await flightStore.searchFlightExecute(
@@ -138,22 +145,46 @@ async function searchFlight() {
     sessionStorage.removeItem('returnFlight');
 
     // Check if we got any flights
-    if (!response || (Array.isArray(response) && response.length === 0)) {
-      // Only show modal for Round Trip with no return flights
-      if (isRoundTrip.value) {
-        showNoFlightsModal.value = true;
-        modalMessage.value = "No return flights available for this route";
-      }
-      // For One Way - silently fail (don't show modal)
+    if (!response || 
+        (response.outbound && response.outbound.length === 0 && !isRoundTrip.value)) {
+      // One-way trip with no outbound flights
+      snackbar.value = {
+        show: true,
+        message: "No outbound flights available for this route",
+        color: "error"
+      };
       return;
     }
 
-    // For Round Trips - check return flights specifically
     if (isRoundTrip.value) {
-      const hasReturn = response.some(flight => flight.type === 'return');
+      // Round trip checks
+      const hasOutbound = response.outbound && response.outbound.length > 0;
+      const hasReturn = response.return && response.return.length > 0;
+      
+      if (!hasOutbound && !hasReturn) {
+        snackbar.value = {
+          show: true,
+          message: "No flights available for this route (both outbound and return)",
+          color: "error"
+        };
+        return;
+      }
+      
+      if (!hasOutbound) {
+        snackbar.value = {
+          show: true,
+          message: "No outbound flights available for this route",
+          color: "error"
+        };
+        return;
+      }
+      
       if (!hasReturn) {
-        showNoFlightsModal.value = true;
-        modalMessage.value = "No return flights available for this route";
+        snackbar.value = {
+          show: true,
+          message: "No return flights available for this route",
+          color: "error"
+        };
         return;
       }
     }
@@ -163,8 +194,11 @@ async function searchFlight() {
 
   } catch (error) {
     console.error("Search failed:", error);
-    showNoFlightsModal.value = true;
-    modalMessage.value = "Error searching for flights. Please try again.";
+    snackbar.value = {
+      show: true,
+      message: "Error searching for flights. Please try again.",
+      color: "error"
+    };
   }
 }
 
@@ -270,125 +304,133 @@ const toProfile = () => {
 </script>
 
 <template>
+  <v-snackbar v-model="snackbar.show" :color="snackbar.color" timeout="3000">
+    {{ snackbar.message }}
+    <template v-slot:actions>
+      <v-btn variant="text" @click="snackbar.show = false">Close</v-btn>
+    </template>
+  </v-snackbar>
+
   <div :class="['header', { scrolled: isScrolled }]">
-    <router-link to="/" class="logo">
-      <v-img :src="settingsData?.logo ? `${settingsData.logo}` : 'No Image'" max-height="40" contain class="logo-img"></v-img>
-    </router-link>
+    <div class="header-container">
+      <router-link to="/" class="logo">
+        <v-img :src="settingsData?.logo ? `${settingsData.logo}` : 'No Image'" 
+               max-height="40" contain class="logo-img"></v-img>
+      </router-link>
 
-    <!-- Origin -->
-    <div class="transport-wrapper d-none d-md-flex">
-      <div class="transport-wrap">
-        <v-select v-model="originPlaceholder" item-value="value" item-title="city" :items="originList" variant="plain"
-          return-object density="compact" hide-details theme="dark">
-          <template #item="data">
-            <v-list-item v-bind="data.props" class="custom-select-item">
-              <template #title>
-                <div class="select-item">
-                  <h6>{{ data.item.raw.city }}</h6>
-                  <div class="d-flex align-center justify-space-between">
-                    <div class="select-item-content d-flex align-center mt-1">
-                      <span class="mdi mdi-airplane air-icon"></span>
-                      <span class="select-text ml-2 text-truncate" style="max-width: 190px">
-                        {{ data.item.raw.name }}
+      <!-- Desktop View -->
+      <div class="transport-wrapper d-none d-md-flex">
+        <div class="transport-wrap">
+          <v-select v-model="originPlaceholder" item-value="value" item-title="city" :items="originList" variant="plain"
+            return-object density="compact" hide-details theme="dark">
+            <template #item="data">
+              <v-list-item v-bind="data.props" class="custom-select-item">
+                <template #title>
+                  <div class="select-item">
+                    <h6>{{ data.item.raw.city }}</h6>
+                    <div class="d-flex align-center justify-space-between">
+                      <div class="select-item-content d-flex align-center mt-1">
+                        <span class="mdi mdi-airplane air-icon"></span>
+                        <span class="select-text ml-2 text-truncate" style="max-width: 190px">
+                          {{ data.item.raw.name }}
+                        </span>
+                      </div>
+                      <span class="select-key-word">
+                        {{ data.item.raw.code }}
                       </span>
                     </div>
-                    <span class="select-key-word">
-                      {{ data.item.raw.code }}
-                    </span>
                   </div>
-                </div>
-              </template>
-            </v-list-item>
-          </template>
-
-          <template #selection="data">
-            <div class="transport-place-container">
-              <div class="transport-place">
-                <div class="transport-title text-caption font-weight-light">
-                  From
-                </div>
-                <div class="transport-content">
-                  <div class="d-flex align-center justify-space-between">
-                    <h2>{{ data.item?.raw?.city }}</h2>
-                    <div class="key-word" v-if="data.item.raw.code">
-                      {{ data.item.raw.code }}
+                </template>
+              </v-list-item>
+            </template>
+            <template #selection="data">
+              <div class="transport-place-container">
+                <div class="transport-place">
+                  <div class="transport-title text-caption font-weight-light">
+                    From
+                  </div>
+                  <div class="transport-content">
+                    <div class="d-flex align-center justify-space-between">
+                      <h2>{{ data.item?.raw?.city }}</h2>
+                      <div class="key-word" v-if="data.item.raw.code">
+                        {{ data.item.raw.code }}
+                      </div>
                     </div>
+                    <p class="font-weight-light">
+                      {{ data.item.raw.name || "Select Your Origin" }}
+                    </p>
                   </div>
-                  <p class="font-weight-light">
-                    {{ data.item.raw.name || "Select Your Origin" }}
-                  </p>
                 </div>
               </div>
-            </div>
-          </template>
-        </v-select>
-      </div>
+            </template>
+          </v-select>
+        </div>
 
-      <!-- Reverse Trip -->
-      <div class="reverse-trip">
-        <v-btn class="reverse-btn" icon="mdi-autorenew" size="x-small" rounded="xl" @click="reverseTrip"></v-btn>
-      </div>
+        <div class="reverse-trip">
+          <v-btn class="reverse-btn" icon="mdi-autorenew" size="x-small" rounded="xl" @click="reverseTrip"></v-btn>
+        </div>
 
-      <!-- Destination -->
-      <div class="transport-wrap">
-        <v-select v-model="destinationPlaceholder" item-value="value" item-title="city" :items="destinationList"
-          variant="plain" return-object density="compact" theme="dark">
-          <template #item="data">
-            <v-list-item v-bind="data.props" class="custom-select-item">
-              <template #title>
-                <div class="select-item">
-                  <h6>{{ data.item.raw.city }}</h6>
-                  <div class="d-flex align-center justify-space-between">
-                    <div class="select-item-content d-flex align-center mt-1">
-                      <span class="mdi mdi-airplane air-icon"></span>
-                      <span class="select-text ml-2 text-truncate" style="max-width: 190px">
-                        {{ data.item.raw.name }}
+        <div class="transport-wrap">
+          <v-select v-model="destinationPlaceholder" item-value="value" item-title="city" :items="destinationList"
+            variant="plain" return-object density="compact" theme="dark">
+            <template #item="data">
+              <v-list-item v-bind="data.props" class="custom-select-item">
+                <template #title>
+                  <div class="select-item">
+                    <h6>{{ data.item.raw.city }}</h6>
+                    <div class="d-flex align-center justify-space-between">
+                      <div class="select-item-content d-flex align-center mt-1">
+                        <span class="mdi mdi-airplane air-icon"></span>
+                        <span class="select-text ml-2 text-truncate" style="max-width: 190px">
+                          {{ data.item.raw.name }}
+                        </span>
+                      </div>
+                      <span class="select-key-word">
+                        {{ data.item.raw.code }}
                       </span>
                     </div>
-                    <span class="select-key-word">
-                      {{ data.item.raw.code }}
-                    </span>
                   </div>
-                </div>
-              </template>
-            </v-list-item>
-          </template>
-
-          <template #selection="data">
-            <div class="transport-place-container">
-              <div class="transport-place">
-                <div class="transport-title text-caption font-weight-light">
-                  To
-                </div>
-                <div class="transport-content">
-                  <div class="d-flex align-center justify-space-between">
-                    <h2>{{ data.item?.raw?.city }}</h2>
-                    <div class="key-word" v-if="data.item.raw.code">
-                      {{ data.item.raw.code }}
+                </template>
+              </v-list-item>
+            </template>
+            <template #selection="data">
+              <div class="transport-place-container">
+                <div class="transport-place">
+                  <div class="transport-title text-caption font-weight-light">
+                    To
+                  </div>
+                  <div class="transport-content">
+                    <div class="d-flex align-center justify-space-between">
+                      <h2>{{ data.item?.raw?.city }}</h2>
+                      <div class="key-word" v-if="data.item.raw.code">
+                        {{ data.item.raw.code }}
+                      </div>
                     </div>
+                    <p class="font-weight-light">
+                      {{ data.item.raw.name || "Select Your Destination" }}
+                    </p>
                   </div>
-                  <p class="font-weight-light">
-                    {{ data.item.raw.name || "Select Your Destination" }}
-                  </p>
                 </div>
               </div>
-            </div>
-          </template>
-        </v-select>
+            </template>
+          </v-select>
+        </div>
       </div>
-    </div>
-    <div class="h-100">
-      <div class="header-right-content d-flex align-center">
-        <!-- Guest -->
+
+      <!-- Mobile Menu Button -->
+      <v-btn class="mobile-menu-btn d-md-none" icon="mdi-menu" variant="text" color="white" 
+             @click="mobileMenuOpen = !mobileMenuOpen"></v-btn>
+
+      <!-- Desktop Right Content -->
+      <div class="header-right-content d-none d-md-flex align-center">
         <v-menu v-model="menu" :close-on-content-click="false" transition="scale-transition">
           <template v-slot:activator="{ props }">
-            <div class="add-guest d-none d-md-flex" v-bind="props">
+            <div class="add-guest" v-bind="props">
               <div class="guest-container">
                 <div class="guest-title text-grey-darken-1">Guests</div>
                 <div class="guest-content d-flex justify-space-between align-center">
                   <h2 class="text-h4 text-grey-lighten-2 font-weight-regular">
                     {{ addGuest[0].value }}
-                    <!-- Show only adults count -->
                   </h2>
                   <span class="mdi mdi-chevron-down"></span>
                 </div>
@@ -408,7 +450,6 @@ const toProfile = () => {
                 {{ item.description }}
               </p>
             </div>
-
             <v-card-actions class="guest-action d-flex justify-end">
               <v-btn variant="text" size="small" @click="menu = false">
                 Done
@@ -417,16 +458,10 @@ const toProfile = () => {
           </v-card>
         </v-menu>
 
-        <!-- Round trip -->
         <div class="d-none d-md-flex align-center">
-          <!-- Vertical Switch -->
           <v-switch v-model="isRoundTrip" class="custom-switch vertical-switch mr-3" hide-details>
-            <template #thumb>
-              <!-- <span class="switch-check mdi mdi-check"></span> -->
-            </template>
+            <template #thumb></template>
           </v-switch>
-
-          <!-- Labels -->
           <div>
             <div class="text-body-2 font-weight-medium cursor-pointer"
               :class="!isRoundTrip ? 'text-white' : 'text-grey-darken-1'" @click="isRoundTrip = false">
@@ -439,8 +474,7 @@ const toProfile = () => {
           </div>
         </div>
 
-        <!-- <router-link to="/departure"> -->
-        <v-btn class="next-btn d-none d-md-flex" icon="mdi-arrow-right" size="large" rounded="lg" @click="searchFlight"
+        <v-btn class="next-btn" icon="mdi-arrow-right" size="large" rounded="lg" @click="searchFlight"
           :disabled="isSearchDisabled"></v-btn>
 
         <v-menu v-model="dashboardMenu" :close-on-content-click="false" :close-on-click="false" location="bottom">
@@ -450,7 +484,6 @@ const toProfile = () => {
                 rounded="lg"></v-btn>
             </div>
           </template>
-
           <v-card min-width="240" color="black" class="dashboard-menu-card" max-height="440">
             <div class="dashboard-menu">
               <v-list-item v-if="userData?.user" class="py-3 profile-menu" :prepend-avatar="userData.user.avatar ||
@@ -458,9 +491,7 @@ const toProfile = () => {
                 " :subtitle="`${userData.user.email}`" :title="userData.user.name" @click="toProfile">
                 <template v-slot:append></template>
               </v-list-item>
-
               <ul class="text-end">
-                <!-- Show login only when NOT logged in -->
                 <li v-if="!userData?.user" class="text-subtitle font-weight-medium text-grey-lighten-2">
                   <router-link to="/signin">Login</router-link>
                 </li>
@@ -479,163 +510,268 @@ const toProfile = () => {
         </v-menu>
       </div>
     </div>
+
+    <!-- Mobile Menu Content -->
+    <div v-if="mobileMenuOpen" class="mobile-menu-content d-md-none">
+      <div class="mobile-user-menu">
+        <v-list>
+          <v-list-item v-if="userData?.user" @click="toProfile">
+            <template #prepend>
+              <v-avatar :image="userData.user.avatar ||
+                `https://ui-avatars.com/api/?name=${userData.user.name}&background=random&color=fff`" size="40"></v-avatar>
+            </template>
+            <v-list-item-title>{{ userData.user.name }}</v-list-item-title>
+            <v-list-item-subtitle>{{ userData.user.email }}</v-list-item-subtitle>
+          </v-list-item>
+          <v-list-item v-if="!userData?.user" to="/signin">
+            <v-list-item-title>Login</v-list-item-title>
+          </v-list-item>
+          <v-list-item to="/flight">
+            <v-list-item-title>Book Trip</v-list-item-title>
+          </v-list-item>
+          <v-list-item to="/my-trip">
+            <v-list-item-title>My Trips</v-list-item-title>
+          </v-list-item>
+          <v-list-item v-if="userData?.user" @click="onLogout">
+            <v-list-item-title>Log Out</v-list-item-title>
+          </v-list-item>
+        </v-list>
+      </div>
+    </div>
   </div>
-
-  <v-dialog v-model="showNoFlightsModal" max-width="500">
-  <v-card>
-    <v-card-title class="text-h5">Flight Unavailable</v-card-title>
-    <v-card-text>
-      {{ modalMessage }}
-    </v-card-text>
-    <v-card-actions>
-      <v-spacer></v-spacer>
-      <v-btn color="primary" @click="showNoFlightsModal = false">OK</v-btn>
-    </v-card-actions>
-  </v-card>
-</v-dialog>
-
 </template>
 
 <style scoped>
+/* Base Header Styles */
 .header {
-  height: 90px;
-  border: 1px solid #a6acb53f;
   background-color: #000000;
   position: fixed;
-  top: 24px;
+  top: 0;
   left: 0;
   right: 0;
-  margin: 0 32px; /* Instead of left/right positioning */
-  border-radius: 16px;
-  z-index: 10;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 20px;
-  transition: 
-    top 0.3s ease,
-    border-radius 0.3s ease,
-    margin 0.3s ease,
-    border-color 0.3s ease;
+  z-index: 1000;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
 }
 
 .header.scrolled {
-  top: 0;
-  margin: 0;
-  border-radius: 0;
-  border: 1px solid transparent;
-  border-bottom: 1px solid #a6acb53f;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-.header-right-content {
-  height: 100%;
-  width: 500px;
+.header-container {
+  display: flex;
+  align-items: center;
   justify-content: space-between;
-}
-
-.profile-menu {
-  border-bottom: 1px solid #6c7a908e;
-}
-
-.h-100 {
-  height: 100%;
+  padding: 0 16px;
+  height: 60px;
+  max-width: 100%;
 }
 
 .logo {
-  border-right: 1px solid #6c7a908e;
-  height: 100%;
-  width: 220px;
   display: flex;
   align-items: center;
-  padding-right: 20px;
+  height: 100%;
+  min-width: 100px;
 }
 
 .logo-img {
   width: 100px;
+  max-height: 40px;
+  object-fit: contain;
 }
 
-.transport-wrapper {
+/* Desktop Styles */
+@media (min-width: 960px) {
+  .header {
+    height: 90px;
+    border-radius: 16px;
+    margin: 0 32px;
+    top: 24px;
+    border: 1px solid #a6acb53f;
+  }
+
+  .header.scrolled {
+    top: 0;
+    margin: 0;
+    border-radius: 0;
+    border: 1px solid transparent;
+    border-bottom: 1px solid #a6acb53f;
+  }
+
+  .header-container {
+    padding: 0 20px;
+  }
+
+  .transport-wrapper {
+    display: flex;
+    align-items: center;
+    height: 100%;
+    width: 100%;
+    margin: 0 20px;
+  }
+
+  /* Keep all your existing desktop styles */
+  .transport-place-container {
+    height: 100%;
+    width: 100%;
+  }
+
+  .transport-place {
+    width: 100%;
+    height: 100%;
+  }
+
+  .transport-title {
+    font-size: 12px;
+    color: #fafafa;
+    line-height: 18px;
+  }
+
+  .transport-content {
+    color: #fff;
+  }
+
+  .transport-content h2 {
+    font-weight: 400;
+    font-size: 24px;
+  }
+
+  .transport-content p {
+    font-size: 12px;
+    color: #a4a3a3;
+    line-height: 16px;
+  }
+
+  .transport-content .key-word {
+    font-size: 22px;
+    color: #a4a3a3;
+  }
+
+  .select-key-word {
+    font-size: 16px;
+    color: #a4a3a3;
+  }
+
+  .reverse-trip {
+    height: 100%;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1;
+  }
+
+  .reverse-trip::after {
+    content: "";
+    position: absolute;
+    width: 1px;
+    height: 100%;
+    background-color: #6c7a908e;
+    z-index: -1;
+  }
+
+  .header-right-content {
+    height: 100%;
+    min-width: 400px;
+    justify-content: flex-end;
+    gap: 16px;
+  }
+
+  .add-guest {
+    cursor: pointer;
+    height: 100%;
+    border-left: 1px solid #6c7a908e;
+    border-right: 1px solid #6c7a908e;
+    padding: 0 16px;
+  }
+
+  .next-btn {
+    background-color: #657ca2;
+    color: #ffffff;
+    font-size: 44px;
+    height: 80%;
+    min-width: 80px;
+  }
+}
+
+/* Mobile Styles */
+.mobile-menu-btn {
+  color: white;
+  margin-left: auto;
+}
+
+.mobile-menu-content {
+  position: absolute;
+  top: 60px;
+  left: 0;
+  right: 0;
+  background-color: #000;
+  padding: 0 16px 16px 16px;
+  border-top: 1px solid #333;
+  z-index: 999;
+  max-height: calc(100vh - 60px);
+  overflow-y: auto;
+}
+
+.mobile-transport-wrapper {
   display: flex;
-  align-items: center;
-  height: 100%;
-  width: 100%;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 16px;
 }
 
-.transport-place-container {
-  height: 100%;
-  width: 100%;
+.mobile-reverse-trip {
+  display: flex;
+  justify-content: center;
+  margin: 8px 0;
 }
 
-.transport-place {
-  width: 100%;
-  height: 100%;
+.mobile-reverse-trip .reverse-btn {
+  transform: rotate(90deg);
 }
 
-.transport-title {
-  font-size: 12px;
-  color: #fafafa;
-  line-height: 18px;
+.mobile-trip-toggle {
+  display: flex;
+  justify-content: center;
+  margin: 16px 0;
 }
 
-.transport-content {
-  color: #fff;
+.mobile-trip-toggle .v-btn {
+  flex: 1;
 }
 
-.transport-content h2 {
-  font-weight: 400;
-  font-size: 24px;
+.mobile-guest-selector {
+  margin: 16px 0;
 }
 
-.transport-content p {
-  font-size: 12px;
-  color: #a4a3a3;
-  line-height: 16px;
+.mobile-search-btn {
+  margin: 16px 0;
 }
 
-.transport-content .key-word {
-  font-size: 22px;
-  color: #a4a3a3;
+.mobile-user-menu {
+  border-top: 1px solid #333;
+  padding-top: 16px;
 }
 
-.select-key-word {
-  font-size: 16px;
-  color: #a4a3a3;
+/* Responsive Adjustments */
+@media (max-width: 600px) {
+  .logo-img {
+    width: 140px;
+  }
+
+  .header-container {
+    padding: 0 12px;
+  }
 }
 
-.transport-content .key-word span {
-  color: #fff;
-  font-size: 26px;
-}
-
-::v-deep(.v-field) {
-  align-items: center !important;
-}
-
-::v-deep(.mdi-menu-down) {
-  color: #ffffff;
-}
-
-::v-deep(.v-field__input) {
-  padding-bottom: 10px !important;
-  padding-left: 20px;
-  padding-right: 20px;
-}
-
-::v-deep(.v-input) {
-  height: 100%;
-}
-
-::v-deep(.v-select__selection) {
-  width: 100%;
+@media (max-width: 400px) {
+  .logo-img {
+    width: 140px;
+  }
 }
 
 .custom-select-item {
   border-top: 1px solid #c3c3c333;
-  /* transition: background-color 0.3s ease; */
-}
-
-.dashboard-menu-card {
-  margin-top: 1px;
 }
 
 .custom-select-item:hover {
@@ -693,10 +829,6 @@ const toProfile = () => {
   background-color: #adcede2c;
 }
 
-.dashboard-menu ul li:first-child {
-  border-top: 1px solid transparent;
-}
-
 .select-item h6 {
   font-size: 12px;
   color: #a4a3a3;
@@ -712,78 +844,6 @@ const toProfile = () => {
 .select-text {
   font-weight: 400;
   font-size: 20px;
-}
-
-.next-btn {
-  background-color: #657ca2;
-  color: #ffffff;
-  font-size: 44px;
-  height: 80%;
-  min-width: 100px;
-}
-
-.reverse-trip {
-  height: 100%;
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1;
-}
-.reverse-trip::after {
-  content: "";
-  position: absolute;
-  width: 1px;
-  height: 100%;
-  background-color: #6c7a908e;
-  z-index: -1;
-}
-.reverse-btn {
-  margin: 0 2px;
-}
-
-.add-guest {
-  cursor: pointer;
-  height: 100%;
-  border-left: 1px solid #6c7a908e;
-  border-right: 1px solid #6c7a908e;
-}
-
-.guest-container {
-  height: 100%;
-  width: 120px;
-  padding: 10px 20px;
-  display: flex;
-  justify-content: space-between;
-  flex-direction: column;
-}
-
-.transport-title {
-  font-size: 16px;
-  font-weight: 500;
-  color: #aaa;
-}
-
-.guest-content {
-  display: flex;
-  align-items: center;
-  gap: 4px;
-}
-
-.guest-content h2 {
-  margin: 0;
-  color: #fff;
-}
-
-.guest-content span {
-  color: #aaa;
-}
-
-.guest-plate {
-  padding: 16px 16px 0 16px;
-  background-color: #000;
-  margin-top: 1px;
-  position: relative;
 }
 
 .plate-item {
@@ -816,32 +876,4 @@ const toProfile = () => {
 ::v-deep(.v-overlay-container) {
   display: none !important;
 }
-
-
-
-@media (max-width: 1299px) {
-  .header-right-content {
-  width: 450px;
-}
-}
-
-@media (max-width: 991px) {
-  .header {
-    height: 60px;
-    width: 100%;
-    border-radius: 10px;
-    padding: 0 20px;
-    top: 0px;
-    left: 0px;
-    right: 0px;
-    border-radius: 0px;
-  }
-  .header-right-content {
-  width: 100%;
-  }
-  .logo {
-    border-right: none;
-}
-}
-
 </style>

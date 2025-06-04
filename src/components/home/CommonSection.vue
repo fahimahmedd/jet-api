@@ -23,7 +23,7 @@
     padding: 100px 0;
 }
 .feature-content h2 {
-  font-size: 38px;
+  font-size: 36px;
   font-weight: 400;
 }
 .feature-content p {
