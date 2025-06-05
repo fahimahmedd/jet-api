@@ -323,6 +323,7 @@ h3 {
   h3 {
     font-size: 1.75rem;
   }
+  
 }
 
 @media (min-width: 960px) {

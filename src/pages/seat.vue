@@ -103,6 +103,7 @@ h3 {
 @media (max-width: 960px) {
   .subpage-left {
     padding: 20px;
+    height: auto;
   }
 
   h3 {
