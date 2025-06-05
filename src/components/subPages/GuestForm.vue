@@ -304,7 +304,8 @@ const handleSubmit = () => {
   <div class="form-content mt-5">
     <form @submit.prevent="handleSubmit">
       <v-row no-gutters>
-        <v-col cols="6" class="px-2 mb-2">
+        <!-- First Name & Last Name - Stack on mobile -->
+        <v-col cols="12" sm="6" class="px-2 mb-2">
           <v-text-field
             v-model="firstName"
             :rules="[rules.required]"
@@ -312,7 +313,7 @@ const handleSubmit = () => {
             required
           ></v-text-field>
         </v-col>
-        <v-col cols="6" class="px-2 mb-2">
+        <v-col cols="12" sm="6" class="px-2 mb-2">
           <v-text-field
             v-model="lastName"
             :rules="[rules.required]"
@@ -320,7 +321,9 @@ const handleSubmit = () => {
             required
           ></v-text-field>
         </v-col>
-        <v-col cols="6" class="px-2 mb-2">
+
+        <!-- Birthday & Gender - Stack on mobile -->
+        <v-col cols="12" sm="6" class="px-2 mb-2">
           <v-date-input
             v-model="birthDate"
             prepend-icon=""
@@ -330,7 +333,7 @@ const handleSubmit = () => {
             required
           ></v-date-input>
         </v-col>
-        <v-col cols="6" class="px-2 mb-2">
+        <v-col cols="12" sm="6" class="px-2 mb-2">
           <v-select 
             v-model="gender"
             :items="items" 
@@ -340,6 +343,7 @@ const handleSubmit = () => {
           ></v-select>
         </v-col>
 
+        <!-- Email - Full width -->
         <v-col cols="12" class="px-2 mb-2">
           <v-text-field
             v-model="email"
@@ -349,7 +353,8 @@ const handleSubmit = () => {
           ></v-text-field>
         </v-col>
 
-        <v-col cols="3" class="px-2">
+        <!-- Phone - Country code above phone on mobile -->
+        <v-col cols="12" sm="3" class="px-2">
           <v-select
             v-model="selectedCountry"
             hide-details
@@ -388,14 +393,11 @@ const handleSubmit = () => {
                 <template #title>
                   <span class="text-subtitle-2 ml-2">{{ item.raw.name }}</span>
                 </template>
-                <!-- <template #subtitle>
-                  <span class="text-caption">{{ item.raw.code }}</span>
-                </template> -->
               </v-list-item>
             </template>
           </v-select>
         </v-col>
-        <v-col cols="9" class="px-2">
+        <v-col cols="12" sm="9" class="px-2">
           <v-text-field 
             v-model="phone" 
             placeholder="Phone Number" 
@@ -403,25 +405,19 @@ const handleSubmit = () => {
             :rules="[rules.phone]"
           />
         </v-col>
+
+        <!-- Notice - Full width -->
         <v-col cols="12">
           <div class="text-medium-emphasis font-weight-regular text-subtitle-2 px-2">
             By providing your phone number, you agree to receive booking-related
             transactional messages. Please reply 'stop' at any time to opt out.
           </div>
-          <!-- <div>
-            <v-checkbox class="text-subtitle-2">
-              <template #label>
-                <span class="text-subtitle-2 font-weight-medium">
-                  Share trip details with this guest.
-                </span>
-              </template>
-            </v-checkbox>
-          </div> -->
         </v-col>
       </v-row>
       
+      <!-- Button - Full width with responsive margin -->
       <v-btn 
-        class="booking-btn mt-10" 
+        class="booking-btn mt-5 mt-sm-10" 
         variant="flat"
         rounded="lg" 
         size="large" 
@@ -436,9 +432,17 @@ const handleSubmit = () => {
   </div>
 </template>
 
-
 <style scoped>
-   .search-input{
-    width: 280px;
-   }
+.search-input {
+  width: 100%;
+  max-width: 280px;
+}
+
+/* Optional: Adjust spacing on small devices */
+@media (max-width: 600px) {
+  .px-2 {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+  }
+}
 </style>

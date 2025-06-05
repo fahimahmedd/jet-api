@@ -56,6 +56,7 @@ const goToHome = () => {
   router.push('/');
 };
 </script>
+
 <template>
   <div class="confirmation-page">
     <!-- Main Content -->
@@ -63,14 +64,13 @@ const goToHome = () => {
       <div class="confirmation-card">
         <!-- Animated Checkmark -->
         <div class="exclamation-animation">
-  <span class="mdi mdi-exclamation-thick"></span>
-</div>
+          <span class="mdi mdi-exclamation-thick"></span>
+        </div>
 
         <h1 class="confirmation-title">Booking Pending..</h1>
         <p class="confirmation-subtitle">Your flight request has been successfully submitted</p>
 
         <!-- Booking Details -->
-        <!-- Updated Booking Details -->
         <div class="confirmation-details">
           <div class="detail-item">
             <v-icon color="#6d92cf">mdi-airplane</v-icon>
@@ -142,13 +142,6 @@ const goToHome = () => {
         </div>
 
         <div class="confirmation-actions">
-          <!-- <a :href="downloadTicket" target="_blank" rel="noopener noreferrer">
-            <v-btn color="#6d92cf" large class="action-btn">
-              <v-icon left>mdi-download</v-icon>
-              Download Ticket
-            </v-btn>
-          </a> -->
-
           <v-btn outlined color="#6d92cf" large class="action-btn" @click="goToBookings">
             <v-icon left>mdi-text-box-outline</v-icon>
             View All Bookings
@@ -169,24 +162,22 @@ const goToHome = () => {
   </div>
 </template>
 
-
-
 <style lang="scss" scoped>
 .confirmation-page {
   min-height: 100vh;
   background: linear-gradient(135deg, #f5f7fa 0%, #e4e8f0 100%);
-  padding-top: 50px;
-  padding-bottom: 50px;
+  padding: 20px;
   position: relative;
   overflow: hidden;
+  display: flex;
+  align-items: center;
 }
 
-
-
 .confirmation-container {
+  width: 100%;
   max-width: 800px;
   margin: 0 auto;
-  padding: 0 20px;
+  padding: 0 15px;
   position: relative;
 }
 
@@ -194,7 +185,7 @@ const goToHome = () => {
   background: white;
   border-radius: 16px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
-  padding: 40px;
+  padding: 30px;
   text-align: center;
   position: relative;
   z-index: 2;
@@ -211,114 +202,77 @@ const goToHome = () => {
   }
 }
 
-.checkmark-animation {
+.exclamation-animation {
   margin: 0 auto 20px;
-  width: 100px;
-  height: 100px;
-}
-
-.checkmark {
-  width: 100px;
-  height: 100px;
-  border-radius: 50%;
-  display: block;
-  stroke-width: 4;
-  stroke: #fff;
-  stroke-miterlimit: 10;
-  margin: 0 auto;
-  animation: fill 0.4s ease-in-out 0.4s forwards, scale 0.3s ease-in-out 0.9s both;
-
-  &__circle {
-    stroke-dasharray: 166;
-    stroke-dashoffset: 166;
-    stroke-width: 4;
-    stroke-miterlimit: 10;
-    stroke: #6d92cf;
-    fill: none;
-    animation: stroke 0.6s cubic-bezier(0.65, 0, 0.45, 1) forwards;
-  }
-
-  &__check {
-    transform-origin: 50% 50%;
-    stroke-dasharray: 48;
-    stroke-dashoffset: 48;
-    animation: stroke 0.3s cubic-bezier(0.65, 0, 0.45, 1) 0.8s forwards;
-  }
-}
-
-@keyframes stroke {
-  100% {
-    stroke-dashoffset: 0;
-  }
-}
-
-@keyframes scale {
-
-  0%,
-  100% {
-    transform: none;
-  }
-
-  50% {
-    transform: scale3d(1.1, 1.1, 1);
-  }
-}
-
-@keyframes fill {
-  100% {
-    box-shadow: inset 0 0 0 100px #6d92cf;
-  }
+  width: 80px;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .confirmation-title {
-  font-size: 2.5rem;
+  font-size: 2rem;
   font-weight: 700;
   color: #2c3e50;
   margin-bottom: 10px;
   background: linear-gradient(to right, #89afed 0%, #5a80bc 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
+  line-height: 1.2;
 }
 
 .confirmation-subtitle {
-  font-size: 1.2rem;
+  font-size: 1rem;
   color: #7f8c8d;
-  margin-bottom: 30px;
+  margin-bottom: 25px;
+  line-height: 1.4;
 }
 
 .confirmation-details {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 20px;
-  margin: 30px 0;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 15px;
+  margin: 25px 0;
   text-align: left;
 }
 
 .detail-item {
   display: flex;
   align-items: center;
-  padding: 15px;
+  padding: 12px;
   background: #f8f9fa;
   border-radius: 8px;
 
   .v-icon {
-    margin-right: 15px;
-    font-size: 28px;
+    margin-right: 12px;
+    font-size: 24px;
+    flex-shrink: 0;
+  }
+
+  > div {
+    overflow: hidden;
   }
 }
 
 .detail-label {
-  font-size: 0.8rem;
+  font-size: 0.75rem;
   color: #7f8c8d;
   text-transform: uppercase;
-  letter-spacing: 1px;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .detail-value {
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 600;
   color: #2c3e50;
-  margin-top: 5px;
+  margin-top: 3px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .route-display {
@@ -326,72 +280,80 @@ const goToHome = () => {
   justify-content: space-between;
   align-items: center;
   margin: 20px 0;
-  padding: 20px;
+  padding: 15px;
   background: #f8f9fa;
   border-radius: 12px;
+  flex-wrap: wrap;
 }
 
 .airport {
   flex: 1;
+  min-width: 100px;
+  padding: 5px;
 
   .code {
-    font-size: 2rem;
+    font-size: 1.5rem;
     font-weight: 700;
     color: #2c3e50;
+    line-height: 1.2;
   }
 
   .city {
-    font-size: 1rem;
+    font-size: 0.9rem;
     color: #7f8c8d;
-    margin-top: 5px;
+    margin-top: 3px;
+    line-height: 1.3;
   }
 }
 
 .flight-path {
   flex: 2;
+  min-width: 150px;
   position: relative;
-  padding: 0 20px;
+  padding: 0 15px;
+  margin: 10px 0;
 
   .duration {
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     color: #757a7a;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    .mdi {
+      margin-right: 5px;
+    }
   }
 
   .line {
     height: 2px;
     background: #bdc3c7;
     position: relative;
-
-    &::after {
-      content: '';
-      position: absolute;
-      width: 100%;
-      height: 2px;
-      background: #bdc3c7;
-      top: 0;
-      left: 0;
-    }
+    width: 100%;
   }
 
   .v-icon {
     position: absolute;
     left: 50%;
-    bottom: -10px;
+    bottom: -12px;
     transform: translateX(-50%);
     background: #f8f9fa;
-    padding: 0 10px;
+    padding: 0 8px;
+    font-size: 20px;
   }
 }
 
 .confirmation-actions {
   display: flex;
   justify-content: center;
-  gap: 15px;
-  margin: 30px 0;
+  gap: 12px;
+  margin: 25px 0;
+  flex-wrap: wrap;
 
   .action-btn {
-    min-width: 200px;
+    min-width: 180px;
+    margin: 5px 0;
   }
 }
 
@@ -399,48 +361,19 @@ const goToHome = () => {
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   color: #7f8c8d;
-  margin-top: 20px;
+  margin-top: 15px;
+  padding: 0 10px;
+  flex-wrap: wrap;
 
   .v-icon {
-    margin-right: 8px;
+    margin-right: 6px;
+    flex-shrink: 0;
   }
 }
 
-.confetti-container {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  pointer-events: none;
-  z-index: 1;
-}
-
-.confetti {
-  position: absolute;
-  width: 10px;
-  height: 10px;
-  background-color: var(--color);
-  left: var(--x);
-  top: var(--y);
-  transform: rotate(var(--angle));
-  animation: confettiFall var(--speed) var(--delay) linear infinite;
-  opacity: 0.8;
-}
-
-@keyframes confettiFall {
-  0% {
-    transform: translateY(-100vh) rotate(var(--angle));
-  }
-
-  100% {
-    transform: translateY(100vh) rotate(calc(var(--angle) * 2));
-  }
-}
-
+/* Animation styles remain the same as before */
 .exclamation-animation {
   position: relative;
   display: inline-block;
@@ -455,7 +388,7 @@ const goToHome = () => {
   left: 0;
   width: 100%;
   height: 100%;
-  border: 2px solid #5a80bc; /* Circle color */
+  border: 2px solid #5a80bc;
   border-radius: 50%;
   box-sizing: border-box;
   animation: exclamation-circle 0.6s ease-in-out both;
@@ -464,8 +397,8 @@ const goToHome = () => {
 .exclamation-animation .mdi-exclamation-thick {
   position: relative;
   display: block;
-  font-size: 24px; /* Icon size */
-  color: #5a80bc; /* Icon color */
+  font-size: 24px;
+  color: #5a80bc;
   text-align: center;
   line-height: 52px;
   opacity: 0;
@@ -495,41 +428,97 @@ const goToHome = () => {
   }
 }
 
-
+/* Responsive Breakpoints */
 @media (max-width: 768px) {
+  .confirmation-page {
+    padding: 15px;
+    align-items: flex-start;
+  }
+
   .confirmation-card {
-    padding: 30px 20px;
+    padding: 25px 15px;
   }
 
   .confirmation-title {
-    font-size: 2rem;
+    font-size: 1.75rem;
+  }
+
+  .confirmation-subtitle {
+    font-size: 0.95rem;
   }
 
   .confirmation-details {
     grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .detail-item {
+    padding: 10px;
+    
+    .v-icon {
+      font-size: 22px;
+      margin-right: 10px;
+    }
   }
 
   .route-display {
     flex-direction: column;
-    gap: 20px;
+    gap: 15px;
+    padding: 15px 10px;
+  }
+
+  .airport {
+    width: 100%;
+    text-align: center;
+    padding: 5px 0;
+    
+    .code {
+      font-size: 1.3rem;
+    }
   }
 
   .flight-path {
     width: 100%;
-    padding: 20px 0;
-
-    .line {
-      width: 100%;
+    padding: 15px 0;
+    margin: 5px 0;
+    
+    .v-icon {
+      bottom: -10px;
     }
   }
 
   .confirmation-actions {
     flex-direction: column;
-    gap: 10px;
-
+    gap: 8px;
+    
     .action-btn {
       width: 100%;
+      min-width: unset;
     }
+  }
+}
+
+@media (max-width: 480px) {
+  .confirmation-title {
+    font-size: 1.5rem;
+  }
+
+  .confirmation-subtitle {
+    font-size: 0.9rem;
+  }
+
+  .detail-value {
+    font-size: 0.9rem;
+  }
+
+  .confirmation-actions .v-btn {
+    font-size: 0.85rem;
+  }
+
+  .confirmation-note {
+    font-size: 0.8rem;
+    justify-content: flex-start;
+    text-align: left;
   }
 }
 </style>

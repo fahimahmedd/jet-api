@@ -120,45 +120,48 @@ const goBackToFlights = () => {
 
 <template>
   <div class="subpage-container">
-    <v-row no-gutters>
-      <v-col cols="12" lg="4" md="12">
-        <div class="subpage-left" style="background-image: url('/images/subPage/departure.jpg')">
-          <router-link to="/">
+    <v-row no-gutters class="flex-column flex-md-row">
+      <v-col cols="12" md="5" lg="4">
+        <div class="subpage-left">
+          <router-link to="/" class="logo-link">
             <div class="logo">
-              <v-img src="/images/logo/logo.png" max-width="180"></v-img>
+              <v-img src="/images/logo/logo.png" :max-width="$vuetify.display.smAndDown ? '140' : '180'"></v-img>
             </div>
           </router-link>
 
-          <h3 class="sub-text-content text-white font-weight-medium">
-            When would you like to depart from {{ flightStore.searchParams?.origin_city }}?
-          </h3>
+          <div class="sub-text-container">
+            <h3 class="sub-text-content text-white font-weight-medium">
+              When would you like to depart from {{ flightStore.searchParams?.origin_city }}?
+            </h3>
+          </div>
         </div>
       </v-col>
-      <v-col cols="12" lg="8" md="12">
+      <v-col cols="12" md="7" lg="8">
         <div class="subpage-content">
           <SubHeader />
-          <v-container>
+          <v-container class="px-4 px-sm-6">
             <div class="sub-container">
-              <h2 class="text-black font-weight-regular text-h3">
+              <h2 class="text-black font-weight-regular text-h4 text-md-h3">
                 Departure
               </h2>
               
-              <div v-if="months.length > 0" class="month-wrapper d-flex gap-4 mt-6">
-                <span 
-                  v-for="month in months" 
-                  :key="month.value"
-                  class="cursor-pointer text-subtitle font-weight-regular px-1 mx-3 py-1 border-b-2" 
-                  :class="{
-                    'border-b-active font-weight-bold': selectedMonth === month.value,
-                    'border-transparent text-gray-600': selectedMonth !== month.value,
-                  }" 
-                  @click="selectedMonth = month.value"
-                >
-                  {{ month.label }}
-                </span>
+              <div v-if="months.length > 0" class="month-wrapper mt-4 mt-sm-6">
+                <div class="month-scroller">
+                  <span 
+                    v-for="month in months" 
+                    :key="month.value"
+                    class="month-tab" 
+                    :class="{
+                      'month-tab-active': selectedMonth === month.value,
+                    }" 
+                    @click="selectedMonth = month.value"
+                  >
+                    {{ month.label }}
+                  </span>
+                </div>
               </div>
 
-              <div class="departure-content mt-8">
+              <div class="departure-content">
                 <div 
                   v-for="item in filteredFlights" 
                   :key="item.id" 
@@ -169,10 +172,10 @@ const goBackToFlights = () => {
                 </div>
               </div>
               
-              <div v-if="months.length === 0" class="mt-20 text-center font-weight-bold text-grey mt-6 text-h6">
+              <div v-if="months.length === 0" class="no-flights-message">
                 No Flights Available
               </div>
-              <div v-else-if="filteredFlights.length === 0" class="mt-20 text-center font-weight-bold text-grey mt-6 text-h6">
+              <div v-else-if="filteredFlights.length === 0" class="no-flights-message">
                 No Flights available for selected month
               </div>
             </div>
@@ -182,18 +185,18 @@ const goBackToFlights = () => {
     </v-row>
 
     <!-- Seat Warning Modal -->
-    <v-dialog v-model="showSeatWarning" persistent max-width="500">
-      <v-card class="pa-6 text-center">
-        <v-icon color="warning" size="64" class="mb-4 mx-auto">mdi-alert-circle-outline</v-icon>
-        <h2 class="text-h5 text-black font-weight-bold mb-3">Not Enough Seats Available</h2>
-        <p class="text-caption-2 text-grey-darken-2 mb-6">
+    <v-dialog v-model="showSeatWarning" persistent :max-width="$vuetify.display.smAndDown ? '90%' : '500'">
+      <v-card class="pa-4 pa-sm-6 text-center">
+        <v-icon color="warning" :size="$vuetify.display.smAndDown ? 48 : 64" class="mb-3 mb-sm-4 mx-auto">mdi-alert-circle-outline</v-icon>
+        <h2 class="text-h6 text-sm-h5 text-black font-weight-bold mb-2 mb-sm-3">Not Enough Seats Available</h2>
+        <p class="text-caption text-sm-caption-2 text-grey-darken-2 mb-4 mb-sm-6">
           Only <strong>{{ availableSeatsCount }}</strong> seats remain, but you're booking for 
           <strong>{{ totalGuests }}</strong> guests. Please select another flight.
         </p>
-        <div class="d-flex justify-center gap-4">
-          <v-btn color="#6d92cf" @click="goBackToFlights">
-            <v-icon start>mdi-arrow-left</v-icon>
-           Select Another Flight
+        <div class="d-flex justify-center gap-3 gap-sm-4">
+          <v-btn color="#6d92cf" @click="goBackToFlights" class="px-4">
+            <v-icon start size="small">mdi-arrow-left</v-icon>
+            Select Another Flight
           </v-btn>
         </div>
       </v-card>
@@ -201,26 +204,25 @@ const goBackToFlights = () => {
   </div>
 </template>
 
-
 <style scoped>
 .subpage-container {
-  height: 100vh;
+  min-height: 100vh;
   width: 100%;
-}
-
-.border-b-active {
-  border-bottom: 2px solid #6C7A90;
 }
 
 .subpage-left {
-  height: 100vh;
+  height: 280px;
   width: 100%;
+  background-image: url('/images/subPage/departure.jpg');
   background-position: center;
   background-size: cover;
   background-repeat: no-repeat;
   position: relative;
   z-index: 1;
-  padding: 30px;
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* Distributes space between logo and text */
 }
 
 .subpage-left::after {
@@ -234,45 +236,119 @@ const goBackToFlights = () => {
   z-index: -1;
 }
 
+.logo-link {
+  display: block;
+  z-index: 2; /* Ensures logo stays above overlay */
+}
+
+.logo {
+  margin-bottom: 0; /* Remove bottom margin since we're using flex spacing */
+}
+
+.sub-text-container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Centers text vertically */
+  flex-grow: 1; /* Takes up remaining space */
+  position: relative;
+  z-index: 2;
+  padding: 20px 0;
+}
+
 h3 {
-  font-size: 28px;
+  font-size: 1.5rem;
+  line-height: 1.3;
+  text-align: center;
 }
 
 .sub-text-content {
   max-width: 340px;
-  margin: 120px auto 0;
-}
-
-.gap {
-  gap: 18px;
+  margin: 0 auto;
 }
 
 .subpage-content {
-  padding-left: 20px;
+  padding: 0;
 }
-.month-wrapper{
+
+.month-wrapper {
   width: 100%;
   overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  padding-bottom: 8px;
 }
 
-@media (max-width: 991px) {
-  .subpage-container {
-    height: auto;
-  }
+.month-scroller {
+  display: flex;
+  gap: 12px;
+  min-width: max-content;
+  padding: 0 4px;
+}
 
+.month-tab {
+  cursor: pointer;
+  font-size: 0.875rem;
+  font-weight: 400;
+  padding: 4px 8px;
+  border-bottom: 2px solid transparent;
+  color: #6b7280;
+  white-space: nowrap;
+}
+
+.month-tab-active {
+  border-bottom: 2px solid #6C7A90;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+.departure-content {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.no-flights-message {
+  margin: 60px 0;
+  text-align: center;
+  font-weight: 600;
+  color: #9ca3af;
+  font-size: 1.125rem;
+}
+
+@media (min-width: 600px) {
   .subpage-left {
-    height: auto;
-    padding: 20px;
+    height: 320px;
+    padding: 25px;
   }
-
-  .subpage-content {
-    padding-left: 0px;
+  
+  h3 {
+    font-size: 1.75rem;
   }
+}
 
-  h2 {
-    margin-top: 15px !important;
-    font-size: 36px !important;
+@media (min-width: 960px) {
+  .subpage-container {
+    display: flex;
+    flex-direction: row;
+    height: 100vh;
   }
+  
+  .subpage-left {
+    height: 100%;
+    padding: 30px;
+  }
+  
+  .sub-text-container {
+    padding: 40px 0;
+  }
+}
 
+@media (min-width: 1280px) {
+  .subpage-left {
+    padding: 40px;
+  }
+  
+  h3 {
+    font-size: 1.75rem;
+  }
 }
 </style>

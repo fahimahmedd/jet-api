@@ -85,7 +85,7 @@ const seatStatus = computed(() => {
           </v-col>
 
           <!-- Plane image & Duration -->
-          <v-col cols="6" lg="4" md="4" class="d-none d-lg-block">
+          <v-col cols="6" lg="4" md="4" class="d-none d-md-block">
             <div>
               <v-img src="/images/subPage/plane.svg" class="mx-auto" width="100%" max-width="260px"></v-img>
               <div class="time-text text-center text-caption text-white font-weight-regular">

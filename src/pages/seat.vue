@@ -100,9 +100,8 @@ h3 {
   top: -30px;
 }
 
-@media (max-width: 991px) {
+@media (max-width: 960px) {
   .subpage-left {
-    height: auto;
     padding: 20px;
   }
 

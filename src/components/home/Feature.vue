@@ -25,11 +25,12 @@ const featureItems = [
     style="background-image: url('/images/feature/feature-bg.jpg')"
   >
     <v-container>
-      <v-row>
-        <v-col>
+      <v-row class="align-center">
+        <!-- Content Column -->
+        <v-col cols="12" md="7" lg="6" order-md="1" order="2">
           <div class="feature-content">
             <h2>
-              What to Except: <br />
+              What to Expect: <br />
               <span class="text-grey-lighten-1"
                 >The Perks of Flying Private</span
               >
@@ -40,36 +41,35 @@ const featureItems = [
                 v-for="(item, id) in featureItems"
                 :key="id"
                 cols="12"
-                xs="12"
                 sm="6"
-                md="6"
-                lg="6"
+                class="feature-col"
               >
-                <div class="feature-item">
-                  <div>
-                    <v-img max-width="60" :src="item.img"></v-img>
+                <div class="feature-item d-flex align-start">
+                  <div class="feature-icon">
+                    <v-img width="50" max-width="50" :src="item.img"></v-img>
                   </div>
-                  <p class="mt-5">{{ item.text }}</p>
+                  <p class="ml-4">{{ item.text }}</p>
                 </div>
               </v-col>
             </v-row>
 
-            <div class="btn-max">
+            <div class="btn-max mt-8 mt-md-16">
               <router-link to="/flight">
                 <v-btn
-                  class="flight-serach-btn booking-btn mt-16"
+                  class="flight-search-btn booking-btn"
                   variant="outlined"
                   rounded="xl"
                   size="large"
-                  width="400"
-                  block
+                  :width="$vuetify.display.mobile ? '100%' : '400'"
                   >Book Your Seat</v-btn
                 >
               </router-link>
             </div>
           </div>
         </v-col>
-        <v-col cols="12" xs="12" sm="12" md="6" lg="6">
+
+        <!-- Image Column -->
+        <v-col cols="12" md="5" lg="6" order-md="2" order="1" class="mb-8 mb-md-0">
           <div class="feature-img">
             <v-img
               cover
@@ -92,6 +92,7 @@ const featureItems = [
   position: relative;
   z-index: 1;
 }
+
 .feature::after {
   position: absolute;
   content: "";
@@ -102,38 +103,131 @@ const featureItems = [
   background-color: rgba(0, 0, 0, 0.89);
   z-index: -1;
 }
+
 .feature-content {
   color: #fff;
-}
-.feature-content h2 {
-  font-size: 38px;
-  font-weight: 400;
-}
-.feature-item {
-  padding: 20px;
-}
-.feature-item p {
-  font-size: 14px;
-  font-weight: 700;
-  max-width: 230px;
-}
-.booking-btn {
-    background-color: #fff;
-    color: #000;
-    font-size: 22px;
-    text-transform: capitalize;
-    min-height: 48px;
-    font-weight: 500;
+  
+  h2 {
+    font-size: 38px;
+    font-weight: 400;
+    line-height: 1.2;
+  }
 }
 
-@media (max-width: 991px) {
-  .feature-item {
-    padding: 0px;
+.feature-item {
+  padding: 12px 0;
+  display: flex;
+  align-items: flex-start;
+  
+  p {
+    font-size: 15px;
+    font-weight: 500;
+    max-width: 100%;
+    line-height: 1.5;
+    margin-left: 16px;
+    margin-top: 4px;
   }
+}
+
+.feature-icon {
+  flex-shrink: 0;
+}
+
+.booking-btn {
+  background-color: #fff;
+  color: #000;
+  font-size: 18px;
+  text-transform: capitalize;
+  min-height: 48px;
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
+
+.feature-img {
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+.btn-max {
+  max-width: 400px;
+}
+
+@media (max-width: 1279px) {
+  .feature-content h2 {
+    font-size: 34px;
+  }
+  
   .feature-item p {
     font-size: 14px;
-    font-weight: 700;
-    max-width: 100%;
+  }
+  
+  .booking-btn {
+    font-size: 17px;
+  }
 }
+
+@media (max-width: 959px) {
+  .feature {
+    padding: 60px 0;
+  }
+  
+  .feature-content h2 {
+    font-size: 30px;
+    text-align: center;
+    
+    span {
+      display: inline-block;
+      margin-top: 4px;
+    }
+  }
+  
+  .feature-col:nth-child(odd) {
+    padding-right: 12px;
+  }
+  
+  .feature-col:nth-child(even) {
+    padding-left: 12px;
+  }
+  
+  .btn-max {
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+@media (max-width: 599px) {
+  .feature {
+    padding: 50px 0;
+  }
+  
+  .feature-content h2 {
+    font-size: 26px;
+  }
+  
+  .feature-item {
+    align-items: flex-start;
+    text-align: left;
+    padding: 16px 0;
+    
+    p {
+      margin-left: 16px !important;
+      margin-top: 4px;
+    }
+  }
+  
+  .feature-icon {
+    width: 50px;
+  }
+  
+  .feature-col {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
+  
+  .booking-btn {
+    font-size: 16px;
+    min-height: 44px;
+  }
 }
 </style>

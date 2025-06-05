@@ -60,14 +60,12 @@ const handleGuestSubmit = async (formData) => {
     const allGuestInfo = guestForms.value.map(g => g.data);
     
     try {
-      // Prepare payload - include user_id if user exists
       const payload = {
         guest: allGuestInfo,
         user_id: userStore.user?.user?.id || null,
         flight_id: guestData.value.flight_id 
       };
 
-      // Execute API call
       const { data, error } = await guestStore.executeGuest({ 
         data: payload 
       });
@@ -79,14 +77,12 @@ const handleGuestSubmit = async (formData) => {
       const responseData = data.value;
       
       if (responseData?.status === "success") {
-        // Only store token/user if we didn't send a user_id (new registration)
         if (!payload.user_id && responseData.token && responseData.user) {
           localStorage.setItem('token', responseData.token);
           localStorage.setItem('user', JSON.stringify(responseData.user));
           userStore.setTokenAndFetchUser(responseData.token);
         }
         
-        // Always store guest info
         sessionStorage.setItem('guestInfo', JSON.stringify(allGuestInfo));
         router.push('/checkout');
       } else {
@@ -103,15 +99,11 @@ const handleGuestSubmit = async (formData) => {
 const isLastGuest = computed(() => {
   return currentGuestIndex.value === (guestData.value?.total_guests || 1) - 1;
 });
-
-console.log(userStore.user, 'hell')
-
-
 </script>
 
 <template>
   <div class="subpage-container">
-    <v-row no-gutters>
+    <v-row no-gutters class="subpage-row">
       <v-col cols="12" lg="5" md="4">
         <div
           class="subpage-left"
@@ -119,17 +111,16 @@ console.log(userStore.user, 'hell')
         >
           <router-link to="/">
             <div class="logo">
-              <v-img src="/images/logo/logo.png" max-width="180"></v-img>
+              <v-img src="/images/logo/logo.png" :max-width="logoSize"></v-img>
             </div>
           </router-link>
 
-        
           <div class="guest-list">
-            <h3 class="text-grey-lighten-2 font-weight-regular">
-            Who will be flying ?
-          </h3>
+            <h3 class="section-title text-grey-lighten-2 font-weight-regular">
+              Who will be flying?
+            </h3>
 
-            <h4 class="text-white mt-4">Guests</h4>
+            <h4 class="guest-title text-white">Guests</h4>
             <v-btn
               v-for="(guest, index) in guestForms"
               :key="guest.id"
@@ -142,8 +133,8 @@ console.log(userStore.user, 'hell')
               @click="currentGuestIndex = index"
             >
               <div class="text-left">
-                <h5 class="text-h6 text-white font-weight-medium">Adult {{ guest.id }}</h5>
-                <p class="font-weight-medium" :class="guest.completed ? 'text-green-lighten-2' : 'text-grey-lighten-2'">
+                <h5 class="guest-number text-white font-weight-medium">Adult {{ guest.id }}</h5>
+                <p class="guest-status font-weight-medium" :class="guest.completed ? 'text-green-lighten-2' : 'text-grey-lighten-2'">
                   {{ guest.completed ? 'Completed' : 'Missing Information' }}
                 </p>
               </div>
@@ -155,11 +146,11 @@ console.log(userStore.user, 'hell')
         <div class="subpage-content">
           <SubHeader />
           <div class="sub-container">
-            <v-container>
+            <v-container class="content-container">
               <div class="guest-form">
-                <h2 class="text-black font-weight-medium text-h4 mt-5">
+                <h2 class="form-title text-black font-weight-medium">
                   Guest Info
-                  <span class="placeholder-text text-grey-darken-1 font-weight-medium text-h6 mt-10">
+                  <span class="guest-counter text-grey-darken-1 font-weight-medium">
                     (Adult {{ currentGuestIndex + 1 }})
                   </span>
                 </h2>
@@ -179,15 +170,32 @@ console.log(userStore.user, 'hell')
   </div>
 </template>
 
+<script>
+export default {
+  computed: {
+    logoSize() {
+      switch (this.$vuetify.display.name) {
+        case 'xs': return '120px';
+        case 'sm': return '150px';
+        default: return '180px';
+      }
+    }
+  }
+}
+</script>
 
 <style scoped>
 .subpage-container {
-  height: 100vh;
+  min-height: 100vh;
   width: 100%;
 }
 
+.subpage-row {
+  min-height: 100vh;
+}
+
 .subpage-left {
-  height: 100vh;
+  min-height: 100vh;
   width: 100%;
   background-position: center;
   background-size: cover;
@@ -195,6 +203,8 @@ console.log(userStore.user, 'hell')
   position: relative;
   z-index: 1;
   padding: 30px;
+  display: flex;
+  flex-direction: column;
 }
 
 .subpage-left::after {
@@ -208,64 +218,172 @@ console.log(userStore.user, 'hell')
   z-index: -1;
 }
 
-h3 {
-  font-size: 32px;
-  margin-top: 120px;
-}
-
-.gap {
-  gap: 18px;
-}
-
-.subpage-content {
-  padding-left: 20px;
-}
-
-.placeholder-text {
-  position: relative;
+.logo {
+  margin-bottom: 40px;
 }
 
 .guest-list {
   max-width: 400px;
-  margin: 20px auto 0;
+  margin: 40px auto 0;
+  width: 100%;
+}
+
+.section-title {
+  font-size: 2rem;
+  line-height: 1.2;
+}
+
+.guest-title {
+  font-size: 1.5rem;
+  margin: 1.5rem 0 0.5rem;
 }
 
 .guest-item {
-  border-radius: 5px;
-  margin-top: 12px;
+  border-radius: 12px;
+  margin-top: 0.75rem;
   text-transform: capitalize !important;
   justify-content: flex-start;
   align-items: flex-start;
-  padding: 10px 20px;
+  padding: 12px 20px;
   width: 100%;
 }
-.guest-item p {
-  font-size: 12px;
+
+.guest-number {
+  font-size: 1.125rem;
+  line-height: 1.2;
 }
+
+.guest-status {
+  font-size: 0.75rem;
+  line-height: 1.2;
+  margin-top: 2px;
+}
+
+.subpage-content {
+  padding: 20px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+}
+
+.sub-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.content-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
 .guest-form {
   max-width: 560px;
   margin: 0 auto;
+  width: 100%;
 }
-@media (max-width: 991px) {
+
+.form-title {
+  font-size: 2rem;
+  line-height: 1.2;
+  margin-bottom: 1rem;
+}
+
+.guest-counter {
+  font-size: 1.5rem;
+  display: block;
+  margin-top: 0.5rem;
+}
+
+/* Responsive adjustments */
+@media (max-width: 1279px) {
+  .section-title {
+    font-size: 1.75rem;
+  }
+  
+  .form-title {
+    font-size: 1.75rem;
+  }
+  
+  .guest-counter {
+    font-size: 1.25rem;
+  }
+}
+
+@media (max-width: 959px) {
   .subpage-left {
-    height: auto;
-    padding: 20px;
+    min-height: auto;
+    padding: 25px 20px;
   }
-
-  h3 {
-    margin-top: 40px;
+  
+  .guest-list {
+    margin: 30px auto;
   }
+  
+  .section-title {
+    font-size: 1.5rem;
+  }
+  
+  .guest-title {
+    font-size: 1.25rem;
+  }
+}
 
+@media (max-width: 767px) {
+  .subpage-row {
+    flex-direction: column;
+  }
+  
+  .subpage-left {
+    padding: 20px 15px;
+  }
+  
   .subpage-content {
-    padding-left: 0px;
+    padding: 20px 15px;
   }
-
-  .subpage-content h2 {
-    font-size: 32px !important;
+  
+  .logo {
+    margin-bottom: 20px;
   }
+  
+  .section-title {
+    font-size: 1.25rem;
+    margin-top: 20px;
+  }
+  
+  .form-title {
+    font-size: 1.5rem;
+  }
+  
+  .guest-counter {
+    font-size: 1.1rem;
+  }
+}
 
-  .placeholder-text {
-    font-size: 30px !important;
+@media (max-width: 479px) {
+  .subpage-left {
+    padding: 15px 12px;
+  }
+  
+  .subpage-content {
+    padding: 15px 12px;
+  }
+  
+  .section-title {
+    font-size: 1.1rem;
+  }
+  
+  .form-title {
+    font-size: 1.25rem;
+  }
+  
+  .guest-item {
+    padding: 10px 15px;
+  }
+  
+  .guest-number {
+    font-size: 1rem;
   }
 }
 </style>

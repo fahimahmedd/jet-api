@@ -24,8 +24,8 @@ const currentBookings = computed(() => {
 </script>
 
 <template>
-  <div class="booking-container">
-    <h2 class="booking-title">Your Flight Itineraries</h2>
+  <div class="booking-container pa-4 pa-sm-6">
+    <h2 class="booking-title text-h5 text-sm-h4">Your Flight Itineraries</h2>
     
     <v-progress-linear
       v-if="bookStore.loading"
@@ -33,15 +33,6 @@ const currentBookings = computed(() => {
       color="#6d92cf"
       class="mb-4"
     ></v-progress-linear>
-
-    
-    <!-- <v-alert
-      v-if="bookStore.error"
-      type="error"
-      class="mb-4"
-    >
-      {{ bookStore.error }}
-    </v-alert> -->
 
     <v-row class="booking-grid">
       <v-col
@@ -68,6 +59,7 @@ const currentBookings = computed(() => {
               small
               :color="booking.status === 'confirmed' ? 'success' : 'warning'"
               class="status-badge"
+              density="comfortable"
             >
               <v-icon small left>
                 {{ booking.status === 'confirmed' ? 'mdi-check-circle' : 'mdi-clock' }}
@@ -116,13 +108,13 @@ const currentBookings = computed(() => {
               </div>
               <div class="detail-item">
                 <v-icon small class="mr-1">mdi-seat</v-icon>
-                <span class="d-flex">
+                <span class="d-flex flex-wrap">
                   <v-chip
                     v-for="seat in booking.seats"
                     :key="seat.id"
                     x-small
                     color="#6d92cf"
-                    class="mr-1 seat-batch"
+                    class="mr-1 mb-1 seat-batch"
                   >
                     {{ seat.seat_number }}
                   </v-chip>
@@ -151,7 +143,6 @@ const currentBookings = computed(() => {
     >
       You don't have any bookings yet
     </v-alert>
-    
   </div>
 </template>
 
@@ -159,34 +150,47 @@ const currentBookings = computed(() => {
 .booking-container {
   max-width: 1200px;
   margin: 0 auto;
+  padding-bottom: 32px;
 }
 
 .booking-title {
-  font-size: 28px;
   font-weight: 600;
   color: #2c3e50;
-  margin-bottom: 10px;
+  margin-bottom: 24px;
   text-align: center;
   position: relative;
+  
+  @media (min-width: 600px) {
+    margin-bottom: 32px;
+  }
 }
 
 .booking-grid {
-  margin-top: 20px;
+  margin-top: 16px;
+  
+  @media (min-width: 600px) {
+    margin-top: 24px;
+  }
 }
 
 .trip-card {
   background: white;
   border-radius: 12px;
-  box-shadow: 0 4px 20px rgba(50, 50, 50, 0.254);
+  box-shadow: 0 4px 12px rgba(50, 50, 50, 0.1);
   overflow: hidden;
   transition: all 0.3s ease;
   height: 100%;
   display: flex;
   flex-direction: column;
+  margin-bottom: 16px;
   
   &:hover {
     transform: translateY(-5px);
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+  }
+  
+  @media (max-width: 600px) {
+    margin-bottom: 24px;
   }
 }
 
@@ -202,9 +206,13 @@ const currentBookings = computed(() => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 16px 20px;
+  padding: 12px 16px;
   background-color: #f8f9fa;
   border-bottom: 1px solid #e9ecef;
+  
+  @media (min-width: 600px) {
+    padding: 16px 20px;
+  }
 }
 
 .airline-brand {
@@ -213,90 +221,127 @@ const currentBookings = computed(() => {
 }
 
 .airline-logo {
-  width: 36px;
-  height: 36px;
+  width: 32px;
+  height: 32px;
   background-color: #e3f2fd;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  margin-right: 10px;
-}
-
-.airline-name {
-  font-size: 14px;
-  font-weight: 500;
-  color: #2c3e50;
+  margin-right: 8px;
+  
+  @media (min-width: 600px) {
+    width: 36px;
+    height: 36px;
+  }
 }
 
 .status-badge {
   font-weight: 600;
   letter-spacing: 0.5px;
-  height: 30px;
 }
-.seat-batch{
+
+.seat-batch {
   font-weight: 500;
   letter-spacing: 0.2px;
-  height: 25px;
   font-size: 12px;
 }
 
 .trip-card-body {
-  padding: 20px;
+  padding: 16px;
   flex-grow: 1;
+  
+  @media (min-width: 600px) {
+    padding: 20px;
+  }
 }
 
 .route-display {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 15px;
+  flex-direction: column;
+  margin-bottom: 12px;
+  
+  @media (min-width: 600px) {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+  }
 }
 
 .airport-info {
-  flex: 1;
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  margin-bottom: 12px;
   
-  &.origin {
-    text-align: left;
-  }
-  
-  &.destination {
-    text-align: right;
+  @media (min-width: 600px) {
+    display: block;
+    flex: 1;
+    margin-bottom: 0;
+    
+    &.origin {
+      text-align: left;
+    }
+    
+    &.destination {
+      text-align: right;
+    }
   }
 }
 
 .airport-code {
-  font-size: 22px;
+  font-size: 18px;
   font-weight: 700;
   color: #2c3e50;
-  margin-bottom: 4px;
+  margin-bottom: 2px;
+  
+  @media (min-width: 600px) {
+    font-size: 22px;
+    margin-bottom: 4px;
+  }
 }
 
 .airport-city {
-  font-size: 13px;
+  font-size: 12px;
   color: #7f8c8d;
-  margin-bottom: 8px;
+  margin-bottom: 4px;
+  
+  @media (min-width: 600px) {
+    font-size: 13px;
+    margin-bottom: 8px;
+  }
 }
 
 .flight-time {
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 600;
   color: #34495e;
+  
+  @media (min-width: 600px) {
+    font-size: 16px;
+  }
 }
 
 .flight-connector {
-  flex: 1;
+  width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
   position: relative;
-  padding: 0 10px;
+  margin: 8px 0 12px;
+  
+  @media (min-width: 600px) {
+    flex: 1;
+    padding: 0 10px;
+    margin: 0;
+  }
 }
 
 .flight-duration {
   font-size: 11px;
   color: #7f8c8d;
-  margin-bottom: 5px;
+  margin-bottom: 4px;
 }
 
 .flight-line {
@@ -304,17 +349,7 @@ const currentBookings = computed(() => {
   height: 1px;
   background-color: #bdc3c7;
   position: relative;
-  margin: 5px 0;
-  
-  &::before {
-    content: '';
-    position: absolute;
-    width: 100%;
-    height: 1px;
-    background-color: #bdc3c7;
-    top: 0;
-    left: 0;
-  }
+  margin: 4px 0;
 }
 
 .flight-icon {
@@ -332,30 +367,43 @@ const currentBookings = computed(() => {
   text-transform: uppercase;
   letter-spacing: 1px;
   color: #7f8c8d;
-  margin-top: 8px;
+  margin-top: 4px;
 }
 
 .flight-details {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-  gap: 12px;
-  margin-top: 15px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+  margin-top: 12px;
+  
+  @media (min-width: 400px) {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 12px;
+  }
 }
 
 .detail-item {
   display: flex;
   align-items: center;
-  font-size: 13px;
+  font-size: 12px;
   color: #34495e;
+  
+  @media (min-width: 600px) {
+    font-size: 13px;
+  }
 }
 
 .trip-card-footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 12px 20px;
+  padding: 12px 16px;
   background-color: #f8f9fa;
   border-top: 1px solid #e9ecef;
+  
+  @media (min-width: 600px) {
+    padding: 12px 20px;
+  }
 }
 
 .price-tag {
@@ -366,56 +414,25 @@ const currentBookings = computed(() => {
 .price-label {
   font-size: 12px;
   color: #7f8c8d;
-  margin-right: 5px;
+  margin-right: 4px;
 }
 
 .price-value {
-  font-size: 18px;
+  font-size: 16px;
   font-weight: 700;
   color: #2c3e50;
+  
+  @media (min-width: 600px) {
+    font-size: 18px;
+  }
 }
 
 .flight-number {
-  font-size: 12px;
+  font-size: 11px;
   color: #7f8c8d;
-}
-
-@media (max-width: 960px) {
-  .booking-title {
-    font-size: 24px;
-  }
   
-  .airport-code {
-    font-size: 20px;
-  }
-}
-
-@media (max-width: 600px) {
-  .route-display {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-  
-  .airport-info {
-    width: 100%;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 15px;
-    
-    &.origin, &.destination {
-      text-align: left;
-    }
-  }
-  
-  .flight-connector {
-    width: 100%;
-    margin: 10px 0;
-    align-items: flex-start;
-  }
-  
-  .flight-line {
-    width: 100%;
+  @media (min-width: 600px) {
+    font-size: 12px;
   }
 }
 </style>

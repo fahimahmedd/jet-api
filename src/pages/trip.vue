@@ -5,7 +5,7 @@ import SubHeader from "@/components/subPages/SubHeader.vue";
 
 <template>
   <div class="subpage-container">
-    <v-row no-gutters>
+    <v-row no-gutters class="subpage-row">
       <v-col cols="12" lg="6" md="6">
         <div
           class="subpage-left"
@@ -23,13 +23,13 @@ import SubHeader from "@/components/subPages/SubHeader.vue";
         <div class="subpage-content">
           <SubHeader />
           <div class="sub-container">
-          <v-container>
-            <h2 class="title-text text-black font-weight-regular mt-5">
-              Trip Summary
-            </h2>
-            <Coupon />
-            <OrderDetail />
-          </v-container>
+            <v-container class="content-container">
+              <h2 class="title-text text-black font-weight-regular mt-5">
+                Trip Summary
+              </h2>
+              <Coupon />
+              <OrderDetail />
+            </v-container>
           </div>
         </div>
       </v-col>
@@ -39,8 +39,12 @@ import SubHeader from "@/components/subPages/SubHeader.vue";
 
 <style scoped>
 .subpage-container {
-  height: 100vh;
+  min-height: 100vh;
   width: 100%;
+}
+
+.subpage-row {
+  min-height: 100vh;
 }
 
 .subpage-left {
@@ -52,6 +56,8 @@ import SubHeader from "@/components/subPages/SubHeader.vue";
   position: relative;
   z-index: 1;
   padding: 30px;
+  display: flex;
+  flex-direction: column;
 }
 
 .subpage-left::after {
@@ -64,36 +70,143 @@ import SubHeader from "@/components/subPages/SubHeader.vue";
   background-color: rgba(0, 0, 0, 0.8);
   z-index: -1;
 }
+
+.logo {
+  margin-bottom: 40px;
+}
+
 h3 {
   font-size: 28px;
   margin-top: 120px;
 }
-.title-text{
+
+.title-text {
   font-size: 40px;
+  line-height: 1.2;
 }
+
 .gap {
   gap: 18px;
 }
+
 .subpage-content {
-  padding-left: 20px;
+  padding: 20px;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
+
+.sub-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.content-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
 .placeholder-text {
   position: relative;
   top: -30px;
 }
-/* .subpage-content{
-    max-height: 100%;
-} */
-@media (max-width: 991px) {
-  .subpage-container {
-  height: auto;
+
+/* Large desktop (1200px and up) */
+@media (min-width: 1200px) {
+  .subpage-content {
+    padding: 40px;
+  }
 }
 
-.subpage-left {
-  height: auto;
+/* Medium devices (tablets, 992px - 1199px) */
+@media (max-width: 1199px) {
+  .title-text {
+    font-size: 34px;
+  }
 }
-.title-text {
+
+/* Small devices (landscape phones, 768px - 991px) */
+@media (max-width: 991px) {
+  .subpage-row {
+    min-height: auto;
+    flex-direction: column;
+  }
+  
+  .subpage-left {
+    min-height: auto;
+    padding: 30px 20px;
+  }
+  
+  .subpage-content {
+    padding: 30px 20px;
+  }
+  
+  .title-text {
+    font-size: 30px;
+    margin-top: 20px;
+  }
+  
+  h3 {
+    margin-top: 60px;
+    font-size: 24px;
+  }
+  
+  .logo {
+    margin-bottom: 30px;
+  }
+}
+
+/* Extra small devices (portrait phones, less than 768px) */
+@media (max-width: 767px) {
+  .subpage-left {
+    padding: 25px 15px;
+  }
+  
+  .subpage-content {
+    padding: 25px 15px;
+  }
+  
+  .title-text {
     font-size: 26px;
+  }
+  
+  h3 {
+    margin-top: 40px;
+    font-size: 22px;
+  }
+  
+  .logo {
+    margin-bottom: 20px;
+  }
+  
+  .logo .v-img {
+    max-width: 150px !important;
+  }
 }
+
+/* Very small devices (less than 576px) */
+@media (max-width: 575px) {
+  .subpage-left {
+    padding: 20px 12px;
+  }
+  
+  .subpage-content {
+    padding: 20px 12px;
+  }
+  
+  .title-text {
+    font-size: 24px;
+  }
+  
+  h3 {
+    font-size: 20px;
+    margin-top: 30px;
+  }
+  
+  .logo .v-img {
+    max-width: 130px !important;
+  }
 }
 </style>
