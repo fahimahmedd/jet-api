@@ -29,7 +29,7 @@ const featureItems = [
 <template>
   <div class="subpage-container">
     <v-row no-gutters>
-      <v-col cols="12" lg="5" md="6" sm="12">
+      <v-col cols="12" lg="5" md="4" sm="12">
         <div
           class="subpage-left"
           style="background-image: url('/images/subPage/plane.svg')"
@@ -62,7 +62,7 @@ const featureItems = [
           </v-row>
         </div>
       </v-col>
-      <v-col cols="12" lg="7" md="6" sm="12">
+      <v-col cols="12" lg="7" md="8" sm="12">
         <div class="subpage-content">
           <v-container>
             <v-tooltip text="Go Back" location="bottom">

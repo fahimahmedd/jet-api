@@ -30,7 +30,7 @@ const handleKeyPress = (event) => {
 </script>
 
 <template>
-  <div class="text-caption-1 text-grey-darken-2 font-weight-regular mt-10">
+  <div class="text-caption-1 text-grey-darken-2 font-weight-regular mt-5">
     Have a coupon code?
   </div>
   <v-text-field

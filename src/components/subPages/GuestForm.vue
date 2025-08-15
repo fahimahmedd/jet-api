@@ -347,6 +347,7 @@ const handleSubmit = () => {
         <v-col cols="12" class="px-2 mb-2">
           <v-text-field
             v-model="email"
+            type="email"
             prepend-inner-icon="mdi-email"
             :rules="[rules.email]"
             placeholder="E-mail"

@@ -122,7 +122,7 @@ const goBackToFlights = () => {
 <template>
   <div class="subpage-container">
     <v-row no-gutters>
-      <v-col cols="12" lg="4" md="12">
+      <v-col cols="12" lg="5" md="12">
         <div class="subpage-left" style="background-image: url('/images/subPage/departure.jpg')">
           <router-link to="/">
             <div class="logo">
@@ -135,7 +135,7 @@ const goBackToFlights = () => {
           </h3>
         </div>
       </v-col>
-      <v-col cols="12" lg="8" md="12">
+      <v-col cols="12" lg="7" md="12">
         <div class="subpage-content">
           <SubHeader />
           <v-container>

@@ -177,7 +177,7 @@ const goToHome = () => {
   width: 100%;
   max-width: 800px;
   margin: 0 auto;
-  padding: 0 15px;
+  padding: 0 0;
   position: relative;
 }
 
@@ -430,6 +430,7 @@ const goToHome = () => {
 
 /* Responsive Breakpoints */
 @media (max-width: 768px) {
+ 
   .confirmation-page {
     padding: 15px;
     align-items: flex-start;
@@ -461,10 +462,10 @@ const goToHome = () => {
     }
   }
 
-  .route-display {
-    flex-direction: column;
-    gap: 15px;
-    padding: 15px 10px;
+   .route-display{
+    flex-direction: row;
+    flex-wrap:nowrap;
+    padding: 10px 0;
   }
 
   .airport {

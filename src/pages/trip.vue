@@ -6,7 +6,7 @@ import SubHeader from "@/components/subPages/SubHeader.vue";
 <template>
   <div class="subpage-container">
     <v-row no-gutters class="subpage-row">
-      <v-col cols="12" lg="6" md="6">
+      <v-col cols="12" lg="5" md="4">
         <div
           class="subpage-left"
           style="background-image: url('/images/subPage/trip.svg')"
@@ -19,12 +19,12 @@ import SubHeader from "@/components/subPages/SubHeader.vue";
           <DepartureHistory />
         </div>
       </v-col>
-      <v-col cols="12" lg="6" md="6">
+      <v-col cols="12" lg="7" md="8">
         <div class="subpage-content">
           <SubHeader />
           <div class="sub-container">
             <v-container class="content-container">
-              <h2 class="title-text text-black font-weight-regular mt-5">
+              <h2 class="title-text text-black font-weight-regular">
                 Trip Summary
               </h2>
               <Coupon />
@@ -91,7 +91,6 @@ h3 {
 
 .subpage-content {
   padding: 20px;
-  height: 100%;
   display: flex;
   flex-direction: column;
 }

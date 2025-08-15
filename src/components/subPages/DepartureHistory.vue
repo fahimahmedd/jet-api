@@ -97,7 +97,7 @@ onMounted(() => {
         <div class="flight-content">
           <v-row no-gutters align="center">
             <!-- Origin Info -->
-            <v-col cols="4">
+            <v-col lg="4" md="4" cols="12">
               <div>
                 <h3 class="text-h5 text-white font-weight-regular letter-space-2">
                   {{ formatTime(outboundFlight.departure_start_time) }}
@@ -112,7 +112,7 @@ onMounted(() => {
             </v-col>
 
             <!-- Plane Image & Duration -->
-            <v-col cols="4">
+            <v-col lg="4" md="4" cols="12">
               <div>
                 <v-img
                   src="/images/subPage/plane.svg"
@@ -127,7 +127,7 @@ onMounted(() => {
             </v-col>
 
             <!-- Destination Info -->
-            <v-col cols="4">
+            <v-col lg="4" md="4" cols="12">
               <div class="text-right">
                 <h3 class="text-h5 text-white font-weight-regular letter-space-2">
                   {{ formatTime(outboundFlight.departure_land_time) }}
@@ -161,7 +161,7 @@ onMounted(() => {
         <div class="flight-content">
           <v-row no-gutters align="center">
             <!-- Origin Info -->
-            <v-col cols="4">
+            <v-col lg="4" md="4" cols="12">
               <div>
                 <h3 class="text-h5 text-white font-weight-regular letter-space-2">
                   {{ formatTime(returnFlight.departure_start_time) }}
@@ -176,7 +176,7 @@ onMounted(() => {
             </v-col>
 
             <!-- Plane Image & Duration -->
-            <v-col cols="4">
+            <v-col lg="4" md="4" cols="12">
               <div>
                 <v-img
                   src="/images/subPage/plane.svg"
@@ -191,7 +191,7 @@ onMounted(() => {
             </v-col>
 
             <!-- Destination Info -->
-            <v-col cols="4">
+            <v-col lg="4" md="4" cols="12">
               <div class="text-right">
                 <h3 class="text-h5 text-white font-weight-regular letter-space-2">
                   {{ formatTime(returnFlight.departure_land_time) }}
@@ -282,7 +282,25 @@ onMounted(() => {
 
 @media (max-width: 991px) {
   .history-title{
-    font-size: 34px;
+    font-size: 20px;
   }
+
+  .departure-history{
+    margin: 20px auto 0;
+}
+.text-up{
+  font-size: 18px;
+  line-height: 28px !important;
+}
+
+.departure-item {
+    padding: 10px 0 10px 0;
+    margin-top: 0px;
+}
+
+.time-text{
+    bottom: 30%;
+}
+
 }
 </style>

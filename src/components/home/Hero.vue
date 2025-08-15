@@ -158,6 +158,7 @@ const modules = [Autoplay, EffectFade];
   
   .hero-slide {
     min-height: 450px;
+    height: 90vh;
   }
 }
 
@@ -179,6 +180,7 @@ const modules = [Autoplay, EffectFade];
   
   .hero-slide {
     min-height: 400px;
+     height: 90vh;
   }
 }
 </style>

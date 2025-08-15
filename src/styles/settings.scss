@@ -72,3 +72,19 @@ body,
         max-width: 1440px;
     }
 }
+
+@media (max-width: 991px) {
+    .subpage-content{
+    max-height: 100%;
+    overflow-y: auto;
+    // padding-bottom: 40px;
+}
+
+.subpage-left{
+    padding: 20px !important;
+    height: auto !important;
+}
+.subpage-left::after {
+    background-color: #000 !important;
+}
+}

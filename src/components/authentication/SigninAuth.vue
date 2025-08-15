@@ -108,7 +108,7 @@ const handleKeyPress = (event) => {
       Log in to an <strong>existing</strong> account
     </h3>
 
-    <div class="auth-content mt-16">
+    <div class="auth-content mt-8">
       <v-form v-model="formValid" @submit.prevent="handleLogin">
         <div class="text-subtitle-1 text-black font-weight-regular">Email Address</div>
         <v-text-field
@@ -191,5 +191,12 @@ const handleKeyPress = (event) => {
 }
 .text-primary {
   color: #1976D2;
+}
+
+@media (max-width: 991px) {
+  .text-h4{
+    font-size: 24px !important;
+    margin-top: 10px;
+  }
 }
 </style>

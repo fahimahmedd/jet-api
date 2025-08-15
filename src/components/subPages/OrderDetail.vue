@@ -70,8 +70,8 @@ const appliedCoupon = computed(() => {
 </script>
 
 <template>
-  <h3 class="text-black font-weight-medium text-h5 mt-10">Order Details</h3>
-  <div class="detail-content mt-5">
+  <h3 class="text-black font-weight-medium text-h5 mt-8">Order Details</h3>
+  <div class="detail-content">
     <div class="detail-item">
       <span> Outbound Flight <span class="font-weight-bold ml-3"> (Adults - {{ guestData?.total_guests || 1 }}) </span></span>
       <span v-if="outboundFlight">
@@ -122,7 +122,7 @@ const appliedCoupon = computed(() => {
         block 
         color="#657ca2"
       >
-        Continue to Payment
+        Continue to Guest Info.
       </v-btn>
     </router-link>
   </div>

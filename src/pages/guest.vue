@@ -270,6 +270,7 @@ export default {
   flex: 1;
   display: flex;
   flex-direction: column;
+  padding-bottom: 30px;
 }
 
 .content-container {
@@ -304,10 +305,14 @@ export default {
   
   .form-title {
     font-size: 1.75rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
   }
   
   .guest-counter {
     font-size: 1.25rem;
+    margin-top: 0px;
   }
 }
 
@@ -318,7 +323,7 @@ export default {
   }
   
   .guest-list {
-    margin: 30px auto;
+    margin: 0px auto;
   }
   
   .section-title {
@@ -327,6 +332,7 @@ export default {
   
   .guest-title {
     font-size: 1.25rem;
+    margin: 10px 0px 0 0;
   }
 }
 
@@ -340,7 +346,7 @@ export default {
   }
   
   .subpage-content {
-    padding: 20px 15px;
+    padding: 0px;
   }
   
   .logo {
@@ -367,7 +373,7 @@ export default {
   }
   
   .subpage-content {
-    padding: 15px 12px;
+    padding: 0px;
   }
   
   .section-title {
