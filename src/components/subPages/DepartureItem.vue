@@ -96,7 +96,7 @@ const seatStatus = computed(() => {
                 <h5 class="text-body-1 text-grey-lighten-4 font-weight-bold">
                   {{ item.origin.city }}
                 </h5>
-                <p class="text-caption text-white font-weight-medium">
+                <p class="text-caption text-truncate text-white font-weight-medium ">
                   {{ item.origin.name }}
                 </p>
               </div>
@@ -131,7 +131,7 @@ const seatStatus = computed(() => {
                 <h5 class="text-body-1 text-grey-lighten-4 font-weight-bold">
                   {{ item.destination.city }}
                 </h5>
-                <p class="text-caption text-white font-weight-medium">
+                <p class="text-caption text-truncate text-white font-weight-medium">
                   {{ item.destination.name }}
                 </p>
               </div>
@@ -229,8 +229,8 @@ const seatStatus = computed(() => {
 }
 
 .seat-wrap span {
-  width: 23px;
-  height: 23px;
+  width: 20px;
+  height: 20px;
   border: 1px solid #dedbdb5d;
   color: #ffffff;
   border-radius: 50%;

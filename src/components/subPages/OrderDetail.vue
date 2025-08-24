@@ -75,7 +75,7 @@ const appliedCoupon = computed(() => {
     <div class="detail-item">
       <span> Outbound Flight <span class="font-weight-bold ml-3"> (Adults - {{ guestData?.total_guests || 1 }}) </span></span>
       <span v-if="outboundFlight">
-        {{ guestData?.total_guests || 1 }} × {{ outboundFlight.price }} SEK
+        {{ guestData?.total_guests || 1 }} × {{ Math.round(outboundFlight.price) }} SEK
       </span>
       <span v-else>
         1 × 15 990 SEK
@@ -85,7 +85,7 @@ const appliedCoupon = computed(() => {
     <div v-if="returnFlight" class="detail-item">
       <span>Return Flight <span class="font-weight-bold ml-3"> (Adults - {{ guestData?.total_guests || 1 }}) </span></span>
       <span>
-        {{ guestData?.total_guests || 1 }} × {{ returnFlight.price }} SEK
+        {{ guestData?.total_guests || 1 }} ×  {{  Math.round(returnFlight.price) }} SEK
       </span>
     </div>
     
@@ -101,7 +101,7 @@ const appliedCoupon = computed(() => {
     
     <div class="detail-item">
       <span>Sub Total</span>
-      <span>{{ subtotal.toFixed(2) }} SEK</span>
+      <span>{{ Math.round(subtotal) }} SEK</span>
     </div>
 
     <v-divider class="my-5"></v-divider>
@@ -109,7 +109,7 @@ const appliedCoupon = computed(() => {
     <div class="detail-item">
       <span class="text-h5">Total:</span>
       <span class="text-h4">
-        <strong>{{ totalWithTaxAndDiscount.toFixed(2) }} SEK</strong>
+        <strong>{{ Math.round(totalWithTaxAndDiscount) }} SEK</strong>
       </span>
     </div>
     
@@ -122,7 +122,7 @@ const appliedCoupon = computed(() => {
         block 
         color="#657ca2"
       >
-        Continue to Guest Info.
+        Continue to Guest Info
       </v-btn>
     </router-link>
   </div>

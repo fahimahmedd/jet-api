@@ -1,91 +1,112 @@
 <script setup>
-import { ref } from 'vue';
-import { useBookFlight } from '@/stores/useBookFlight';
-import { useRouter } from 'vue-router';
+import { ref } from "vue";
+import { useBookFlight } from "@/stores/useBookFlight";
+import { useRouter } from "vue-router";
 
 const bookStore = useBookFlight();
 const router = useRouter();
 const isConfirming = ref(false);
+const storedGuests = ref([]);
+const guestData = sessionStorage.getItem("guestInfo");
 
 const handleConfirmation = async () => {
   try {
     isConfirming.value = true;
-    
+
     // Get booking data for verification
-    const outboundBooking = JSON.parse(sessionStorage.getItem('outboundBookingData') || 'null');
-    const returnBooking = JSON.parse(sessionStorage.getItem('returnBookingData') || 'null');
-    const bookingData = JSON.parse(sessionStorage.getItem('bookingData') || 'null');
-    
-    console.log('Current booking data:', {
+    const outboundBooking = JSON.parse(
+      sessionStorage.getItem("outboundBookingData") || "null"
+    );
+    const returnBooking = JSON.parse(
+      sessionStorage.getItem("returnBookingData") || "null"
+    );
+    const bookingData = JSON.parse(
+      sessionStorage.getItem("bookingData") || "null"
+    );
+
+    console.log("Current booking data:", {
       outbound: outboundBooking,
       return: returnBooking,
-      oneWay: bookingData
+      oneWay: bookingData,
     });
-    
+
     const result = await bookStore.confirmBooking();
-    
+
     // Prepare seat information for confirmation page
-    let seatInfo = '';
+    let seatInfo = "";
     if (outboundBooking && returnBooking) {
-      seatInfo = `Outbound: ${outboundBooking.seat_ids.join(',')}, Return: ${returnBooking.seat_ids.join(',')}`;
+      seatInfo = `Outbound: ${outboundBooking.seat_ids.join(
+        ","
+      )}, Return: ${returnBooking.seat_ids.join(",")}`;
     } else {
-      seatInfo = bookingData?.seat_ids?.join(',') || '';
+      seatInfo = bookingData?.seat_ids?.join(",") || "";
     }
-    
+
     router.push({
-      path: '/booked',
+      path: "/booked",
       query: {
         bookingId: result.booking_id,
         seats: seatInfo,
-        tripType: outboundBooking && returnBooking ? 'roundtrip' : 'oneway'
-      }
+        tripType: outboundBooking && returnBooking ? "roundtrip" : "oneway",
+      },
     });
-    
   } catch (error) {
-    const errorMessage = error.response?.data?.message || 
-                        error.message || 
-                        'Booking failed. Please check your selected seats and try again.';
+    const errorMessage =
+      error.response?.data?.message ||
+      error.message ||
+      "Booking failed. Please check your selected seats and try again.";
     alert(errorMessage);
-    console.error('Confirmation error:', error);
+    console.error("Confirmation error:", error);
   } finally {
     isConfirming.value = false;
   }
 };
-</script>
 
+if (guestData) {
+  try {
+    storedGuests.value = JSON.parse(guestData);
+  } catch (err) {
+    console.error("Error parsing guestInfo:", err);
+  }
+}
+</script>
 
 <template>
   <div class="detail-content mt-5">
     <h3 class="text-black font-weight-medium text-h5 mt-10">Guest Info</h3>
-    <div class="selected-guest mt-4">
+    <div
+      class="selected-guest mt-4"
+      v-for="(guest, index) in storedGuests"
+      :key="index"
+    >
       <span class="text-black font-weight-regular text-caption-1">
-        Guest - 1
+       {{ guest.firstName }} {{ guest.lastName }}
       </span>
     </div>
 
     <h3 class="text-black font-weight-medium text-h5 mt-10">Luggage Details</h3>
     <div class="font-weight-regular mt-3 text-body-2 text-grey-darken-1">
       The luggage capacity has been met. If you'd like to bring additional
-      luggage beyond what's included, please contact our Concierge team
-      by email or web chat.
+      luggage beyond what's included, please contact our Concierge team by email
+      or web chat.
     </div>
 
     <!-- <Coupon /> -->
 
     <OrderDetail />
-    <v-btn 
-    class="booking-btn mt-10" 
-    variant="flat"
-    rounded="lg" 
-    size="large" 
-    block 
-    color="#657ca2"
-    @click="handleConfirmation"
-    :loading="isConfirming"
-    :disabled="isConfirming"
-  >
-    Confirm Your Booking
-  </v-btn>
+    <v-btn
+      class="booking-btn mt-10"
+      variant="flat"
+      rounded="lg"
+      size="large"
+      block
+      color="#657ca2"
+      @click="handleConfirmation"
+      :loading="isConfirming"
+      :disabled="isConfirming"
+    >
+      Confirm Your Booking
+    </v-btn>
     <h3 class="text-black font-weight-medium text-h5 mt-10">Payment</h3>
     <div class="payment-container mt-5">
       <v-btn
@@ -96,11 +117,11 @@ const handleConfirmation = async () => {
       ></v-btn>
       <span class="text-caption-1 mt-3">Add payment method</span>
     </div>
-    <v-btn 
-      block 
-      height="48" 
-      variant="tonal" 
-      rounded 
+    <v-btn
+      block
+      height="48"
+      variant="tonal"
+      rounded
       class="mt-4"
       :loading="isLoading"
       @click="handlePayment"
