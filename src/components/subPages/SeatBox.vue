@@ -552,6 +552,8 @@ const combineRoundTripData = () => {
 
   .seat-item {
     transform: none;
+     height: 41px !important;
+     width: 51px;
   }
 
   .seat-1 {

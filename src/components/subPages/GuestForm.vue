@@ -418,7 +418,7 @@ const handleSubmit = () => {
       
       <!-- Button - Full width with responsive margin -->
       <v-btn 
-        class="booking-btn mt-5 mt-sm-10" 
+        class="booking-btn mt-2 mt-sm-5" 
         variant="flat"
         rounded="lg" 
         size="large" 
