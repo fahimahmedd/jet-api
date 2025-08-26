@@ -53,7 +53,7 @@ body,
     max-height: 440px !important;
 }
 .subpage-content{
-    max-height: 100vh;
+    height: 100%;
     overflow-y: scroll;
     padding-bottom: 40px;
     position: relative;
@@ -67,17 +67,23 @@ body,
 .letter-space-2{
     letter-spacing: 2px !important;
 }
+
+.subpage-container{
+    min-height: 100vh;
+}
 @media (min-width: 1920px) {
     .v-container {
         max-width: 1440px;
     }
 }
 
-@media (max-width: 991px) {
+@media (max-width: 960px) {
+    .subpage-container{
+    min-height: auto;
+}
     .subpage-content{
-    max-height: 100%;
+    height: 100%;
     overflow-y: auto;
-    // padding-bottom: 40px;
 }
 
 .subpage-left{

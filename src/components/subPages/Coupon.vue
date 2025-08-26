@@ -30,6 +30,8 @@ const handleKeyPress = (event) => {
 </script>
 
 <template>
+  <div>
+
   <div class="text-caption-1 text-grey-darken-2 font-weight-regular mt-5">
     Have a coupon code?
   </div>
@@ -60,6 +62,7 @@ const handleKeyPress = (event) => {
   <div v-if="flightStore.couponError" class="text-caption text-error mt-2 d-flex align-center ga-1">
     <v-icon color="error">mdi-alert-circle</v-icon>
     {{ flightStore.couponError }}
+  </div>
   </div>
 </template>
 

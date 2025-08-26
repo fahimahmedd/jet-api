@@ -4,9 +4,9 @@ import SubHeader from "@/components/subPages/SubHeader.vue";
 </script>
 
 <template>
-  <div class="subpage-container">
-    <v-row no-gutters class="subpage-row">
-      <v-col cols="12" lg="5" md="4">
+  <div>
+    <v-row no-gutters class="subpage-container">
+      <v-col cols="12" lg="5" md="6">
         <div
           class="subpage-left"
           style="background-image: url('/images/subPage/trip.svg')"
@@ -19,7 +19,7 @@ import SubHeader from "@/components/subPages/SubHeader.vue";
           <DepartureHistory />
         </div>
       </v-col>
-      <v-col cols="12" lg="7" md="8">
+      <v-col cols="12" lg="7" md="6">
         <div class="subpage-content">
           <SubHeader />
           <div class="sub-container">
@@ -38,17 +38,11 @@ import SubHeader from "@/components/subPages/SubHeader.vue";
 </template>
 
 <style scoped>
-.subpage-container {
-  min-height: 100vh;
-  width: 100%;
-}
 
-.subpage-row {
-  min-height: 100vh;
-}
+
 
 .subpage-left {
-  min-height: 100vh;
+  height: 100%;
   width: 100%;
   background-position: center;
   background-size: cover;
@@ -90,7 +84,6 @@ h3 {
 }
 
 .subpage-content {
-  padding: 20px;
   display: flex;
   flex-direction: column;
 }
@@ -112,35 +105,11 @@ h3 {
   top: -30px;
 }
 
-/* Large desktop (1200px and up) */
-@media (min-width: 1200px) {
-  .subpage-content {
-    padding: 40px;
-  }
-}
 
-/* Medium devices (tablets, 992px - 1199px) */
-@media (max-width: 1199px) {
-  .title-text {
-    font-size: 34px;
-  }
-}
 
 /* Small devices (landscape phones, 768px - 991px) */
-@media (max-width: 991px) {
-  .subpage-row {
-    min-height: auto;
-    flex-direction: column;
-  }
-  
-  .subpage-left {
-    min-height: auto;
-    padding: 30px 20px;
-  }
-  
-  .subpage-content {
-    padding: 30px 20px;
-  }
+@media (max-width: 991px) { 
+
   
   .title-text {
     font-size: 30px;
@@ -163,9 +132,7 @@ h3 {
     padding: 25px 15px;
   }
   
-  .subpage-content {
-    padding: 25px 15px;
-  }
+ 
   
   .title-text {
     font-size: 26px;
@@ -190,11 +157,6 @@ h3 {
   .subpage-left {
     padding: 20px 12px;
   }
-  
-  .subpage-content {
-    padding: 20px 12px;
-  }
-  
   .title-text {
     font-size: 24px;
   }

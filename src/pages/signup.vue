@@ -8,8 +8,8 @@ const router = useRouter();
 </script>
 
 <template>
-  <div class="subpage-container">
-    <v-row no-gutters>
+  <div >
+    <v-row no-gutters class="subpage-container">
       <v-col cols="12" lg="5" md="4" sm="12">
         <div
           class="subpage-left"
@@ -56,13 +56,9 @@ const router = useRouter();
 </template>
 
 <style scoped>
-.subpage-container {
-  height: 100vh;
-  width: 100%;
-}
 
 .subpage-left {
-  height: 100vh;
+  height: 100%;
   width: 100%;
   background-position: center;
   background-size: cover;
@@ -112,9 +108,7 @@ h3 {
 }
 
 @media (max-width: 991px) {
-  .subpage-container {
-    height: auto;
-  }
+
   .subpage-left {
     height: auto;
   }

@@ -102,9 +102,9 @@ const isLastGuest = computed(() => {
 </script>
 
 <template>
-  <div class="subpage-container">
-    <v-row no-gutters class="subpage-row">
-      <v-col cols="12" lg="5" md="4">
+  <div >
+    <v-row no-gutters class="subpage-container">
+      <v-col cols="12" lg="4" md="4">
         <div
           class="subpage-left"
           style="background-image: url('/images/subPage/seat.jpg')"
@@ -142,7 +142,7 @@ const isLastGuest = computed(() => {
           </div>
         </div>
       </v-col>
-      <v-col cols="12" lg="7" md="8">
+      <v-col cols="12" lg="8" md="8">
         <div class="subpage-content">
           <SubHeader />
           <div class="sub-container">
@@ -185,17 +185,13 @@ export default {
 </script>
 
 <style scoped>
-.subpage-container {
-  min-height: 100vh;
-  width: 100%;
-}
 
 .subpage-row {
   min-height: 100vh;
 }
 
 .subpage-left {
-  min-height: 100vh;
+  height: 100%;
   width: 100%;
   background-position: center;
   background-size: cover;
@@ -260,7 +256,6 @@ export default {
 }
 
 .subpage-content {
-  padding: 20px;
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -318,7 +313,7 @@ export default {
 
 @media (max-width: 959px) {
   .subpage-left {
-    min-height: auto;
+    height: auto;
     padding: 25px 20px;
   }
   
@@ -345,9 +340,6 @@ export default {
     padding: 20px 15px;
   }
   
-  .subpage-content {
-    padding: 0px;
-  }
   
   .logo {
     margin-bottom: 20px;
@@ -370,10 +362,6 @@ export default {
 @media (max-width: 479px) {
   .subpage-left {
     padding: 15px 12px;
-  }
-  
-  .subpage-content {
-    padding: 0px;
   }
   
   .section-title {

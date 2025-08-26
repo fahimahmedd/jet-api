@@ -97,7 +97,7 @@ onMounted(() => {
         <div class="flight-content">
           <v-row no-gutters align="center">
             <!-- Origin Info -->
-            <v-col lg="4" md="4" cols="12">
+            <v-col cols="12" sm="4" lg="4" md="4">
               <div>
                 <h3 class="text-h5 text-white font-weight-regular letter-space-2">
                   {{ formatTime(outboundFlight.departure_start_time) }}
@@ -112,7 +112,7 @@ onMounted(() => {
             </v-col>
 
             <!-- Plane Image & Duration -->
-            <v-col lg="4" md="4" cols="12">
+            <v-col cols="12" sm="4" lg="4" md="4">
               <div>
                 <v-img
                   src="/images/subPage/plane.svg"
@@ -127,7 +127,7 @@ onMounted(() => {
             </v-col>
 
             <!-- Destination Info -->
-            <v-col lg="4" md="4" cols="12">
+            <v-col cols="12" sm="4" lg="4" md="4">
               <div class="text-right">
                 <h3 class="text-h5 text-white font-weight-regular letter-space-2">
                   {{ formatTime(outboundFlight.departure_land_time) }}
@@ -161,7 +161,7 @@ onMounted(() => {
         <div class="flight-content">
           <v-row no-gutters align="center">
             <!-- Origin Info -->
-            <v-col lg="4" md="4" cols="12">
+            <v-col lg="4" sm="4" md="4" cols="12">
               <div>
                 <h3 class="text-h5 text-white font-weight-regular letter-space-2">
                   {{ formatTime(returnFlight.departure_start_time) }}
@@ -176,7 +176,7 @@ onMounted(() => {
             </v-col>
 
             <!-- Plane Image & Duration -->
-            <v-col lg="4" md="4" cols="12">
+            <v-col lg="4" sm="4" md="4" cols="12">
               <div>
                 <v-img
                   src="/images/subPage/plane.svg"
@@ -191,7 +191,7 @@ onMounted(() => {
             </v-col>
 
             <!-- Destination Info -->
-            <v-col lg="4" md="4" cols="12">
+            <v-col lg="4" sm="4" md="4" cols="12">
               <div class="text-right">
                 <h3 class="text-h5 text-white font-weight-regular letter-space-2">
                   {{ formatTime(returnFlight.departure_land_time) }}
@@ -252,7 +252,7 @@ onMounted(() => {
 }
 
 .history-title {
-  font-size: 40px;
+  font-size: 32px;
 }
 
 .mt-2px {
@@ -280,14 +280,16 @@ onMounted(() => {
   letter-spacing: 2px;
 }
 
+@media (max-width: 599px) {
+  .time-text{
+      bottom: 30%;
+  }
+}
+
 @media (max-width: 991px) {
   .history-title{
     font-size: 20px;
   }
-
-  .departure-history{
-    margin: 20px auto 0;
-}
 .text-up{
   font-size: 18px;
   line-height: 28px !important;
@@ -298,9 +300,14 @@ onMounted(() => {
     margin-top: 0px;
 }
 
-.time-text{
-    bottom: 30%;
-}
+
 
 }
+
+@media (min-width: 600px) and (max-width: 990.98px) {
+  .time-text{
+    bottom: -5px;
+  }
+}
+
 </style>

@@ -20,8 +20,8 @@ const destinationCity = computed(() => {
 </script>
 
 <template>
-  <div class="subpage-container">
-    <v-row no-gutters>
+  <div>
+    <v-row no-gutters class="subpage-container">
       <v-col cols="12" lg="4" md="4">
         <div class="subpage-left" style="background-image: url('/images/subPage/seat.jpg')">
           <router-link to="/">
@@ -39,7 +39,7 @@ const destinationCity = computed(() => {
         <div class="subpage-content">
           <SubHeader />
           <v-container>
-            <h2 class="text-black font-weight-regular text-h3 mt-10">
+            <h2 class="text-black font-weight-regular text-h3 mt-5">
               Seating
             </h2>
             <div class="placeholder-text text-grey-lighten-1 font-weight-medium text-h3 mt-10">
@@ -55,13 +55,9 @@ const destinationCity = computed(() => {
 </template>
 
 <style scoped>
-.subpage-container {
-  height: 100vh;
-  width: 100%;
-}
 
 .subpage-left {
-  height: 100vh;
+  height: 100%;
   width: 100%;
   background-position: center;
   background-size: cover;
@@ -103,7 +99,6 @@ h3 {
 @media (max-width: 960px) {
   .subpage-left {
     padding: 20px;
-    height: auto;
   }
 
   h3 {

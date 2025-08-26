@@ -86,7 +86,7 @@ const seatStatus = computed(() => {
         <div class="flight-content mt-2">
           <v-row no-gutters>
             <!-- Origin Info -->
-            <v-col cols="6" lg="4" md="4">
+            <v-col col="6" sm="4" md="4" lg="4">
               <div>
                 <h3
                   class="text-h5 text-white font-weight-medium letter-space-2"
@@ -103,8 +103,8 @@ const seatStatus = computed(() => {
             </v-col>
 
             <!-- Plane image & Duration -->
-            <v-col cols="6" lg="4" md="4" class="d-none d-md-block">
-              <div>
+            <v-col col="6" sm="4" md="4" lg="4">
+              <div class="graphic-show">
                 <v-img
                   src="/images/subPage/plane.svg"
                   class="mx-auto"
@@ -121,7 +121,7 @@ const seatStatus = computed(() => {
             </v-col>
 
             <!-- Destination Info -->
-            <v-col cols="6" lg="4" md="4">
+            <v-col col="6" sm="4" md="4" lg="4">
               <div class="text-right">
                 <h3
                   class="text-h5 text-white font-weight-medium letter-space-2"
@@ -277,13 +277,51 @@ const seatStatus = computed(() => {
   background-color: #ff9800;
 }
 
-@media (max-width: 991px) {
+
+@media (min-width: 961px) and (max-width: 1199.98px) {
+ .graphic-show{
+    display: none;
+  }
+.item-content {
+    width: 65%;
+  }
+   .item-price {
+    width: 35%;
+  }
+ }
+
+
+@media (max-width: 960px) {
+
+  .item-content {
+    width: 70%;
+  }
+   .item-price {
+    width: 30%;
+  }
+
+  
+}
+
+
+@media (max-width: 700px) {
   .departure-item {
+    height: auto;
+    padding: 16px;
+  }
+ .graphic-show{
+    display: none;
+  }
+  
+}
+
+
+@media (max-width: 590px) {
+ .departure-item {
     height: auto;
     display: grid;
     padding: 16px;
   }
-
   .item-content {
     width: 100%;
     padding-right: 10px;
@@ -298,5 +336,6 @@ const seatStatus = computed(() => {
   .seat-notification {
     bottom: -18px;
   }
+ 
 }
 </style>

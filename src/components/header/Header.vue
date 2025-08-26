@@ -860,7 +860,7 @@ const toProfile = () => {
   }
 }
 
-@media (max-width: 1272px) {
+@media (max-width: 1279px) {
   .header {
     height: 70px;
     top: 0;

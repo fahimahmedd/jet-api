@@ -120,9 +120,9 @@ const goBackToFlights = () => {
 </script>
 
 <template>
-  <div class="subpage-container">
-    <v-row no-gutters>
-      <v-col cols="12" lg="5" md="12">
+  <div >
+    <v-row no-gutters class="subpage-container">
+      <v-col cols="12" md="5" lg="4">
         <div class="subpage-left" style="background-image: url('/images/subPage/departure.jpg')">
           <router-link to="/">
             <div class="logo">
@@ -135,7 +135,7 @@ const goBackToFlights = () => {
           </h3>
         </div>
       </v-col>
-      <v-col cols="12" lg="7" md="12">
+      <v-col cols="12" md="7" lg="8">
         <div class="subpage-content">
           <SubHeader />
           <v-container>
@@ -204,17 +204,13 @@ const goBackToFlights = () => {
 
 
 <style scoped>
-.subpage-container {
-  height: 100vh;
-  width: 100%;
-}
 
 .border-b-active {
   border-bottom: 2px solid #6C7A90;
 }
 
 .subpage-left {
-  height: 100vh;
+  height: 100%;
   width: 100%;
   background-position: center;
   background-size: cover;
@@ -258,12 +254,8 @@ h3 {
 }
 
 @media (max-width: 991px) {
-  .subpage-container {
-    height: auto;
-  }
 
   .subpage-left {
-    height: auto;
     padding: 20px;
   }
 

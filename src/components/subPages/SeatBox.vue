@@ -1,70 +1,72 @@
 <script setup>
-import { reactive, onMounted, computed, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
-import { useFlightStore } from '@/stores/useFlight'
-import { url } from '@/plugins/baseUrl'
-import { useUserStore } from '@/stores/useUser'
-import { storeToRefs } from 'pinia'
+import { reactive, onMounted, computed, ref } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import { useFlightStore } from "@/stores/useFlight";
+import { url } from "@/plugins/baseUrl";
+import { useUserStore } from "@/stores/useUser";
+import { storeToRefs } from "pinia";
 
-const userStore = useUserStore()
-const { user, loadingUser } = storeToRefs(userStore)
-const route = useRoute()
-const router = useRouter()
-const flightStore = useFlightStore()
-const isLoading = ref(false)
+const userStore = useUserStore();
+const { user, loadingUser } = storeToRefs(userStore);
+const route = useRoute();
+const router = useRouter();
+const flightStore = useFlightStore();
+const isLoading = ref(false);
 
 // Get guest count from session storage
 const getSearchParams = () => {
   try {
-    return JSON.parse(sessionStorage.getItem('searchParams')) || {}
+    return JSON.parse(sessionStorage.getItem("searchParams")) || {};
   } catch {
-    return {}
+    return {};
   }
-}
-const searchParams = getSearchParams()
-const totalGuests = searchParams?.totalGuests || 1
+};
+const searchParams = getSearchParams();
+const totalGuests = searchParams?.totalGuests || 1;
 
 // Get flight ID from session storage based on trip type
 const getFlightId = () => {
   if (flightStore.isRoundTrip) {
     if (!flightStore.selectedReturnFlight) {
       // Outbound flight case
-      const outboundFlight = JSON.parse(sessionStorage.getItem('outboundFlight'))
-      return outboundFlight?.id || null
+      const outboundFlight = JSON.parse(
+        sessionStorage.getItem("outboundFlight")
+      );
+      return outboundFlight?.id || null;
     } else {
       // Return flight case
-      const returnFlight = JSON.parse(sessionStorage.getItem('returnFlight'))
-      return returnFlight?.id || null
+      const returnFlight = JSON.parse(sessionStorage.getItem("returnFlight"));
+      return returnFlight?.id || null;
     }
   } else {
     // One-way trip case
-    const outboundFlight = JSON.parse(sessionStorage.getItem('outboundFlight'))
-    return outboundFlight?.id || null
+    const outboundFlight = JSON.parse(sessionStorage.getItem("outboundFlight"));
+    return outboundFlight?.id || null;
   }
-}
+};
 
-const flightId = ref(null)
-const seats = reactive([])
-const selectedSeats = reactive([])
+const flightId = ref(null);
+const seats = reactive([]);
+const selectedSeats = reactive([]);
 
 const availableSeatsCount = computed(() => {
-  return seats.filter(seat => !seat.booked).length
-})
+  return seats.filter((seat) => !seat.booked).length;
+});
 
 const fetchSeats = async () => {
   try {
     // Get flight ID first
-    flightId.value = getFlightId()
+    flightId.value = getFlightId();
     if (!flightId.value) {
-      console.error('No flight ID found in session storage')
-      router.push('/')
-      return
+      console.error("No flight ID found in session storage");
+      router.push("/");
+      return;
     }
 
-    isLoading.value = true
-    await flightStore.flightSeat(`${url}/flights/${flightId.value}/seats`)
-    seats.splice(0, seats.length)
-    const apiSeats = flightStore.seats?.seats || []
+    isLoading.value = true;
+    await flightStore.flightSeat(`${url}/flights/${flightId.value}/seats`);
+    seats.splice(0, seats.length);
+    const apiSeats = flightStore.seats?.seats || [];
 
     apiSeats.forEach((seat, index) => {
       seats.push({
@@ -72,144 +74,151 @@ const fetchSeats = async () => {
         class: `seat-${index + 1}`,
         selected: false,
         booked: seat.is_booked === 1,
-        seat_number: seat.seat_number || `Seat ${index + 1}`
-      })
-    })
+        seat_number: seat.seat_number || `Seat ${index + 1}`,
+      });
+    });
 
     // Check if enough seats are available after loading
     if (availableSeatsCount.value < totalGuests) {
-      showSeatWarning.value = true
+      showSeatWarning.value = true;
     }
   } catch (error) {
-    console.error('Error fetching seats:', error)
+    console.error("Error fetching seats:", error);
   } finally {
-    isLoading.value = false
+    isLoading.value = false;
   }
-}
+};
 
 onMounted(() => {
-  fetchSeats()
-  
+  fetchSeats();
+
   // Restore previous selection if exists
   const savedBooking = sessionStorage.getItem(
-    flightStore.isRoundTrip && !flightStore.selectedReturnFlight 
-      ? 'outboundBookingData' 
-      : 'bookingData'
-  )
+    flightStore.isRoundTrip && !flightStore.selectedReturnFlight
+      ? "outboundBookingData"
+      : "bookingData"
+  );
   if (savedBooking) {
-    const bookingData = JSON.parse(savedBooking)
+    const bookingData = JSON.parse(savedBooking);
     if (bookingData.flight_id === flightId.value) {
-      bookingData.selected_seats?.forEach(savedSeat => {
-        const seat = seats.find(s => s.id === savedSeat.id)
+      bookingData.selected_seats?.forEach((savedSeat) => {
+        const seat = seats.find((s) => s.id === savedSeat.id);
         if (seat && !seat.booked) {
-          seat.selected = true
-          selectedSeats.push(savedSeat)
+          seat.selected = true;
+          selectedSeats.push(savedSeat);
         }
-      })
+      });
     }
   }
-})
+});
 
 // watch(() => route.params.id, fetchSeats)
 
 const toggleSeat = (id) => {
-  const seat = seats.find((s) => s.id === id)
-  if (!seat || seat.booked) return
+  const seat = seats.find((s) => s.id === id);
+  if (!seat || seat.booked) return;
 
   if (seat.selected) {
-    seat.selected = false
-    const index = selectedSeats.findIndex(s => s.id === id)
-    if (index !== -1) selectedSeats.splice(index, 1)
+    seat.selected = false;
+    const index = selectedSeats.findIndex((s) => s.id === id);
+    if (index !== -1) selectedSeats.splice(index, 1);
   } else if (selectedSeats.length < totalGuests) {
-    seat.selected = true
+    seat.selected = true;
     selectedSeats.push({
       id: seat.id,
-      seat_number: seat.seat_number
-    })
+      seat_number: seat.seat_number,
+    });
   } else {
-    const seatElement = document.querySelector(`.${seat.class}`)
-    seatElement.classList.add('limit-reached')
-    setTimeout(() => seatElement.classList.remove('limit-reached'), 500)
+    const seatElement = document.querySelector(`.${seat.class}`);
+    seatElement.classList.add("limit-reached");
+    setTimeout(() => seatElement.classList.remove("limit-reached"), 500);
   }
-}
+};
 
 const buttonState = computed(() => ({
   text: `${selectedSeats.length}/${totalGuests}`,
   disabled: selectedSeats.length !== totalGuests,
-  color: selectedSeats.length === totalGuests ? 'primary' : 'grey'
-}))
+  color: selectedSeats.length === totalGuests ? "primary" : "grey",
+}));
 
 const selectedSeatsDisplay = computed(() => {
-  if (selectedSeats.length === 0) return 'Not selected'
-  return selectedSeats.map(s => s.seat_number).join(', ')
-})
-
+  if (selectedSeats.length === 0) return "Not selected";
+  return selectedSeats.map((s) => s.seat_number).join(", ");
+});
 
 const proceedToTrip = async () => {
-  if (buttonState.value.disabled) return
-  
+  if (buttonState.value.disabled) return;
+
   try {
     const bookingData = {
       flight_id: flightId.value,
-      seat_ids: selectedSeats.map(seat => seat.id),
+      seat_ids: selectedSeats.map((seat) => seat.id),
       trip_type: searchParams.trip,
-      selected_seats: selectedSeats
+      selected_seats: selectedSeats,
     };
 
     const guestData = {
       flight_id: flightId.value,
       total_guests: totalGuests,
-      selected_seats: selectedSeats
+      selected_seats: selectedSeats,
     };
 
-    sessionStorage.setItem('guestData', JSON.stringify(guestData));
+    sessionStorage.setItem("guestData", JSON.stringify(guestData));
 
     if (flightStore.isRoundTrip) {
       if (!flightStore.selectedReturnFlight) {
-        sessionStorage.setItem('outboundBookingData', JSON.stringify(bookingData));
-        router.push('/return-departure');
+        sessionStorage.setItem(
+          "outboundBookingData",
+          JSON.stringify(bookingData)
+        );
+        router.push("/return-departure");
       } else {
-        sessionStorage.setItem('returnBookingData', JSON.stringify(bookingData));
+        sessionStorage.setItem(
+          "returnBookingData",
+          JSON.stringify(bookingData)
+        );
         combineRoundTripData();
-        router.push('/trip');
+        router.push("/trip");
       }
     } else {
-      sessionStorage.setItem('bookingData', JSON.stringify(bookingData));
-      router.push('/trip');
+      sessionStorage.setItem("bookingData", JSON.stringify(bookingData));
+      router.push("/trip");
     }
   } catch (error) {
-    console.error('Navigation error:', error);
+    console.error("Navigation error:", error);
   }
 };
 
 const combineRoundTripData = () => {
   try {
-    const outboundData = JSON.parse(sessionStorage.getItem('outboundBookingData'));
-    const returnData = JSON.parse(sessionStorage.getItem('returnBookingData'));
-    const guestData = JSON.parse(sessionStorage.getItem('guestData'));
+    const outboundData = JSON.parse(
+      sessionStorage.getItem("outboundBookingData")
+    );
+    const returnData = JSON.parse(sessionStorage.getItem("returnBookingData"));
+    const guestData = JSON.parse(sessionStorage.getItem("guestData"));
 
     if (!outboundData || !returnData || !guestData) {
-      throw new Error('Missing booking data for round trip');
+      throw new Error("Missing booking data for round trip");
     }
 
     const combinedData = {
-      trip_type: 'return',
+      trip_type: "return",
       outbound: {
         flight_id: outboundData.flight_id,
         seat_ids: outboundData.seat_ids,
-        selected_seats: outboundData.selected_seats
+        selected_seats: outboundData.selected_seats,
       },
       return: {
         flight_id: returnData.flight_id,
         seat_ids: returnData.seat_ids,
-        selected_seats: returnData.selected_seats
+        selected_seats: returnData.selected_seats,
       },
-      total_guests: guestData.total_guests
+      total_guests: guestData.total_guests,
     };
 
-    sessionStorage.setItem('bookingData', JSON.stringify(combinedData));
+    sessionStorage.setItem("bookingData", JSON.stringify(combinedData));
   } catch (error) {
-    console.error('Error combining round trip data:', error);
+    console.error("Error combining round trip data:", error);
     throw error;
   }
 };
@@ -220,23 +229,32 @@ const combineRoundTripData = () => {
     <div v-if="isLoading" class="loading-overlay">
       <v-progress-circular indeterminate color="primary"></v-progress-circular>
     </div>
-    
+
     <div class="seat-container">
-      <v-btn 
-        v-for="seat in seats" 
-        :key="seat.id" 
-        :class="[seat.class, { 
-          'selected': seat.selected, 
-          'booked': seat.booked,
-          'limit-reached': selectedSeats.length >= totalGuests && !seat.selected && !seat.booked
-        }]"
-        class="seat-item" 
-        :disabled="seat.booked" 
-        @click="toggleSeat(seat.id)" 
-        density="compact" 
+      <v-btn
+        v-for="seat in seats"
+        :key="seat.id"
+        :class="[
+          seat.class,
+          {
+            selected: seat.selected,
+            booked: seat.booked,
+            'limit-reached':
+              selectedSeats.length >= totalGuests &&
+              !seat.selected &&
+              !seat.booked,
+          },
+        ]"
+        class="seat-item"
+        :disabled="seat.booked"
+        @click="toggleSeat(seat.id)"
+        density="compact"
         variant="tonal"
       >
-        <span v-if="seat.booked" class="booked-text text-caption text-white font-weight-bold">
+        <span
+          v-if="seat.booked"
+          class="booked-text text-caption text-white font-weight-bold"
+        >
           BOKAD
         </span>
       </v-btn>
@@ -262,14 +280,16 @@ const combineRoundTripData = () => {
         <div>
           <v-img src="/images/seat/seat.png" height="22" width="22"></v-img>
         </div>
-        <span class="text-body-2">Seating: <strong>{{ selectedSeatsDisplay }}</strong></span>
+        <span class="text-body-2"
+          >Seating: <strong>{{ selectedSeatsDisplay }}</strong></span
+        >
       </div>
-      
-      <v-btn 
-        size="large" 
-        density="comfortable" 
+
+      <v-btn
+        size="large"
+        density="comfortable"
         :variant="buttonState.disabled ? 'outlined' : 'tonal'"
-        min-width="150" 
+        min-width="150"
         rounded
         :disabled="buttonState.disabled"
         :color="buttonState.color"
@@ -278,11 +298,8 @@ const combineRoundTripData = () => {
         {{ buttonState.text }}
       </v-btn>
     </div>
-
- 
   </div>
 </template>
-
 
 <style scoped>
 .seat-wrapper {
@@ -371,7 +388,7 @@ const combineRoundTripData = () => {
 }
 
 .selected {
-  background-color: #1E4721 !important;
+  background-color: #1e4721 !important;
   color: white !important;
   transform: scale(1.05);
 }
@@ -387,9 +404,15 @@ const combineRoundTripData = () => {
 }
 
 @keyframes pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.1); }
-  100% { transform: scale(1); }
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+  }
 }
 
 .seat-overview {
@@ -421,7 +444,7 @@ const combineRoundTripData = () => {
 
 .available-seat {
   background-color: #353434d9;
-  border: 1px solid #9E9E9E;
+  border: 1px solid #9e9e9e;
 }
 
 .seat-footer {
@@ -528,57 +551,61 @@ const combineRoundTripData = () => {
   }
 
   .seat-item {
-    transform: rotate(90deg);
+    transform: none;
   }
 
   .seat-1 {
     top: 95px;
-    right: 30px;
+    right: 32px;
     left: auto;
+    background-image: url(/images/seat/mob-seat-1.png);
   }
 
   .seat-2 {
-    top: 190px;
-    right: 30px;
+    top: 199px;
+    right: 32px;
     left: auto;
+    background-image: url(/images/seat/mob-seat-2.png);
   }
 
   .seat-3 {
     top: 310px;
-    right: 30px;
+    right: 32px;
     left: auto;
   }
 
   .seat-4 {
-    bottom: 155px;
+    bottom: 160px;
     top: auto;
-    right: 30px;
+    right: 32px;
   }
 
   .seat-5 {
     top: 200px;
-    left: 30px;
+    left: 32px;
   }
 
   .seat-6 {
     top: 310px;
-    left: 30px;
+    left: 32px;
+    background-image: url(/images/seat/mob-seat-6.png);
   }
 
   .seat-7 {
     bottom: 160px;
     top: auto;
-    left: 30px;
+    left: 32px;
     right: auto;
+    background-image: url(/images/seat/mob-seat-7.png);
   }
-  
+
   .seat-overview {
     flex-direction: column;
     align-items: flex-start;
     gap: 8px;
     padding: 0 16px;
   }
-  
+
   .seat-footer {
     flex-direction: column;
     gap: 16px;

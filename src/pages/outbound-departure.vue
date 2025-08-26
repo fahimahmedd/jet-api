@@ -119,8 +119,8 @@ const goBackToFlights = () => {
 </script>
 
 <template>
-  <div class="subpage-container">
-    <v-row no-gutters class="flex-column flex-md-row">
+  <div >
+    <v-row no-gutters class="subpage-container">
       <v-col cols="12" md="5" lg="4">
         <div class="subpage-left">
           <router-link to="/" class="logo-link">
@@ -205,13 +205,9 @@ const goBackToFlights = () => {
 </template>
 
 <style scoped>
-.subpage-container {
-  min-height: 100vh;
-  width: 100%;
-}
 
 .subpage-left {
-  height: 280px;
+  height: 100%;
   width: 100%;
   background-image: url('/images/subPage/departure.jpg');
   background-position: center;
@@ -222,7 +218,7 @@ const goBackToFlights = () => {
   padding: 20px;
   display: flex;
   flex-direction: column;
-  justify-content: space-between; /* Distributes space between logo and text */
+  justify-content: space-between;
 }
 
 .subpage-left::after {
@@ -316,7 +312,6 @@ h3 {
 
 @media (min-width: 600px) {
   .subpage-left {
-    height: 320px;
     padding: 25px;
   }
   
@@ -327,11 +322,6 @@ h3 {
 }
 
 @media (min-width: 960px) {
-  .subpage-container {
-    display: flex;
-    flex-direction: row;
-    height: 100vh;
-  }
   
   .subpage-left {
     height: 100%;

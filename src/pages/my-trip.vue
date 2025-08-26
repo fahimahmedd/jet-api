@@ -7,9 +7,9 @@ const router = useRouter();
 </script>
 
 <template>
-  <div class="subpage-container">
-    <v-row no-gutters>
-      <v-col cols="12" lg="5" md="4" sm="12">
+  <div >
+    <v-row no-gutters class="subpage-container">
+      <v-col cols="12" lg="4" md="4" sm="12">
         <div
           class="subpage-left"
           style="background-image: url('/images/subPage/departure.jpg')"
@@ -27,7 +27,7 @@ const router = useRouter();
         </h3>
         </div>
       </v-col>
-      <v-col cols="12" lg="7" md="8" sm="12">
+      <v-col cols="12" lg="8" md="8" sm="12">
         <div class="subpage-content">
           <v-container>
             <v-tooltip text="Go Back" location="bottom">
@@ -56,13 +56,9 @@ const router = useRouter();
 </template>
 
 <style scoped>
-.subpage-container {
-  height: 100vh;
-  width: 100%;
-}
 
 .subpage-left {
-  height: 100vh;
+  height: 100%;
   width: 100%;
   background-position: center;
   background-size: cover;
@@ -86,8 +82,8 @@ h3 {
   font-size: 32px;
 }
 .sub-text-content{
-  max-width: 340px;
-  margin: 100px auto 0;
+  max-width: 450px;
+  margin: 80px auto 0;
 }
 .gap {
   gap: 18px;
@@ -98,12 +94,6 @@ h3 {
 
 
 @media (max-width: 991px) {
-  .subpage-container {
-    height: auto;
-  }
-  .subpage-left {
-    height: auto;
-  }
   .subpage-content {
     padding-left: 0px;
   }
