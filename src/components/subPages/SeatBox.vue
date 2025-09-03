@@ -250,10 +250,10 @@ const combineRoundTripData = () => {
         @click="toggleSeat(seat.id)"
         density="compact"
         variant="tonal"
-      >
+      > 
         <span
           v-if="seat.booked"
-          class="booked-text text-caption text-white font-weight-bold"
+          class="booked-text text-caption text-grey-darken-3 text-black font-weight-bold"
         >
           BOKAD
         </span>
@@ -344,6 +344,8 @@ const combineRoundTripData = () => {
   transition: all 0.2s ease;
 }
 
+ 
+
 /* Seat positioning and background */
 .seat-1 {
   background-image: url(/images/seat/seat-1.png);
@@ -394,9 +396,9 @@ const combineRoundTripData = () => {
 }
 
 .booked {
-  background-color: #eeeeeea8;
+  background-color: #ffffffd1;
   pointer-events: none;
-  opacity: 0.8;
+  opacity: 1;
 }
 
 .limit-reached {
@@ -459,6 +461,8 @@ const combineRoundTripData = () => {
     max-width: 700px;
   }
 
+
+
   .seat-1 {
     top: 20px;
     left: 162px;
@@ -505,7 +509,12 @@ const combineRoundTripData = () => {
     max-width: 600px;
     background-image: url("/images/seat/md-seat-plan.jpg");
   }
+  
+  .booked-text{
+    font-size: 10px !important;
+  }
 
+ 
   .seat-1 {
     top: 20px;
     left: 120px;
@@ -549,54 +558,60 @@ const combineRoundTripData = () => {
     background-image: url("/images/seat/m-seat-plan.jpg");
     margin: 0 auto;
   }
-
+   .booked-text {
+    transform: rotate(90deg);
+    font-size: 12px !important;
+   }
   .seat-item {
     transform: none;
-     height: 41px !important;
-     width: 51px;
+     height: 50px !important;
+     width: 40px;
   }
 
   .seat-1 {
-    top: 95px;
-    right: 32px;
+    top: 90px;
+    right: 30px;
     left: auto;
     background-image: url(/images/seat/mob-seat-1.png);
   }
 
   .seat-2 {
-    top: 199px;
-    right: 32px;
+    top: 190px;
+    right: 30px;
     left: auto;
     background-image: url(/images/seat/mob-seat-2.png);
   }
 
   .seat-3 {
-    top: 310px;
-    right: 32px;
+    top: 300px;
+    right: 30px;
     left: auto;
+    background-image: url(/images/seat/mob-seat-3.png);
   }
 
   .seat-4 {
-    bottom: 160px;
+    bottom: 148px;
     top: auto;
-    right: 32px;
+    right: 30px;
+    background-image: url(/images/seat/mob-seat-4.png);
   }
 
   .seat-5 {
-    top: 200px;
-    left: 32px;
+    top: 190px;
+    left: 30px;
+    background-image: url(/images/seat/mob-seat-5.png);
   }
 
   .seat-6 {
-    top: 310px;
-    left: 32px;
+    top: 300px;
+    left: 30px;
     background-image: url(/images/seat/mob-seat-6.png);
   }
 
   .seat-7 {
-    bottom: 160px;
+    bottom: 148px;
     top: auto;
-    left: 32px;
+    left: 30px;
     right: auto;
     background-image: url(/images/seat/mob-seat-7.png);
   }

@@ -1,28 +1,62 @@
-<script setup></script>
+<script setup>
+import { computed } from 'vue';
+
+const props = defineProps({
+  data: {
+    type: Object,
+    required: true
+  }
+});
+
+const title = computed(() => {
+  return props.data?.title || 'The Complete Travel Package';
+});
+
+const backgroundImage = computed(() => {
+  return props.data?.image || '/images/explore/package-bg.webp';
+});
+
+const packageTitle = computed(() => {
+  return props.data?.items?.[0]?.title || 'Meadowood';
+});
+
+const packageDescription = computed(() => {
+  return props.data?.items?.[0]?.description || 'Experience a fixture of the northern wine country community and recipient of the Michelin Three Key award, nestled in the woodlands of St. Helena.';
+});
+
+const buttonText = computed(() => {
+  return props.data?.button_text || 'Book Now';
+});
+
+const buttonLink = computed(() => {
+  return props.data?.button_link || '#';
+});
+</script>
 
 <template>
   <div class="package py-10 py-sm-16">
     <v-container>
-      <h2 class="text-black font-weight-medium text-center text-md-start">The Complete Travel Package</h2>
+      <h2 class="text-black font-weight-medium text-center text-md-start">{{ title }}</h2>
       <div
         class="package-bg mt-6 mt-sm-10 d-flex align-end"
-        style="background-image: url('/images/explore/package-bg.webp')"
+        :style="`background-image: url('${backgroundImage}')`"
       >
         <div class="package-content">
-          <h4 class="text-h6 font-weight-regular">Meadowood</h4>
+          <h4 class="text-h6 font-weight-regular">{{ packageTitle }}</h4>
           <p class="text-grey-darken-1 font-weight-regular mt-2 mt-sm-4">
-            Experience a fixture of the northern wine country community and recipient of the Michelin Three Key award, nestled in the woodlands of St. Helena.
+            {{ packageDescription }}
           </p>
-          <v-btn
-            class="booking-btn mt-4 mt-sm-6"
-            variant="outlined"
-            rounded="xl"
-            size="large"
-             min-width="300"
-            :width="$vuetify.display.smAndDown ? '100%' : '100%'"
-          >
-            Book Now
-          </v-btn>
+         <v-btn
+              class="booking-btn mt-4 mt-sm-6"
+              variant="outlined"
+              rounded="xl"
+              size="large"
+              min-width="300"
+              :width="$vuetify.display.smAndDown ? '100%' : '100%'"
+              :to="buttonLink"
+            >
+              {{ buttonText }}
+            </v-btn>
         </div>
       </div>
     </v-container>

@@ -1,28 +1,47 @@
 <script setup>
-const featureItems = [
-  {
-    img: "/images/feature/feature-icon-1.svg",
-    text: "Save precious time by traveling between our private terminals—skip the lines and crowds.",
-  },
-  {
-    img: "/images/feature/feature-icon-2.svg",
-    text: "Check in curbside just 20 minutes before your flight and effortlessly board the jet.",
-  },
-  {
-    img: "/images/feature/feature-icon-3.svg",
-    text: "Fly in comfort with generous space, Italian leather seats, and a relaxing ambiance.",
-  },
-  {
-    img: "/images/feature/feature-icon-4.svg",
-    text: "Enjoy a premium open bar oboard.",
-  },
-];
+import { computed } from 'vue';
+
+const props = defineProps({
+  data: {
+    type: Object,
+    required: true
+  }
+});
+
+const featureItems = computed(() => {
+  if (!props.data?.items) return [];
+  
+  return props.data.items.map(item => ({
+    img: item.icon, 
+    text: item.description
+  }));
+});
+
+const image = computed(() => {
+  return props.data?.image || '/images/feature/feature-bg.jpg';
+});
+
+const title = computed(() => {
+  return props.data?.title || 'What to Expect';
+});
+
+const subtitle = computed(() => {
+  return props.data?.subtitle || 'The Perks of Flying Private';
+});
+
+const buttonText = computed(() => {
+  return props.data?.button_text || 'Book Your Seat';
+});
+
+const buttonLink = computed(() => {
+  return props.data?.button_link || '/flight';
+});
 </script>
 
 <template>
   <div
     class="feature"
-    style="background-image: url('/images/feature/feature-bg.jpg')"
+     style="background-image: url('/images/feature/feature-bg.jpg')"
   >
     <v-container>
       <v-row class="align-center">
@@ -30,10 +49,8 @@ const featureItems = [
         <v-col cols="12" md="7" lg="6" order-md="1" order="2">
           <div class="feature-content">
             <h2>
-              What to Expect: <br />
-              <span class="text-grey-lighten-1"
-                >The Perks of Flying Private</span
-              >
+              {{ title }}: <br />
+              <span class="text-grey-lighten-1">{{ subtitle }}</span>
             </h2>
 
             <v-row class="mt-5">
@@ -54,27 +71,34 @@ const featureItems = [
             </v-row>
 
             <div class="btn-max mt-8 mt-md-16">
-              <router-link to="/flight">
                 <v-btn
                   class="flight-search-btn booking-btn"
                   variant="outlined"
                   rounded="xl"
                   size="large"
                   :width="$vuetify.display.mobile ? '100%' : '400'"
-                  >Book Your Seat</v-btn
+                  :to="buttonLink"
                 >
-              </router-link>
+                  {{ buttonText }}
+                </v-btn>
             </div>
           </div>
         </v-col>
 
         <!-- Image Column -->
         <v-col cols="12" md="5" lg="6" order-md="2" order="1" class="mb-8 mb-md-0">
-          <div class="feature-img">
+          <div class="feature-img" v-if="data.image">
             <v-img
               cover
               rounded="xl"
-              src="/public/images/feature/feature.jpg"
+              :src="data.image"
+            ></v-img>
+          </div>
+          <div class="feature-img" v-else>
+            <v-img
+              cover
+              rounded="xl"
+              :src="image"
             ></v-img>
           </div>
         </v-col>

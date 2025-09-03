@@ -1,4 +1,36 @@
 <script setup>
+import { computed } from 'vue';
+
+const props = defineProps({
+  data: {
+    type: Object,
+    required: true
+  }
+});
+
+const title = computed(() => {
+  return props.data?.title || 'Safety Always';
+});
+
+const subtitle = computed(() => {
+  return props.data?.subtitle || 'Jetshare holds itself to the highest safety standards, mirroring many of the requirements governing commercial airlines.';
+});
+
+const description = computed(() => {
+  return props.data?.description || 'In addition to our specialization in a single fleet type, owning and operating all of our Embraer Aircraft, we\'ve earned the prestigious ARGUS Platinum rating, which recognizes our safety procedures and places us among the top 5% of private aviation operators worldwide.';
+});
+
+const buttonText = computed(() => {
+  return props.data?.button_text || 'Book Your Seat';
+});
+
+const buttonLink = computed(() => {
+  return props.data?.button_link || '/flight';
+});
+
+const image = computed(() => {
+  return props.data?.image || '/public/images/explore/safety.webp';
+});
 </script>
 
 <template>
@@ -7,32 +39,31 @@
             <v-row align="center">
                 <v-col cols="12" lg="5" md="6" order="2" order-md="1">
                     <div class="explore-content">
-                        <h2 class="font-weight-regular text-white">Safety Always</h2>
+                        <h2 class="font-weight-regular text-white">{{ title }}</h2>
                         <h3 class="text-white font-weight-light mt-2 mt-sm-4">
-                            Jetshare holds itself to the highest safety standards, mirroring many of the requirements governing commercial airlines.
+                            {{ subtitle }}
                         </h3>
                         <p class="font-weight-light text-grey-darken-1 mt-4 mt-sm-6">
-                            In addition to our specialization in a single fleet type, owning and operating all of our Embraer Aircraft, we've earned the prestigious ARGUS Platinum rating, which recognizes our safety procedures and places us among the top 5% of private aviation operators worldwide.
+                            {{ description }}
                         </p>
                     </div>
 
                     <div class="btn-max mt-8 mt-sm-16">
-                        <router-link to="/flight">
-                            <v-btn
+                          <v-btn
                                 class="booking-btn"
                                 variant="outlined"
                                 rounded="xl"
                                 size="large"
                                 :width="$vuetify.display.smAndDown ? '100%' : '100%'"
+                                :to="buttonLink"
                             >
-                                Book Your Seat
+                                {{ buttonText }}
                             </v-btn>
-                        </router-link>
                     </div>
                 </v-col>
                 <v-col cols="12" lg="7" md="6" order="1" order-md="2" class="mb-8 mb-md-0">
                     <v-img 
-                        src="/public/images/explore/safety.webp"   
+                        :src="image"   
                         cover
                         rounded="xl"
                         min-height="300"

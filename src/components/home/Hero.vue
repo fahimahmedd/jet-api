@@ -11,6 +11,16 @@ import { storeToRefs } from "pinia";
 const settingStore = useSettingStore();
 const { settingsData } = storeToRefs(settingStore);
 const modules = [Autoplay, EffectFade];
+
+
+defineProps({
+  data: {
+    type: Object,
+    required: true
+  }
+});
+
+
 </script>
 
 <template>
@@ -50,17 +60,17 @@ const modules = [Autoplay, EffectFade];
         <v-container>
           <h1>{{ settingsData?.tagline }}</h1>
           <div class="btn-max">
-            <router-link to="/flight">
               <v-btn 
                 class="booking-btn mt-5 mt-sm-8" 
                 variant="outlined"
                 rounded="xl" 
                 size="large" 
                 :width="$vuetify.display.smAndDown ? '100%' : '400'"
+                v-if="data.button_text"
+                :to="data?.button_link"
               >
-                Book Your Seat
+                {{ data.button_text }}
               </v-btn>
-            </router-link>
           </div>
         </v-container>
       </div>

@@ -1,5 +1,36 @@
 <script setup>
+import { computed } from 'vue';
 
+const props = defineProps({
+  data: {
+    type: Object,
+    required: true
+  }
+});
+
+const title = computed(() => {
+  return props.data?.title || 'Explore Destinations';
+});
+
+const subtitle = computed(() => {
+  return props.data?.subtitle || 'Wherever you choose to wander, fly in signature Jetshare style.';
+});
+
+const description = computed(() => {
+  return props.data?.description || 'Jet to a collection of sought-after leisure destinations or seek out an elevated travel experience to the world\'s largest entertainment and sporting events.';
+});
+
+const buttonText = computed(() => {
+  return props.data?.button_text || 'Book Your Seat';
+});
+
+const buttonLink = computed(() => {
+  return props.data?.button_link || '/flight';
+});
+
+const image = computed(() => {
+  return props.data?.image || '/public/images/explore/map.jpg';
+});
 </script>
 
 <template>
@@ -8,10 +39,10 @@
             <v-row class="align-center">
                 <v-col cols="12" lg="5" md="6" order="2" order-md="1">
                     <div class="explore-content">
-                        <h2 class="text-black font-weight-regular">Explore Destinations</h2>
-                        <h3 class="text-black font-weight-light mt-2 mt-sm-4">Wherever you choose to wander, fly in signature Jetshare style.</h3>
+                        <h2 class="text-black font-weight-regular">{{ title }}</h2>
+                        <h3 class="text-black font-weight-light mt-2 mt-sm-4">{{ subtitle }}</h3>
                         <p class="font-weight-light text-grey-darken-2 mt-4 mt-sm-6">
-                            Jet to a collection of sought-after leisure destinations or seek out an elevated travel experience to the world's largest entertainment and sporting events.
+                            {{ description }}
                         </p>
                         <div class="mt-6 mt-sm-10 text-h6 text-black font-weight-medium d-flex align-center">
                             Where should we jet next? <span class="mdi mdi-arrow-right ml-2"></span>
@@ -19,18 +50,16 @@
                     </div>
 
                     <div class="btn-max mt-8 mt-sm-16">
-                        <router-link to="/flight">
-                            <v-btn class="booking-btn" variant="outlined"
+                         <v-btn class="booking-btn" variant="outlined"
                                 rounded="xl" size="large"
-                                :width="$vuetify.display.smAndDown ? '100%' : '100%'">
-                                Book Your Seat
+                                :width="$vuetify.display.smAndDown ? '100%' : '100%'" :to="buttonLink">
+                                {{ buttonText }}
                             </v-btn>
-                        </router-link>
                     </div>
                 </v-col>
                 <v-col cols="12" lg="7" md="6" order="1" order-md="2" class="mb-8 mb-md-0">
                     <v-img 
-                        src="/public/images/explore/map.jpg"   
+                        :src="image"   
                         cover
                         rounded="xl"
                         min-height="300"

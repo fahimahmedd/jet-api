@@ -1,4 +1,37 @@
-<script setup></script>
+<script setup>
+import { computed } from 'vue';
+
+const props = defineProps({
+  data: {
+    type: Object,
+    required: true
+  }
+});
+
+const title = computed(() => {
+  return props.data?.title || 'The Art of Traveling Well';
+});
+
+const subtitle = computed(() => {
+  return props.data?.subtitle || 'Thoughtfully curated to redefine your expectations.';
+});
+
+const description = computed(() => {
+  return props.data?.description || 'With a shared dedication to hospitality, the brand partners we\'ve integrated throughout your journey offer the highest level of product integrity, attentive service, and experience to indulge the senses from start to finish.';
+});
+
+const buttonText = computed(() => {
+  return props.data?.button_text || 'Book Your Seat';
+});
+
+const buttonLink = computed(() => {
+  return props.data?.button_link || '/flight';
+});
+
+const image = computed(() => {
+  return props.data?.image || '/public/images/explore/travel.webp';
+});
+</script>
 
 <template>
   <div class="explore py-10 py-sm-16 bg-black">
@@ -6,34 +39,30 @@
       <v-row class="align-center">
         <v-col cols="12" lg="5" md="6" order="2" order-md="1">
           <div class="explore-content">
-            <h2 class="text-white font-weight-regular">The Art of Traveling Well</h2>
+            <h2 class="text-white font-weight-regular">{{ title }}</h2>
             <h3 class="text-white font-weight-light mt-2 mt-sm-4">
-              Thoughtfully curated to redefine your expectations.
+              {{ subtitle }}
             </h3>
             <p class="font-weight-light text-grey-darken-1 mt-4 mt-sm-6">
-              With a shared dedication to hospitality, the brand partners we've
-              integrated throughout your journey offer the highest level of
-              product integrity, attentive service, and experience to indulge
-              the senses from start to finish.
+              {{ description }}
             </p>
           </div>
 
           <div class="btn-max mt-8 mt-sm-16">
-            <router-link to="/flight">
-              <v-btn
+             <v-btn
                 class="booking-btn"
                 variant="outlined"
                 rounded="xl"
                 size="large"
                 :width="$vuetify.display.smAndDown ? '100%' : '100%'"
-                >Book Your Seat</v-btn
+                :to="buttonLink"
+                >{{ buttonText }}</v-btn
               >
-            </router-link>
           </div>
         </v-col>
         <v-col cols="12" lg="7" md="6" order="1" order-md="2" class="mb-8 mb-md-0">
           <v-img
-            src="/public/images/explore/travel.webp"
+            :src="image"
             cover
             rounded="xl"
             min-height="300"
@@ -110,6 +139,7 @@
   
   .booking-btn {
     font-size: 17px;
+    min-height: 46px;
   }
 }
 
